@@ -13,6 +13,14 @@ body {
   scroll-behavior: smooth;
 }
 
+:root {
+  --brand-purple: #7356a8;
+  --brand-light: #ede8f5;
+  --warm-bg: #fbf8f5;
+  --text-primary: #1c1827;
+  --text-muted: #6b6378;
+}
+
 body {
   margin: 0;
   font-family: Inter, sans-serif;

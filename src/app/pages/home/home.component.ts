@@ -1,10 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
-
-interface NavLink {
-  label: string;
-  href: string;
-}
+import { Component } from '@angular/core';
 
 interface Kitten {
   id: number;
@@ -52,16 +47,7 @@ interface FooterColumn {
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  menuOpen = false;
-  isScrolled = false;
   activeKittenId: number | null = null;
-
-  navLinks: NavLink[] = [
-    { label: 'О питомнике', href: '#about' },
-    { label: 'Котята', href: '#kittens' },
-    { label: 'Философия', href: '#philosophy' },
-    { label: 'Отзывы', href: '#reviews' },
-  ];
 
   philosophyPoints: string[] = [
     'Встречает у двери каждый день',
@@ -201,19 +187,6 @@ export class HomeComponent {
       links: ['Telegram', 'WhatsApp', 'Instagram', 'Email'],
     },
   ];
-
-  @HostListener('window:scroll')
-  onWindowScroll(): void {
-    this.isScrolled = window.scrollY > 40;
-  }
-
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
-
-  closeMenu(): void {
-    this.menuOpen = false;
-  }
 
   setActiveKitten(id: number | null): void {
     this.activeKittenId = id;

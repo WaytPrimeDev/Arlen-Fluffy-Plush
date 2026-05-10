@@ -1,34 +1,4 @@
 <div class="landing">
-  <header class="topbar" [class.topbar--scrolled]="isScrolled">
-    <a href="#" class="brand">Arlen Fluffy Plush</a>
-
-    <nav class="topbar__nav">
-      @for (link of navLinks; track link.href) {
-        <a [href]="link.href">{{ link.label }}</a>
-      }
-      <a href="#contact" class="topbar__cta">Написать нам</a>
-    </nav>
-
-    <button
-      class="topbar__burger"
-      type="button"
-      aria-label="Открыть меню"
-      [attr.aria-expanded]="menuOpen"
-      (click)="toggleMenu()"
-    >
-      <span></span><span></span><span></span>
-    </button>
-  </header>
-
-  @if (menuOpen) {
-    <div class="mobile-menu">
-      @for (link of navLinks; track link.href) {
-        <a [href]="link.href" (click)="closeMenu()">{{ link.label }}</a>
-      }
-      <a href="#contact" (click)="closeMenu()">Написать нам</a>
-    </div>
-  }
-
   <section class="hero">
     <div class="hero__content">
       <div class="hero__tag">
@@ -133,35 +103,7 @@
       <h2>Познакомьтесь с нашими <span>маленькими принцами и принцессами</span></h2>
     </div>
     <div class="kittens__grid">
-      @for (kitten of kittens; track kitten.id) {
-        <article
-          class="kitten-card"
-          [class.kitten-card--active]="activeKittenId === kitten.id"
-          (mouseenter)="setActiveKitten(kitten.id)"
-          (mouseleave)="setActiveKitten(null)"
-        >
-          <div class="kitten-card__media">
-            <img [src]="kitten.img" [alt]="kitten.name" />
-            <span class="kitten-card__badge" [style.background]="kitten.badgeColor">{{
-              kitten.badge
-            }}</span>
-          </div>
-          <div class="kitten-card__body">
-            <div class="kitten-card__head">
-              <div>
-                <h3>{{ kitten.name }}</h3>
-                <p>{{ kitten.breed }}</p>
-              </div>
-              <strong>{{ kitten.price }}</strong>
-            </div>
-            <div class="kitten-card__tags">
-              <span>{{ kitten.color }}</span>
-              <span>{{ kitten.age }}</span>
-            </div>
-            <a href="#contact">Познакомиться с {{ kitten.name }}</a>
-          </div>
-        </article>
-      }
+      <a class="button button--primary" href="/kittens">Смотреть всех котят →</a>
     </div>
   </section>
 
