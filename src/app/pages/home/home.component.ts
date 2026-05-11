@@ -1,18 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
-interface Kitten {
-  id: number;
-  name: string;
-  breed: string;
-  color: string;
-  age: string;
-  price: string;
-  img: string;
-  badge: string;
-  badgeColor: string;
-}
-
 interface WhyItem {
   icon: string;
   title: string;
@@ -53,53 +41,6 @@ export class HomeComponent {
     'Встречает у двери каждый день',
     'Создает атмосферу уюта без усилий',
     'Слышит вас, когда никто другой не слышит',
-  ];
-
-  kittens: Kitten[] = [
-    {
-      id: 1,
-      name: 'Луна',
-      breed: 'Шотландская вислоухая',
-      color: 'Серебристо-белая',
-      age: '3 месяца',
-      price: '45 000 UAH',
-      img: 'https://images.unsplash.com/photo-1773782285485-70dd6ddaeefd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXRlJTIwa2l0dGVuJTIwd2hpdGUlMjBmbHVmZnklMjBjbG9zZSUyMHVwfGVufDF8fHx8MTc3ODE0NzU1OXww&ixlib=rb-4.1.0&q=80&w=800',
-      badge: 'Доступна',
-      badgeColor: '#4CAF82',
-    },
-    {
-      id: 2,
-      name: 'Граф',
-      breed: 'Британская короткошерстная',
-      color: 'Голубой',
-      age: '2.5 месяца',
-      price: '55 000 UAH',
-      img: 'https://images.unsplash.com/photo-1561047845-68d8fbabd26f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxicml0aXNoJTIwc2hvcnRoYWlyJTIwa2l0dGVuJTIwYmx1ZSUyMGdyYXl8ZW58MXx8fHwxNzc4MTQ3NTY1fDA&ixlib=rb-4.1.0&q=80&w=800',
-      badge: 'Доступен',
-      badgeColor: '#4CAF82',
-    },
-    {
-      id: 3,
-      name: 'Ирис',
-      breed: 'Персидская',
-      color: 'Кремовая',
-      age: '3.5 месяца',
-      price: '60 000 UAH',
-      img: 'https://images.unsplash.com/photo-1681137617949-5b0078e67cce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwZXJzaWFuJTIwa2l0dGVuJTIwcG9ydHJhaXQlMjBzdHVkaW98ZW58MXx8fHwxNzc4MTQ3NTU5fDA&ixlib=rb-4.1.0&q=80&w=800',
-      badge: 'Резерв',
-      badgeColor: '#F5A623',
-    },
-    {
-      id: 4,
-      name: 'Тоби',
-      breed: 'Шотландская вислоухая',
-      color: 'Темно-серый',
-      age: '2 месяца',
-      price: '50 000 UAH',
-      img: 'https://images.unsplash.com/photo-1761473060416-942247cd68f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY290dGlzaCUyMGZvbGQlMjBraXR0ZW4lMjBjdXRlJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzc4MTQ3NTY0fDA&ixlib=rb-4.1.0&q=80&w=800',
-      badge: 'Доступен',
-      badgeColor: '#4CAF82',
-    },
   ];
 
   whyItems: WhyItem[] = [

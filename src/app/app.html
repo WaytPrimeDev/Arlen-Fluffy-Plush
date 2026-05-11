@@ -1,7 +1,16 @@
 <header class="app-topbar">
-  <a class="app-topbar__brand" routerLink="/">Arlen Fluffy Plush</a>
+  <a class="app-topbar__brand" routerLink="/"
+    ><img
+      src="./assets/img/navigation/photo_2024-08-31_20-45-32.png"
+      alt="Arlen Fluffy Plush"
+      width="60"
+      height="60"
+    />Arlen Fluffy Plush</a
+  >
   <nav class="app-topbar__nav" aria-label="Главное меню">
-    <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Главная</a>
+    <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }"
+      >Главная</a
+    >
     <a routerLink="/kittens" routerLinkActive="is-active">Котята</a>
     <a routerLink="/parents" routerLinkActive="is-active">Родители</a>
     <a routerLink="/families" routerLinkActive="is-active">Семьи</a>

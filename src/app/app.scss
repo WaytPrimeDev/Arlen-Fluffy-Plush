@@ -17,6 +17,9 @@
 }
 
 .app-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   font-family: 'Playfair Display', serif;
   color: #1c1827;
   text-decoration: none;
