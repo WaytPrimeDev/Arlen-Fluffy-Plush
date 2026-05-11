@@ -1,30 +1,14 @@
 {
     "version": 2,
-    "name": "arlen-fluffy-plush-client",
     "rewrites": [
       {
         "source": "/api/:path*",
-        "destination": "https://arlenback-production.up.railway.app/api/:path*"
+        "destination": "https://arlenback-production.up.railway.app/:path*"
       },
-      {
-        "source": "/(.*)",
-        "destination": "/$1"
-      }
+      { "handle": "filesystem" },
+      { "source": "/(.*)", "destination": "/" }
     ],
     "headers": [
-      {
-        "source": "/(.*)",
-        "headers": [
-          {
-            "key": "X-Content-Type-Options",
-            "value": "nosniff"
-          },
-          {
-            "key": "X-Frame-Options",
-            "value": "DENY"
-          }
-        ]
-      },
       {
         "source": "/assets/(.*)",
         "headers": [
@@ -34,11 +18,5 @@
           }
         ]
       }
-    ],
-    "functions": {
-      "server/main.js": {
-        "memory": 1024,
-        "maxDuration": 10
-      }
-    }
+    ]
   }
