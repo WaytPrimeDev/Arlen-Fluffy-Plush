@@ -5,8 +5,13 @@
         "source": "/api/:path*",
         "destination": "https://arlenback-production.up.railway.app/:path*"
       },
-      { "handle": "filesystem" },
-      { "source": "/(.*)", "destination": "/" }
+      {
+        "handle": "filesystem"
+      },
+      {
+        "source": "/(.*)",
+        "destination": "/index.server.html"
+      }
     ],
     "headers": [
       {
