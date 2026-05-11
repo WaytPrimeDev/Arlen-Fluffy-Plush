@@ -1,0 +1,44 @@
+{
+    "version": 2,
+    "name": "arlen-fluffy-plush-client",
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "https://arlenback-production.up.railway.app/api/:path*"
+      },
+      {
+        "source": "/(.*)",
+        "destination": "/$1"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/(.*)",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          }
+        ]
+      },
+      {
+        "source": "/assets/(.*)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      }
+    ],
+    "functions": {
+      "server/main.js": {
+        "memory": 1024,
+        "maxDuration": 10
+      }
+    }
+  }

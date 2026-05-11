@@ -1,3 +1,115 @@
 <section class="kitten-page">
-  <h1>Kitten</h1>
+  <div class="kitten-page__container">
+    <a class="kitten-page__back" routerLink="/kittens" aria-label="Назад к списку котят">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Все котята
+    </a>
+
+    @if (isLoading()) {
+      <div class="kitten-page__state" role="status">
+        <div class="kitten-page__skeleton-gallery"></div>
+        <div class="kitten-page__skeleton-info">
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--subtitle"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+        </div>
+      </div>
+    } @else if (loadError()) {
+      <div class="kitten-page__empty" role="alert">
+        <p class="kitten-page__eyebrow">Ошибка</p>
+        <h1>Что-то пошло не так</h1>
+        <p>{{ loadError() }}</p>
+        <a class="kitten-page__cta" routerLink="/kittens">Вернуться к списку</a>
+      </div>
+    } @else if (kitten()) {
+      <div class="kitten-page__layout">
+
+        <!-- Gallery -->
+        <div class="kitten-page__gallery">
+          <div class="kitten-page__main-image">
+            <img [src]="selectedImage()" [alt]="kitten()!.nameUa || kitten()!.nameEn || 'Котенок'" />
+            <span
+              class="kitten-page__badge"
+              [class.kitten-page__badge--available]="kitten()!.status === 'available'"
+              [class.kitten-page__badge--reserved]="kitten()!.status === 'reserved'"
+              [class.kitten-page__badge--offline]="kitten()!.status === 'offline' || kitten()!.status === 'sold'"
+            >
+              {{ getStatusLabel(kitten()!.status) }}
+            </span>
+          </div>
+
+          @if (images().length > 1) {
+            <div class="kitten-page__thumbs" role="list" aria-label="Галерея фотографий">
+              @for (img of images(); track img.full; let i = $index) {
+                <button
+                  type="button"
+                  class="kitten-page__thumb"
+                  [class.kitten-page__thumb--active]="selectedImageIndex() === i"
+                  (click)="selectImage(i)"
+                  [attr.aria-label]="'Фото ' + (i + 1)"
+                  [attr.aria-pressed]="selectedImageIndex() === i"
+                  role="listitem"
+                >
+                  <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Details -->
+        <div class="kitten-page__details">
+          <p class="kitten-page__eyebrow">{{ kitten()!.breed || 'Порода не указана' }}</p>
+          <h1>{{ kitten()!.nameUa || kitten()!.nameEn || 'Котенок' }}</h1>
+
+          <dl class="kitten-page__info-grid">
+            <div class="kitten-page__info-cell">
+              <dt>Пол</dt>
+              <dd>{{ formatSex(kitten()!.sex) }}</dd>
+            </div>
+            <div class="kitten-page__info-cell">
+              <dt>День рождения</dt>
+              <dd>{{ formatBirthDay(kitten()!.birthDay) }}</dd>
+            </div>
+            <div class="kitten-page__info-cell">
+              <dt>Окрас</dt>
+              <dd>{{ kitten()!.color || 'Не указан' }}</dd>
+            </div>
+          </dl>
+
+          <div class="kitten-page__price-block">
+            <h2>Стоимость</h2>
+            <div class="kitten-page__price-rows">
+              @if (kitten()!.price?.pet) {
+                <div class="kitten-page__price-row">
+                  <span>Питомец</span>
+                  <strong>{{ kitten()!.price!.pet }}</strong>
+                </div>
+              }
+              @if (kitten()!.price?.breeding) {
+                <div class="kitten-page__price-row">
+                  <span>Разведение</span>
+                  <strong>{{ kitten()!.price!.breeding }}</strong>
+                </div>
+              }
+              @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
+                <p class="kitten-page__price-inquiry">Цена по запросу</p>
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    } @else {
+      <div class="kitten-page__empty" role="status">
+        <p class="kitten-page__eyebrow">404</p>
+        <h1>Котенок не найден</h1>
+        <p>Возможно, он уже нашёл свой дом.</p>
+        <a class="kitten-page__cta" routerLink="/kittens">Посмотреть других котят</a>
+      </div>
+    }
+  </div>
 </section>

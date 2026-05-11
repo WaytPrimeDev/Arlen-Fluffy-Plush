@@ -13,7 +13,7 @@
       <button
         type="button"
         class="kittens-page__filter"
-        [class.kittens-page__filter--active]="activeStatus === option.value"
+        [class.kittens-page__filter--active]="activeStatus() === option.value"
         (click)="setStatus(option.value)"
         [attr.aria-label]="'Показать статус: ' + option.label"
       >
@@ -22,23 +22,32 @@
     }
   </div>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="kittens-page__empty" role="status">
       <h2>Загрузка...</h2>
       <p>Получаем актуальный список котят.</p>
     </div>
-  } @else if (loadError) {
+  } @else if (loadError()) {
     <div class="kittens-page__empty" role="alert">
       <h2>Ошибка загрузки</h2>
-      <p>{{ loadError }}</p>
+      <p>{{ loadError() }}</p>
     </div>
-  } @else if (filteredKittens.length) {
+  } @else if (filteredKittens().length) {
     <div class="kittens-page__grid">
-      @for (kitten of filteredKittens; track kitten.id) {
-        <article class="kitten-card">
+      @for (kitten of filteredKittens(); track kitten.id) {
+        <a
+          class="kitten-card"
+          [routerLink]="['/kittens', kitten.id]"
+          [attr.aria-label]="'Подробнее о котенке ' + kitten.name"
+        >
           <div class="kitten-card__media">
             <img [src]="kitten.image" [alt]="'Котенок ' + kitten.name" loading="lazy" />
-            <span class="kitten-card__status" [ngClass]="'kitten-card__status--' + kitten.status">
+            <span
+              class="kitten-card__status"
+              [class.kitten-card__status--available]="kitten.status === 'available'"
+              [class.kitten-card__status--reserved]="kitten.status === 'reserved'"
+              [class.kitten-card__status--offline]="kitten.status === 'offline'"
+            >
               {{ getStatusLabel(kitten.status) }}
             </span>
           </div>
@@ -60,16 +69,9 @@
 
             <div class="kitten-card__footer">
               <strong>{{ kitten.priceLabel }}</strong>
-              <a
-                class="kitten-card__link"
-                [routerLink]="['/kittens', kitten.id]"
-                [attr.aria-label]="'Подробнее о котенке ' + kitten.name"
-              >
-                Подробнее
-              </a>
             </div>
           </div>
-        </article>
+        </a>
       }
     </div>
   } @else {

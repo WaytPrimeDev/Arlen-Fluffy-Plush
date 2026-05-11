@@ -38,6 +38,11 @@ interface KittensApiResponse {
   message: string;
 }
 
+interface KittenApiResponse {
+  data: KittenApiItem;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -49,5 +54,11 @@ export class KittensService {
     return this.http
       .get<KittensApiResponse>(this.apiUrl)
       .pipe(map((response) => response.data ?? []));
+  }
+
+  getKittenById(id: string): Observable<KittenApiItem> {
+    return this.http
+      .get<KittenApiResponse>(`https://arlenback-production.up.railway.app/cats/kitten/${id}`)
+      .pipe(map((response) => response.data));
   }
 }

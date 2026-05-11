@@ -3,5 +3,466 @@
 }
 
 .parent-page {
-  padding: 1rem;
+  background: var(--warm-bg);
+  min-height: 100vh;
+}
+
+.parent-page__container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 5rem;
+}
+
+/* Back link */
+.parent-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--brand-purple);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  transition: gap 0.2s ease;
+
+  &:hover { gap: 0.65rem; }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ─── HERO ──────────────────────────────────────────────────── */
+.parent-page__hero {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 3rem;
+  align-items: start;
+  border-radius: 28px;
+  padding: 2rem;
+  margin-bottom: 3.5rem;
+  background: #fff;
+  border: 1px solid rgb(115 86 168 / 10%);
+  box-shadow: 0 8px 32px rgb(28 24 39 / 5%);
+
+  /* Tinted accent strip per sex */
+  border-top: 4px solid var(--brand-purple);
+
+  &--female {
+    border-top-color: #c65a96;
+  }
+
+  &--male {
+    border-top-color: #4278c6;
+  }
+}
+
+/* Photo */
+.parent-page__photo-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.parent-page__photo-wrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--brand-light);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.parent-page__sex-badge {
+  position: absolute;
+  bottom: 0.9rem;
+  left: 0.9rem;
+  border-radius: 999px;
+  padding: 0.38rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  backdrop-filter: blur(6px);
+
+  &--female { background: rgb(198 90 150 / 88%); }
+  &--male   { background: rgb(66 120 198 / 88%); }
+}
+
+.parent-page__thumbs {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.parent-page__thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: var(--brand-light);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &:hover { transform: translateY(-2px); }
+
+  &--active {
+    border-color: var(--brand-purple);
+    box-shadow: 0 0 0 2px rgb(115 86 168 / 20%);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+/* Info */
+.parent-page__info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.parent-page__eyebrow {
+  width: fit-content;
+  padding: 0.38rem 0.85rem;
+  border-radius: 999px;
+  background: rgb(115 86 168 / 12%);
+  color: var(--brand-purple);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.parent-page__info-col h1 {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.parent-page__facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.parent-page__fact {
+  background: var(--brand-light);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+
+  dt {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+}
+
+/* ─── KITTENS SECTION ───────────────────────────────────────── */
+.parent-page__kittens {
+  /* visual separator from hero */
+}
+
+.parent-page__kittens-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+
+  h2 {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--text-primary);
+  }
+}
+
+.parent-page__kittens-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  border-radius: 999px;
+  background: var(--brand-purple);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.parent-page__no-kittens {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Kittens grid — 4 cols to match parents list */
+.parent-page__kittens-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Kitten card (reused style, local scope) */
+.kitten-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgb(115 86 168 / 10%);
+  box-shadow: 0 6px 18px rgb(28 24 39 / 5%);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgb(115 86 168 / 24%);
+    box-shadow: 0 14px 32px rgb(115 86 168 / 14%);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+.kitten-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--brand-light);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+  }
+}
+
+.kitten-card:hover .kitten-card__media img {
+  transform: scale(1.04);
+}
+
+.kitten-card__status {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  border-radius: 999px;
+  padding: 0.28rem 0.6rem;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+
+  &--available { background: #2d9a65; }
+  &--reserved  { background: #d49b28; }
+  &--offline   { background: #8b8a96; }
+}
+
+.kitten-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem;
+
+  h3 {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+}
+
+.kitten-card__breed {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #8f7bab;
+}
+
+.kitten-card__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    background: var(--brand-light);
+    color: var(--brand-purple);
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+}
+
+.kitten-card__price {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--brand-purple);
+}
+
+/* Empty / error */
+.parent-page__empty {
+  max-width: 480px;
+  margin: 4rem auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  p { color: var(--text-muted); margin: 0; }
+}
+
+.parent-page__cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  background: var(--brand-purple);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+
+  &:hover { background: #5e4191; }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 3px;
+  }
+}
+
+/* Skeleton */
+.parent-page__skeleton {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 3rem;
+  border-radius: 28px;
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid rgb(115 86 168 / 10%);
+  margin-bottom: 3.5rem;
+}
+
+.parent-page__skeleton-aside,
+.parent-page__skeleton-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-block {
+  border-radius: 12px;
+  background: linear-gradient(90deg, #ede8f5 25%, #f5f2fa 50%, #ede8f5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+
+  &--photo {
+    aspect-ratio: 3 / 4;
+    border-radius: 18px;
+  }
+
+  &--title {
+    height: 2.5rem;
+    width: 60%;
+  }
+
+  &--line {
+    height: 1rem;
+    width: 80%;
+  }
+
+  &--short {
+    width: 45%;
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .parent-page__hero,
+  .parent-page__skeleton {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .parent-page__photo-wrap {
+    aspect-ratio: 4 / 3;
+    max-height: 380px;
+  }
+
+  .parent-page__kittens-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 580px) {
+  .parent-page__hero {
+    padding: 1.25rem;
+  }
+
+  .parent-page__facts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .parent-page__kittens-grid {
+    grid-template-columns: 1fr;
+  }
 }

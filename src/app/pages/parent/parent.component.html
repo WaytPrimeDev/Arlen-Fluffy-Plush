@@ -1,3 +1,160 @@
-<section class="parent-page">
-  <h1>Parent</h1>
-</section>
+<article class="parent-page">
+  <div class="parent-page__container">
+
+    <a class="parent-page__back" routerLink="/parents" aria-label="Назад к списку родителей">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Все родители
+    </a>
+
+    @if (isLoading()) {
+      <div class="parent-page__skeleton">
+        <div class="parent-page__skeleton-aside">
+          <div class="skeleton-block skeleton-block--photo"></div>
+          <div class="skeleton-block skeleton-block--line"></div>
+          <div class="skeleton-block skeleton-block--line skeleton-block--short"></div>
+        </div>
+        <div class="parent-page__skeleton-main">
+          <div class="skeleton-block skeleton-block--title"></div>
+          <div class="skeleton-block skeleton-block--line"></div>
+          <div class="skeleton-block skeleton-block--line skeleton-block--short"></div>
+        </div>
+      </div>
+    } @else if (loadError()) {
+      <div class="parent-page__empty" role="alert">
+        <p class="parent-page__eyebrow">Ошибка</p>
+        <h1>Что-то пошло не так</h1>
+        <p>{{ loadError() }}</p>
+        <a class="parent-page__cta" routerLink="/parents">Вернуться к списку</a>
+      </div>
+    } @else if (parent()) {
+
+      <!-- ─── HERO STRIP ─────────────────────────────────────── -->
+      <div
+        class="parent-page__hero"
+        [class.parent-page__hero--female]="parent()!.sex === 'female'"
+        [class.parent-page__hero--male]="parent()!.sex === 'male'"
+      >
+        <!-- Photo column -->
+        <div class="parent-page__photo-col">
+          <div class="parent-page__photo-wrap">
+            <img
+              [src]="selectedImage()"
+              [alt]="parent()!.nameUa || parent()!.nameEn || 'Родитель'"
+            />
+            <span
+              class="parent-page__sex-badge"
+              [class.parent-page__sex-badge--female]="parent()!.sex === 'female'"
+              [class.parent-page__sex-badge--male]="parent()!.sex === 'male'"
+            >
+              {{ formatSex(parent()!.sex) }}
+            </span>
+          </div>
+
+          @if (images().length > 1) {
+            <div class="parent-page__thumbs">
+              @for (img of images(); track img.full; let i = $index) {
+                <button
+                  type="button"
+                  class="parent-page__thumb"
+                  [class.parent-page__thumb--active]="selectedImageIndex() === i"
+                  (click)="selectImage(i)"
+                  [attr.aria-label]="'Фото ' + (i + 1)"
+                  [attr.aria-pressed]="selectedImageIndex() === i"
+                >
+                  <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Info column -->
+        <div class="parent-page__info-col">
+          <p class="parent-page__eyebrow">Родитель питомника</p>
+          <h1>{{ parent()!.nameUa || parent()!.nameEn || 'Без имени' }}</h1>
+
+          <dl class="parent-page__facts">
+            <div class="parent-page__fact">
+              <dt>Порода</dt>
+              <dd>{{ parent()!.breed || 'Не указана' }}</dd>
+            </div>
+            <div class="parent-page__fact">
+              <dt>Окрас</dt>
+              <dd>{{ parent()!.color || 'Не указан' }}</dd>
+            </div>
+            <div class="parent-page__fact">
+              <dt>Пол</dt>
+              <dd>{{ formatSex(parent()!.sex) }}</dd>
+            </div>
+            <div class="parent-page__fact">
+              <dt>Котят</dt>
+              <dd>{{ kittens().length || parent()!.Kittens?.length || 0 }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- ─── KITTENS SECTION ───────────────────────────────── -->
+      <section class="parent-page__kittens" aria-labelledby="kittens-heading">
+        <header class="parent-page__kittens-header">
+          <h2 id="kittens-heading">
+            @if (parent()!.sex === 'female') { Котята этой кошки }
+            @else if (parent()!.sex === 'male') { Котята этого кота }
+            @else { Котята }
+          </h2>
+          @if (kittens().length) {
+            <span class="parent-page__kittens-count">{{ kittens().length }}</span>
+          }
+        </header>
+
+        @if (!kittens().length) {
+          <p class="parent-page__no-kittens">Котята не найдены или данные ещё не загружены.</p>
+        } @else {
+          <ul class="parent-page__kittens-grid" role="list">
+            @for (kitten of kittens(); track kitten.id) {
+              <li role="listitem">
+                <a
+                  class="kitten-card"
+                  [routerLink]="['/kittens', kitten.id]"
+                  [attr.aria-label]="'Перейти к котёнку ' + kitten.name"
+                >
+                  <div class="kitten-card__media">
+                    <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                    <span
+                      class="kitten-card__status"
+                      [class.kitten-card__status--available]="kitten.status === 'available'"
+                      [class.kitten-card__status--reserved]="kitten.status === 'reserved'"
+                      [class.kitten-card__status--offline]="kitten.status === 'offline'"
+                    >
+                      {{ getStatusLabel(kitten.status) }}
+                    </span>
+                  </div>
+                  <div class="kitten-card__body">
+                    <h3>{{ kitten.name }}</h3>
+                    <p class="kitten-card__breed">{{ kitten.breed }}</p>
+                    <ul class="kitten-card__pills">
+                      <li>{{ kitten.age }}</li>
+                      <li>{{ kitten.sex }}</li>
+                      <li>{{ kitten.color }}</li>
+                    </ul>
+                    <p class="kitten-card__price">{{ kitten.priceLabel }}</p>
+                  </div>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+    } @else {
+      <div class="parent-page__empty" role="status">
+        <p class="parent-page__eyebrow">404</p>
+        <h1>Родитель не найден</h1>
+        <a class="parent-page__cta" routerLink="/parents">Посмотреть всех</a>
+      </div>
+    }
+
+  </div>
+</article>
