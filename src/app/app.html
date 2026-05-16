@@ -7,14 +7,15 @@
       height="60"
     /><span class="app-topbar__brand-text">Arlen Fluffy Plush</span></a
   >
-  <nav class="app-topbar__nav" aria-label="Главное меню">
+  <nav class="app-topbar__nav" aria-label="Main menu">
     <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }"
-      >Главная</a
+      >{{ 'home' | translate }}</a
     >
-    <a routerLink="/kittens" routerLinkActive="is-active">Котята</a>
-    <a routerLink="/parents" routerLinkActive="is-active">Родители</a>
-    <a routerLink="/families" routerLinkActive="is-active">Семьи</a>
+    <a routerLink="/kittens" routerLinkActive="is-active">{{ 'kittens' | translate }}</a>
+    <a routerLink="/parents" routerLinkActive="is-active">{{ 'parents' | translate }}</a>
+    <a routerLink="/families" routerLinkActive="is-active">{{ 'families' | translate }}</a>
   </nav>
+  <app-language-switcher></app-language-switcher>
 </header>
 
 <main class="app-content">

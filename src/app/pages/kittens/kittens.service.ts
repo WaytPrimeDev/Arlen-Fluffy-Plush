@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { I18nService } from '../../services/i18n.service';
 
 export interface KittenImage {
   full: string;
@@ -33,6 +34,10 @@ export interface KittenApiItem {
   parentId?: KittenParentRef;
 }
 
+export interface KittenDisplayItem extends KittenApiItem {
+  name: string;
+}
+
 interface KittensApiResponse {
   data: KittenApiItem[];
   message: string;
@@ -47,18 +52,37 @@ interface KittenApiResponse {
   providedIn: 'root',
 })
 export class KittensService {
+  private readonly apiUrl = 'http://localhost:3000';
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'https://arlenback-production.up.railway.app/cats/kittens';
+  private readonly i18n = inject(I18nService);
 
   getKittens(): Observable<KittenApiItem[]> {
     return this.http
-      .get<KittensApiResponse>(this.apiUrl)
+      .get<KittensApiResponse>(`${this.apiUrl}/cats/kittens`)
       .pipe(map((response) => response.data ?? []));
   }
 
   getKittenById(id: string): Observable<KittenApiItem> {
     return this.http
-      .get<KittenApiResponse>(`https://arlenback-production.up.railway.app/cats/kitten/${id}`)
+      .get<KittenApiResponse>(`${this.apiUrl}/cats/kitten/${id}`)
       .pipe(map((response) => response.data));
+  }
+
+  /**
+   * Get the localized name for a kitten based on current language
+   */
+  getLocalizedName(kitten: KittenApiItem): string {
+    const lang = this.i18n.getLanguage();
+    return lang === 'uk' ? kitten.nameUa || kitten.nameEn || '' : kitten.nameEn || kitten.nameUa || '';
+  }
+
+  /**
+   * Map kitten items with localized names
+   */
+  mapWithLocalizedNames(kittens: KittenApiItem[]): KittenDisplayItem[] {
+    return kittens.map((kitten) => ({
+      ...kitten,
+      name: this.getLocalizedName(kitten),
+    }));
   }
 }

@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
 import { KittensService, type KittenApiItem } from './kittens.service';
+import { I18nService } from '../../services/i18n.service';
+import { CommonModule } from '@angular/common';
 
 type KittenStatus = 'available' | 'reserved' | 'offline';
 type StatusFilter = KittenStatus | 'all';
@@ -33,28 +35,29 @@ interface LoadState {
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1518288774672-b94e808873ff?auto=format&fit=crop&w=1200&q=80';
 
-const STATUS_LABELS: Record<KittenStatus, string> = {
-  available: 'Свободен',
-  reserved: 'Резерв',
-  offline: 'Неактивен',
-};
-
 @Component({
   selector: 'app-kittens',
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   templateUrl: './kittens.component.html',
   styleUrl: './kittens.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KittensComponent {
   private readonly kittensService = inject(KittensService);
+  protected readonly i18n = inject(I18nService);
 
-  protected readonly statusOptions: StatusOption[] = [
-    { value: 'all', label: 'Все' },
-    { value: 'available', label: 'Свободен' },
-    { value: 'reserved', label: 'Резерв' },
-    { value: 'offline', label: 'Неактивен' },
-  ];
+  protected readonly statusLabels = computed<Record<KittenStatus, string>>(() => ({
+    available: this.i18n.t('available'),
+    reserved: this.i18n.t('reserved'),
+    offline: this.i18n.t('sold'),
+  }));
+
+  protected readonly statusOptions = computed<StatusOption[]>(() => [
+    { value: 'all', label: this.i18n.t('all') },
+    { value: 'available', label: this.i18n.t('available') },
+    { value: 'reserved', label: this.i18n.t('reserved') },
+    { value: 'offline', label: this.i18n.t('sold') },
+  ]);
 
   protected readonly activeStatus = signal<StatusFilter>('all');
 
@@ -70,7 +73,7 @@ export class KittensComponent {
       catchError(() =>
         of<LoadState>({
           kittens: [],
-          error: 'Не удалось загрузить котят. Попробуйте обновить страницу чуть позже.',
+          error: this.i18n.t('error'),
           loaded: true,
         }),
       ),
@@ -93,7 +96,7 @@ export class KittensComponent {
   }
 
   protected getStatusLabel(status: KittenStatus): string {
-    return STATUS_LABELS[status];
+    return this.statusLabels()[status];
   }
 }
 

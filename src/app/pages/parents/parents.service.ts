@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { I18nService } from '../../services/i18n.service';
 
 export interface ParentImage {
   full: string;
@@ -21,6 +22,10 @@ export interface ParentApiItem {
   images?: ParentImage[];
 }
 
+export interface ParentDisplayItem extends ParentApiItem {
+  name: string;
+}
+
 interface ParentsApiResponse {
   data: ParentApiItem[];
   message: string;
@@ -36,17 +41,38 @@ interface ParentApiResponse {
 })
 export class ParentsService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'https://arlenback-production.up.railway.app/cats/parents';
+  private readonly i18n = inject(I18nService);
+  private readonly apiUrl = 'http://localhost:3000';
 
   getParents(): Observable<ParentApiItem[]> {
     return this.http
-      .get<ParentsApiResponse>(this.apiUrl)
+      .get<ParentsApiResponse>(`${this.apiUrl}/cats/parent`)
       .pipe(map((response) => response.data ?? []));
   }
 
   getParentById(id: string): Observable<ParentApiItem> {
     return this.http
-      .get<ParentApiResponse>(`https://arlenback-production.up.railway.app/cats/parent/${id}`)
+      .get<ParentApiResponse>(`${this.apiUrl}/cats/parent/${id}`)
       .pipe(map((response) => response.data));
+  }
+
+  /**
+   * Get the localized name for a parent based on current language
+   */
+  getLocalizedName(parent: ParentApiItem): string {
+    const lang = this.i18n.getLanguage();
+    return lang === 'uk'
+      ? parent.nameUa || parent.nameEn || ''
+      : parent.nameEn || parent.nameUa || '';
+  }
+
+  /**
+   * Map parent items with localized names
+   */
+  mapWithLocalizedNames(parents: ParentApiItem[]): ParentDisplayItem[] {
+    return parents.map((parent) => ({
+      ...parent,
+      name: this.getLocalizedName(parent),
+    }));
   }
 }

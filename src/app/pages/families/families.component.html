@@ -1,3 +1,201 @@
 <section class="families-page">
-  <h1>Families</h1>
+  <header class="families-page__header">
+    <p class="families-page__eyebrow">Наши семьи</p>
+    <h1>Кошачьи семьи Arlen Fluffy Plush</h1>
+    <p class="families-page__subtitle">
+      Исследуйте различные породы, познакомьтесь с нашими семьями и найдите идеального котенка
+    </p>
+  </header>
+
+  <!-- Tabs -->
+  <div class="families-page__tabs">
+    @for (tab of tabOptions(); track tab.value) {
+      <button
+        class="families-page__tab"
+        [class.families-page__tab--active]="activeTab() === tab.value"
+        (click)="setTab(tab.value)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="families-page__loading">
+      <p>Загрузка...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="families-page__error">
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  <!-- Breeds Tab -->
+  @if (activeTab() === 'breeds') {
+    <div class="families-page__content">
+      <div class="breeds-grid">
+        @for (breed of breeds(); track breed.id) {
+          <article class="breed-card">
+            <div class="breed-card__image">
+              <img [src]="breed.image" [alt]="breed.name" />
+            </div>
+            <div class="breed-card__content">
+              <h3 class="breed-card__title">{{ breed.name }}</h3>
+              <p class="breed-card__description">{{ breed.description }}</p>
+
+              <div class="breed-card__characteristics">
+                <div class="characteristic">
+                  <span class="characteristic__label">Характер:</span>
+                  <span class="characteristic__value">{{ breed.characteristics.temperament }}</span>
+                </div>
+                <div class="characteristic">
+                  <span class="characteristic__label">Размер:</span>
+                  <span class="characteristic__value">{{ breed.characteristics.size }}</span>
+                </div>
+                <div class="characteristic">
+                  <span class="characteristic__label">Активность:</span>
+                  <span class="characteristic__value">{{ breed.characteristics.energyLevel }}</span>
+                </div>
+                <div class="characteristic">
+                  <span class="characteristic__label">Уход:</span>
+                  <span class="characteristic__value">{{ breed.characteristics.maintenanceLevel }}</span>
+                </div>
+              </div>
+
+              <button class="breed-card__cta">Узнать больше</button>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Families Tab -->
+  @if (activeTab() === 'families') {
+    <div class="families-page__content">
+      <div class="families-grid">
+        <article class="family-card">
+          <div class="family-card__header">
+            <p class="family-card__breed">British Shorthair</p>
+            <span class="family-card__year">Основана в 2020</span>
+          </div>
+
+          <div class="family-card__parents">
+            <div class="family-card__parent">
+              <img
+                src="https://images.unsplash.com/photo-1574158622147-08a9b37261a7?auto=format&fit=crop&w=200&q=80"
+                alt="Мама"
+                class="family-card__parent-image"
+              />
+              <p class="family-card__parent-label">Мама</p>
+            </div>
+            <div class="family-card__parent">
+              <img
+                src="https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?auto=format&fit=crop&w=200&q=80"
+                alt="Папа"
+                class="family-card__parent-image"
+              />
+              <p class="family-card__parent-label">Папа</p>
+            </div>
+          </div>
+
+          <div class="family-card__info">
+            <p class="family-card__description">
+              Красивая и гармоничная семья с отличным темпераментом. Котята выращиваются в любви
+              и заботе.
+            </p>
+            <div class="family-card__stats">
+              <div class="stat">
+                <span class="stat__value">8</span>
+                <span class="stat__label">котят</span>
+              </div>
+              <div class="stat">
+                <span class="stat__value">5</span>
+                <span class="stat__label">помётов</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="family-card__cta">Подробнее о семье</button>
+        </article>
+
+        <article class="family-card">
+          <div class="family-card__header">
+            <p class="family-card__breed">Scottish Fold</p>
+            <span class="family-card__year">Основана в 2021</span>
+          </div>
+
+          <div class="family-card__parents">
+            <div class="family-card__parent">
+              <img
+                src="https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=200&q=80"
+                alt="Мама"
+                class="family-card__parent-image"
+              />
+              <p class="family-card__parent-label">Мама</p>
+            </div>
+            <div class="family-card__parent">
+              <img
+                src="https://images.unsplash.com/photo-1523266635335-684c5b6fe213?auto=format&fit=crop&w=200&q=80"
+                alt="Папа"
+                class="family-card__parent-image"
+              />
+              <p class="family-card__parent-label">Папа</p>
+            </div>
+          </div>
+
+          <div class="family-card__info">
+            <p class="family-card__description">
+              Энергичная семья с уникальным внешним видом. Все котята получают раннюю социализацию.
+            </p>
+            <div class="family-card__stats">
+              <div class="stat">
+                <span class="stat__value">12</span>
+                <span class="stat__label">котят</span>
+              </div>
+              <div class="stat">
+                <span class="stat__value">6</span>
+                <span class="stat__label">помётов</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="family-card__cta">Подробнее о семье</button>
+        </article>
+      </div>
+    </div>
+  }
+
+  <!-- Kittens Tab -->
+  @if (activeTab() === 'kittens') {
+    <div class="families-page__content">
+      <div class="kittens-grid">
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+          <article class="kitten-card">
+            <div class="kitten-card__image">
+              <img
+                [src]="'https://images.unsplash.com/photo-1574158622147-08a9b37261a7?auto=format&fit=crop&w=300&q=80&t=' + i"
+                [alt]="'Котенок ' + i"
+              />
+              <span class="kitten-card__status">Доступно</span>
+            </div>
+            <div class="kitten-card__content">
+              <h3 class="kitten-card__name">Котенок {{ i }}</h3>
+              <p class="kitten-card__breed">British Shorthair</p>
+              <div class="kitten-card__meta">
+                <span>📅 2 месяца</span>
+                <span>💜 Девочка</span>
+              </div>
+              <p class="kitten-card__price">25 000 - 35 000 ₴</p>
+              <button class="kitten-card__cta">Узнать больше</button>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  }
 </section>

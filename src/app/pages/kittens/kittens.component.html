@@ -9,7 +9,7 @@
   </header>
 
   <div class="kittens-page__filters" aria-label="Фильтрация котят по статусу">
-    @for (option of statusOptions; track option.value) {
+    @for (option of statusOptions(); track option.value) {
       <button
         type="button"
         class="kittens-page__filter"

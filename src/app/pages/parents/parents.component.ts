@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
 import { ParentsService, type ParentApiItem } from './parents.service';
+import { I18nService } from '../../services/i18n.service';
+import { CommonModule } from '@angular/common';
 
 type SexFilter = 'all' | 'male' | 'female';
 
@@ -32,19 +34,20 @@ const FALLBACK_IMAGE =
 
 @Component({
   selector: 'app-parents',
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   templateUrl: './parents.component.html',
   styleUrl: './parents.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParentsComponent {
   private readonly parentsService = inject(ParentsService);
+  protected readonly i18n = inject(I18nService);
 
-  protected readonly sexOptions: SexOption[] = [
-    { value: 'all', label: 'Все' },
-    { value: 'female', label: 'Кошки' },
-    { value: 'male', label: 'Коты' },
-  ];
+  protected readonly sexOptions = computed<SexOption[]>(() => [
+    { value: 'all', label: this.i18n.t('all') },
+    { value: 'female', label: this.i18n.t('female') },
+    { value: 'male', label: this.i18n.t('male') },
+  ]);
 
   protected readonly activeSex = signal<SexFilter>('all');
 
@@ -60,7 +63,7 @@ export class ParentsComponent {
       catchError(() =>
         of<LoadState>({
           parents: [],
-          error: 'Не удалось загрузить список родителей. Попробуйте обновить страницу.',
+          error: this.i18n.t('error'),
           loaded: true,
         }),
       ),
@@ -83,9 +86,9 @@ export class ParentsComponent {
   }
 
   protected formatSex(sex: ParentListItem['sex']): string {
-    if (sex === 'female') return 'Кошка';
-    if (sex === 'male') return 'Кот';
-    return 'Не указан';
+    if (sex === 'female') return this.i18n.t('female');
+    if (sex === 'male') return this.i18n.t('male');
+    return this.i18n.t('noData');
   }
 }
 

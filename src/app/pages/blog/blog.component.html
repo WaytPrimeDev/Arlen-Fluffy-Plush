@@ -1,0 +1,64 @@
+<section class="blog-page">
+  <header class="blog-page__header">
+    <p class="blog-page__eyebrow">Блог питомника</p>
+    <h1>Полезная информация о кошках</h1>
+    <p class="blog-page__subtitle">
+      Советы от специалистов, статьи об уходе и интересные факты о кошках
+    </p>
+  </header>
+
+  <div class="blog-page__posts">
+    <div class="posts-grid">
+      @for (post of posts; track post.id) {
+        <article class="post-card">
+          <div class="post-card__image">
+            <img [src]="post.image" [alt]="post.title" />
+            <span class="post-card__category">{{ post.category }}</span>
+          </div>
+
+          <div class="post-card__content">
+            <p class="post-card__meta">{{ post.date }} • {{ post.author }}</p>
+            <h3 class="post-card__title">{{ post.title }}</h3>
+            <p class="post-card__excerpt">{{ post.excerpt }}</p>
+
+            <button class="post-card__cta">Читать полностью →</button>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+
+  <!-- Featured Section -->
+  <section class="blog-page__featured">
+    <h2>Популярные статьи</h2>
+    <div class="featured-grid">
+      <article class="featured-card">
+        <div class="featured-card__number">1</div>
+        <h3>Как выбрать идеального британского котенка</h3>
+        <p>Советы для новичков по выбору здорового и дружелюбного котенка</p>
+      </article>
+
+      <article class="featured-card">
+        <div class="featured-card__number">2</div>
+        <h3>Уход за длинной шерстью кошек</h3>
+        <p>Полное руководство по уходу за шерстью ваших пушистых друзей</p>
+      </article>
+
+      <article class="featured-card">
+        <div class="featured-card__number">3</div>
+        <h3>Особенности характера британских кошек</h3>
+        <p>Узнайте, почему британские кошки такие особенные и уникальные</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="blog-page__newsletter">
+    <h2>Получайте советы и новости</h2>
+    <p>Подпишитесь на нашу рассылку и будьте в курсе всех новостей питомника</p>
+    <form class="newsletter-form">
+      <input type="email" placeholder="Введите ваш email" required />
+      <button type="submit">Подписаться</button>
+    </form>
+  </section>
+</section>
