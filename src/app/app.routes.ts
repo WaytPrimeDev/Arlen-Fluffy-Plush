@@ -29,4 +29,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/families/families.component').then((m) => m.FamiliesComponent),
   },
+  {
+    path: 'about',
+    loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
+  },
+  {
+    path: 'contacts',
+    loadComponent: () =>
+      import('./pages/contacts/contacts.component').then((m) => m.ContactsComponent),
+  },
 ];

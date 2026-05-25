@@ -1,158 +1,170 @@
 <article class="parent-page">
   <div class="parent-page__container">
 
-    <a class="parent-page__back" routerLink="/parents" aria-label="Назад к списку родителей">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+    <a class="parent-page__back" routerLink="/parents" [attr.aria-label]="i18n.t('backToParents')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
       </svg>
-      Все родители
+      {{ i18n.t('backToParents') }}
     </a>
 
     @if (isLoading()) {
-      <div class="parent-page__skeleton">
-        <div class="parent-page__skeleton-aside">
-          <div class="skeleton-block skeleton-block--photo"></div>
-          <div class="skeleton-block skeleton-block--line"></div>
-          <div class="skeleton-block skeleton-block--line skeleton-block--short"></div>
-        </div>
-        <div class="parent-page__skeleton-main">
-          <div class="skeleton-block skeleton-block--title"></div>
-          <div class="skeleton-block skeleton-block--line"></div>
-          <div class="skeleton-block skeleton-block--line skeleton-block--short"></div>
+      <div class="parent-page__state" role="status">
+        <div class="parent-page__skeleton-gallery"></div>
+        <div class="parent-page__skeleton-info">
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--subtitle"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
         </div>
       </div>
     } @else if (loadError()) {
       <div class="parent-page__empty" role="alert">
-        <p class="parent-page__eyebrow">Ошибка</p>
-        <h1>Что-то пошло не так</h1>
+        <p class="parent-page__eyebrow">{{ i18n.t('error') }}</p>
+        <h1>{{ i18n.t('error') }}</h1>
         <p>{{ loadError() }}</p>
-        <a class="parent-page__cta" routerLink="/parents">Вернуться к списку</a>
+        <a class="parent-page__back-cta" routerLink="/parents">{{ i18n.t('backToParents') }}</a>
       </div>
     } @else if (parent()) {
 
-      <!-- ─── HERO STRIP ─────────────────────────────────────── -->
-      <div
-        class="parent-page__hero"
-        [class.parent-page__hero--female]="parent()!.sex === 'female'"
-        [class.parent-page__hero--male]="parent()!.sex === 'male'"
-      >
-        <!-- Photo column -->
-        <div class="parent-page__photo-col">
-          <div class="parent-page__photo-wrap">
-            <img
-              [src]="selectedImage()"
-              [alt]="parent()!.nameUa || parent()!.nameEn || 'Родитель'"
-            />
-            <span
-              class="parent-page__sex-badge"
-              [class.parent-page__sex-badge--female]="parent()!.sex === 'female'"
-              [class.parent-page__sex-badge--male]="parent()!.sex === 'male'"
-            >
-              {{ formatSex(parent()!.sex) }}
-            </span>
-          </div>
+      <div class="parent-page__layout">
+
+        <!-- Gallery -->
+        <div class="parent-page__gallery" appPhotoViewer="a">
+          <a
+            class="parent-page__main-image"
+            [href]="selectedImage()"
+            [attr.data-pswp-width]="1600"
+            [attr.data-pswp-height]="1067"
+            [attr.data-pswp-index]="selectedImageIndex()"
+          >
+            <img [src]="selectedImage()" [alt]="name()" />
+          </a>
 
           @if (images().length > 1) {
-            <div class="parent-page__thumbs">
+            <div class="parent-page__thumbs" role="list">
               @for (img of images(); track img.full; let i = $index) {
-                <button
-                  type="button"
+                <a
                   class="parent-page__thumb"
                   [class.parent-page__thumb--active]="selectedImageIndex() === i"
-                  (click)="selectImage(i)"
-                  [attr.aria-label]="'Фото ' + (i + 1)"
-                  [attr.aria-pressed]="selectedImageIndex() === i"
+                  [href]="img.full"
+                  [attr.data-pswp-width]="1600"
+                  [attr.data-pswp-height]="1067"
+                  [attr.data-pswp-index]="i"
+                  (click)="selectImage(i); $event.preventDefault()"
+                  [attr.aria-label]="'Photo ' + (i + 1)"
+                  role="listitem"
                 >
                   <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
-                </button>
+                </a>
               }
             </div>
           }
         </div>
 
-        <!-- Info column -->
-        <div class="parent-page__info-col">
-          <p class="parent-page__eyebrow">Родитель питомника</p>
-          <h1>{{ parent()!.nameUa || parent()!.nameEn || 'Без имени' }}</h1>
+        <!-- Details -->
+        <div class="parent-page__details">
 
-          <dl class="parent-page__facts">
-            <div class="parent-page__fact">
-              <dt>Порода</dt>
-              <dd>{{ parent()!.breed || 'Не указана' }}</dd>
+          <header class="parent-page__title-row">
+            <h1>{{ name() }}</h1>
+            @if (sexLabel(); as label) {
+              <div class="parent-page__title-badges">
+                <span
+                  class="parent-page__badge-pill"
+                  [class.parent-page__badge-pill--female]="parent()!.sex === 'female'"
+                  [class.parent-page__badge-pill--male]="parent()!.sex === 'male'"
+                >
+                  <span aria-hidden="true">{{ sexSymbol() }}</span> {{ label }}
+                </span>
+              </div>
+            }
+          </header>
+
+          <section class="parent-page__spec-card" [attr.aria-label]="i18n.t('specifications')">
+            <div class="parent-page__spec-row">
+              <svg class="parent-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m17 6-2.5-2.5"/><path d="m14 8-1-1"/><path d="m7 18 2.5 2.5"/><path d="m10 16 1 1"/>
+              </svg>
+              <div>
+                <p class="parent-page__spec-label">{{ i18n.t('breed') }}</p>
+                <p class="parent-page__spec-value">{{ parent()!.breed || '—' }}</p>
+              </div>
             </div>
-            <div class="parent-page__fact">
-              <dt>Окрас</dt>
-              <dd>{{ parent()!.color || 'Не указан' }}</dd>
+            <div class="parent-page__spec-row">
+              <svg class="parent-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+              </svg>
+              <div>
+                <p class="parent-page__spec-label">{{ i18n.t('color') }}</p>
+                <p class="parent-page__spec-value">{{ parent()!.color || '—' }}</p>
+              </div>
             </div>
-            <div class="parent-page__fact">
-              <dt>Пол</dt>
-              <dd>{{ formatSex(parent()!.sex) }}</dd>
+            <div class="parent-page__spec-row">
+              <svg class="parent-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M12 5c1.5-2 4-2.5 5.5-1 1.5 1.5 1.5 4 0 5.5L12 15 6.5 9.5c-1.5-1.5-1.5-4 0-5.5C8 2.5 10.5 3 12 5z"/>
+              </svg>
+              <div>
+                <p class="parent-page__spec-label">{{ i18n.t('sex') }}</p>
+                <p class="parent-page__spec-value">{{ sexLabel() || '—' }}</p>
+              </div>
             </div>
-            <div class="parent-page__fact">
-              <dt>Котят</dt>
-              <dd>{{ kittens().length || parent()!.Kittens?.length || 0 }}</dd>
-            </div>
-          </dl>
+          </section>
+
         </div>
       </div>
 
-      <!-- ─── KITTENS SECTION ───────────────────────────────── -->
       <section class="parent-page__kittens" aria-labelledby="kittens-heading">
         <header class="parent-page__kittens-header">
-          <h2 id="kittens-heading">
-            @if (parent()!.sex === 'female') { Котята этой кошки }
-            @else if (parent()!.sex === 'male') { Котята этого кота }
-            @else { Котята }
-          </h2>
+          <h2 id="kittens-heading">{{ kittensSectionTitle() }}</h2>
           @if (kittens().length) {
             <span class="parent-page__kittens-count">{{ kittens().length }}</span>
           }
         </header>
 
         @if (!kittens().length) {
-          <p class="parent-page__no-kittens">Котята не найдены или данные ещё не загружены.</p>
+          <p class="parent-page__no-kittens">{{ i18n.t('noKittensYet') }}</p>
         } @else {
-          <ul class="parent-page__kittens-grid" role="list">
+          <div class="parent-page__kittens-grid">
             @for (kitten of kittens(); track kitten.id) {
-              <li role="listitem">
-                <a
-                  class="kitten-card"
-                  [routerLink]="['/kittens', kitten.id]"
-                  [attr.aria-label]="'Перейти к котёнку ' + kitten.name"
-                >
-                  <div class="kitten-card__media">
-                    <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
-                    <span
-                      class="kitten-card__status"
-                      [class.kitten-card__status--available]="kitten.status === 'available'"
-                      [class.kitten-card__status--reserved]="kitten.status === 'reserved'"
-                      [class.kitten-card__status--offline]="kitten.status === 'offline'"
-                    >
-                      {{ getStatusLabel(kitten.status) }}
-                    </span>
+              <a
+                class="kitten-card"
+                [routerLink]="['/kittens', kitten.id]"
+                [attr.aria-label]="kitten.name + ', ' + kitten.breed"
+              >
+                <div class="kitten-card__media">
+                  <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                  <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                </div>
+                <div class="kitten-card__body">
+                  <h3 class="kitten-card__name">{{ kitten.name }}</h3>
+                  <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
+                  @if (kitten.gender !== 'unknown') {
+                    <p class="kitten-card__gender">
+                      <span
+                        class="kitten-card__gender-symbol"
+                        [class.kitten-card__gender-symbol--male]="kitten.gender === 'male'"
+                        [class.kitten-card__gender-symbol--female]="kitten.gender === 'female'"
+                        aria-hidden="true"
+                      >{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
+                      {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
+                    </p>
+                  }
+                  <div class="kitten-card__footer">
+                    <strong class="kitten-card__price">{{ kitten.priceLabel }}</strong>
+                    <span class="kitten-card__cta" aria-hidden="true">{{ i18n.t('viewDetails') }}</span>
                   </div>
-                  <div class="kitten-card__body">
-                    <h3>{{ kitten.name }}</h3>
-                    <p class="kitten-card__breed">{{ kitten.breed }}</p>
-                    <ul class="kitten-card__pills">
-                      <li>{{ kitten.age }}</li>
-                      <li>{{ kitten.sex }}</li>
-                      <li>{{ kitten.color }}</li>
-                    </ul>
-                    <p class="kitten-card__price">{{ kitten.priceLabel }}</p>
-                  </div>
-                </a>
-              </li>
+                </div>
+              </a>
             }
-          </ul>
+          </div>
         }
       </section>
 
     } @else {
       <div class="parent-page__empty" role="status">
         <p class="parent-page__eyebrow">404</p>
-        <h1>Родитель не найден</h1>
-        <a class="parent-page__cta" routerLink="/parents">Посмотреть всех</a>
+        <h1>{{ i18n.t('noData') }}</h1>
+        <a class="parent-page__back-cta" routerLink="/parents">{{ i18n.t('backToParents') }}</a>
       </div>
     }
 

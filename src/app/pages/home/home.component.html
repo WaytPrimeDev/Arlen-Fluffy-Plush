@@ -171,27 +171,4 @@
       Написать в Telegram →
     </a>
   </section>
-
-  <footer class="footer">
-    <div class="footer__top">
-      <div>
-        <div class="brand brand--footer">Arlen Fluffy Plush</div>
-        <p>Питомник котят с любовью и документами WCF. Харьков и вся Украина.</p>
-      </div>
-      <div class="footer__cols">
-        @for (col of footerColumns; track col.title) {
-          <div>
-            <h4>{{ col.title }}</h4>
-            @for (link of col.links; track link) {
-              <a href="#">{{ link }}</a>
-            }
-          </div>
-        }
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2024 Arlen Fluffy Plush. Все права защищены.</p>
-      <p>Сделано с любовью для котов и их семей</p>
-    </div>
-  </footer>
 </div>

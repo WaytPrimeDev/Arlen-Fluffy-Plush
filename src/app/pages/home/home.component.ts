@@ -23,11 +23,6 @@ interface ContactItem {
   value: string;
 }
 
-interface FooterColumn {
-  title: string;
-  links: string[];
-}
-
 @Component({
   selector: 'app-home',
   imports: [CommonModule],
@@ -111,21 +106,6 @@ export class HomeComponent {
       label: 'Email',
       link: 'mailto:hello@arlen-fluffy.com',
       value: 'hello@arlen-fluffy.com',
-    },
-  ];
-
-  footerColumns: FooterColumn[] = [
-    {
-      title: 'Питомник',
-      links: ['О нас', 'Породы', 'Родители', 'Галерея'],
-    },
-    {
-      title: 'Котята',
-      links: ['Все котята', 'Резервирование', 'Документы', 'Доставка'],
-    },
-    {
-      title: 'Связь',
-      links: ['Telegram', 'WhatsApp', 'Instagram', 'Email'],
     },
   ];
 

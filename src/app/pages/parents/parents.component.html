@@ -21,7 +21,24 @@
     }
   </div>
 
-  @if (isLoading()) {
+  <div class="parents-page__select-filters">
+    <label class="parents-page__select-label">
+      <span>{{ i18n.t('filterByBreed') }}</span>
+      <select
+        class="parents-page__select"
+        [value]="activeBreed()"
+        (change)="setBreed($any($event.target).value)"
+        [attr.aria-label]="i18n.t('filterByBreed')"
+      >
+        <option value="all">{{ i18n.t('allBreeds') }}</option>
+        @for (breed of breeds(); track breed) {
+          <option [value]="breed">{{ breed }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (isLoading() && parents().length === 0) {
     <div class="parents-page__grid" aria-busy="true">
       @for (n of [1, 2, 3, 4]; track n) {
         <div class="parent-card parent-card--skeleton">
@@ -76,6 +93,19 @@
         </li>
       }
     </ul>
+
+    @if (hasNextPage()) {
+      <div class="parents-page__load-more">
+        <button
+          type="button"
+          class="parents-page__load-more-button"
+          (click)="loadMore()"
+          [disabled]="isLoading()"
+        >
+          {{ isLoading() ? i18n.t('loading') : i18n.t('loadMore') }}
+        </button>
+      </div>
+    }
   } @else {
     <div class="parents-page__empty" role="status">
       <h2>Никого не найдено</h2>

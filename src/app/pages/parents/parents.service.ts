@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { I18nService } from '../../services/i18n.service';
+import type { ListParams, PaginatedResponse } from '../../services/filters.service';
+import { buildListParams } from '../../services/http-params.util';
 
 export interface ParentImage {
   full: string;
@@ -26,11 +28,6 @@ export interface ParentDisplayItem extends ParentApiItem {
   name: string;
 }
 
-interface ParentsApiResponse {
-  data: ParentApiItem[];
-  message: string;
-}
-
 interface ParentApiResponse {
   data: ParentApiItem;
   message: string;
@@ -42,12 +39,12 @@ interface ParentApiResponse {
 export class ParentsService {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
-  private readonly apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = 'https://arlenback-production.up.railway.app/api';
 
-  getParents(): Observable<ParentApiItem[]> {
-    return this.http
-      .get<ParentsApiResponse>(`${this.apiUrl}/cats/parent`)
-      .pipe(map((response) => response.data ?? []));
+  getParents(params: ListParams = {}): Observable<PaginatedResponse<ParentApiItem>> {
+    return this.http.get<PaginatedResponse<ParentApiItem>>(`${this.apiUrl}/cats/parents`, {
+      params: buildListParams(params),
+    });
   }
 
   getParentById(id: string): Observable<ParentApiItem> {
