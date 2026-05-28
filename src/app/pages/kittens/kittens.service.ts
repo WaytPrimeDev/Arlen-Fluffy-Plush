@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { I18nService } from '../../services/i18n.service';
+import type { ListParams, PaginatedResponse } from '../../services/filters.service';
+import { buildListParams } from '../../services/http-params.util';
 
 export interface KittenImage {
   full: string;
@@ -38,11 +40,6 @@ export interface KittenDisplayItem extends KittenApiItem {
   name: string;
 }
 
-interface KittensApiResponse {
-  data: KittenApiItem[];
-  message: string;
-}
-
 interface KittenApiResponse {
   data: KittenApiItem;
   message: string;
@@ -52,14 +49,14 @@ interface KittenApiResponse {
   providedIn: 'root',
 })
 export class KittensService {
-  private readonly apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = 'https://arlenback-production.up.railway.app/api';
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
 
-  getKittens(): Observable<KittenApiItem[]> {
-    return this.http
-      .get<KittensApiResponse>(`${this.apiUrl}/cats/kittens`)
-      .pipe(map((response) => response.data ?? []));
+  getKittens(params: ListParams = {}): Observable<PaginatedResponse<KittenApiItem>> {
+    return this.http.get<PaginatedResponse<KittenApiItem>>(`${this.apiUrl}/cats/kittens`, {
+      params: buildListParams(params),
+    });
   }
 
   getKittenById(id: string): Observable<KittenApiItem> {

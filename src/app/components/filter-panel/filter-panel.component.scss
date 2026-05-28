@@ -1,0 +1,239 @@
+:host {
+  display: block;
+  font-family: inherit;
+}
+
+.filter-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-panel__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  align-self: flex-start;
+  padding: 0.65rem 1.05rem;
+  border-radius: 12px;
+  border: 1px solid rgb(115 86 168 / 22%);
+  background: #fff;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    border-color: rgb(115 86 168 / 45%);
+    background: #fbf9ff;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--brand-purple);
+    box-shadow: 0 0 0 3px rgb(115 86 168 / 18%);
+  }
+
+  &--open,
+  &--active {
+    border-color: var(--brand-purple);
+    color: var(--brand-purple);
+  }
+
+  &--open {
+    box-shadow: 0 0 0 3px rgb(115 86 168 / 18%);
+  }
+}
+
+.filter-panel__badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--brand-purple);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.filter-panel__chevron {
+  color: var(--brand-purple);
+  transition: transform 0.2s ease;
+}
+
+.filter-panel__chevron--open {
+  transform: rotate(180deg);
+}
+
+.filter-panel__chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-panel__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.45rem 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--brand-light);
+  color: var(--brand-purple);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  border: 1px solid rgb(115 86 168 / 18%);
+}
+
+.filter-panel__chip-label {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.filter-panel__chip-value {
+  font-weight: 500;
+}
+
+.filter-panel__chip-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: rgb(115 86 168 / 14%);
+  color: var(--brand-purple);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgb(115 86 168 / 25%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+.filter-panel__clear-all {
+  background: transparent;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--brand-purple);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+.filter-panel__popover {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  z-index: 60;
+  min-width: 320px;
+  max-width: min(560px, calc(100vw - 2rem));
+  padding: 1.1rem;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid rgb(115 86 168 / 18%);
+  box-shadow:
+    0 18px 40px rgb(28 24 39 / 14%),
+    0 4px 10px rgb(28 24 39 / 4%);
+  animation: filter-panel-pop 0.16s ease-out;
+}
+
+@keyframes filter-panel-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.filter-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.filter-panel__field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filter-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgb(115 86 168 / 12%);
+}
+
+.filter-panel__reset {
+  padding: 0.5rem 0.95rem;
+  border-radius: 10px;
+  border: 1px solid rgb(115 86 168 / 22%);
+  background: #fff;
+  color: var(--brand-purple);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--brand-light);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-panel__popover {
+    min-width: 0;
+    width: calc(100vw - 2rem);
+    max-width: none;
+    left: 0;
+  }
+
+  .filter-panel__grid {
+    grid-template-columns: 1fr;
+  }
+}

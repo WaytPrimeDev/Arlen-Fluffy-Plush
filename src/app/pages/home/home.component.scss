@@ -750,69 +750,6 @@
   font-size: 0.9rem;
 }
 
-.footer {
-  background: #120f1c;
-  padding: 60px 8vw 40px;
-  display: grid;
-  gap: 2.2rem;
-}
-
-.brand--footer {
-  color: var(--warm-bg);
-  margin-bottom: 1rem;
-}
-
-.footer p {
-  color: rgb(251 248 245 / 40%);
-  max-width: 300px;
-  line-height: 1.7;
-}
-
-.footer__top {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.footer__cols {
-  display: flex;
-  gap: 3.5rem;
-  flex-wrap: wrap;
-}
-
-.footer__cols h4 {
-  color: rgb(251 248 245 / 50%);
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  margin-bottom: 1rem;
-  letter-spacing: 0.1em;
-}
-
-.footer__cols a {
-  display: block;
-  text-decoration: none;
-  color: rgb(251 248 245 / 55%);
-  margin-bottom: 0.6rem;
-}
-
-.footer__cols a:hover {
-  color: #c4adee;
-}
-
-.footer__bottom {
-  border-top: 1px solid rgb(255 255 255 / 6%);
-  padding-top: 1.25rem;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.footer__bottom p {
-  color: rgb(251 248 245 / 30%);
-}
-
 @media (max-width: 980px) {
   .topbar__nav {
     display: none;

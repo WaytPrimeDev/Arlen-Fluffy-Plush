@@ -3,16 +3,15 @@
     <div class="hero__content">
       <div class="hero__tag">
         <span class="hero__tag-dot"></span>
-        <span>Питомник WCF - с любовью с 2014</span>
+        <span>{{ 'homeHeroTag' | translate }}</span>
       </div>
-      <h1 class="hero__title">Котенок -<br /><span>не питомец.</span><br />Это семья.</h1>
-      <p class="hero__description">
-        Мы разводим котят, которые становятся полноправными членами семьи - они греют холодные
-        вечера, слышат ваши истории и превращают квартиру в настоящий дом.
-      </p>
+      <h1 class="hero__title">
+        {{ 'homeHeroTitle1' | translate }}<br /><span>{{ 'homeHeroTitle2' | translate }}</span><br />{{ 'homeHeroTitle3' | translate }}
+      </h1>
+      <p class="hero__description">{{ 'homeHeroDescription' | translate }}</p>
       <div class="hero__actions">
-        <a class="button button--primary" href="#kittens">Познакомиться с котятами →</a>
-        <a class="button button--ghost" href="#about">О питомнике</a>
+        <a class="button button--primary" href="#kittens">{{ 'homeHeroCtaPrimary' | translate }}</a>
+        <a class="button button--ghost" href="#about">{{ 'homeHeroCtaSecondary' | translate }}</a>
       </div>
     </div>
     <div class="hero__media">
@@ -25,8 +24,8 @@
       <div class="hero__pill">
         <div class="hero__pill-icon">🐾</div>
         <div>
-          <div class="hero__pill-title">Все котята социализированы</div>
-          <div class="hero__pill-text">Готовы к переезду в любящий дом</div>
+          <div class="hero__pill-title">{{ 'homeHeroPillTitle' | translate }}</div>
+          <div class="hero__pill-text">{{ 'homeHeroPillText' | translate }}</div>
         </div>
       </div>
     </div>
@@ -41,21 +40,17 @@
       <div class="philosophy__image-tint"></div>
     </div>
     <div class="philosophy__content">
-      <span class="eyebrow eyebrow--dark">Наша философия</span>
-      <h2>Кот -<br /><span>неотъемлемая часть</span><br />современной квартиры</h2>
-      <p>
-        Современная жизнь - быстрая, шумная, требовательная. И именно поэтому нам нужен кот. Он не
-        требует объяснений, когда вы вернулись поздно. Он просто приходит и ложится рядом.
-      </p>
-      <p>
-        Кот знает, когда вам грустно. Он чувствует тревогу, выбирает именно ваши колени и превращает
-        даже пустую новую квартиру в настоящий уютный дом.
-      </p>
+      <span class="eyebrow eyebrow--dark">{{ 'homePhilosophyEyebrow' | translate }}</span>
+      <h2>
+        {{ 'homePhilosophyTitle1' | translate }}<br /><span>{{ 'homePhilosophyTitle2' | translate }}</span><br />{{ 'homePhilosophyTitle3' | translate }}
+      </h2>
+      <p>{{ 'homePhilosophyParagraph1' | translate }}</p>
+      <p>{{ 'homePhilosophyParagraph2' | translate }}</p>
       <div class="philosophy__list">
-        @for (point of philosophyPoints; track point) {
+        @for (point of philosophyPoints; track point.textKey) {
           <div class="philosophy__item">
             <span>✦</span>
-            {{ point }}
+            {{ point.textKey | translate }}
           </div>
         }
       </div>
@@ -64,8 +59,8 @@
 
   <section class="lifestyle" id="about">
     <div class="section-head">
-      <span class="eyebrow">Жизнь с котом</span>
-      <h2>Каждый момент - особенный</h2>
+      <span class="eyebrow">{{ 'homeLifestyleEyebrow' | translate }}</span>
+      <h2>{{ 'homeLifestyleTitle' | translate }}</h2>
     </div>
     <div class="bento">
       <article class="bento__item bento__item--big">
@@ -73,12 +68,12 @@
           src="https://images.unsplash.com/photo-1762013214046-04898e5d271c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXQlMjBzbGVlcGluZyUyMG9uJTIwc29mYSUyMG1vZGVybiUyMGludGVyaW9yfGVufDF8fHx8MTc3ODE0NzU1OHww&ixlib=rb-4.1.0&q=80&w=800"
           alt="Cat on modern sofa"
         />
-        <p>«Диван никогда не был таким уютным»</p>
+        <p>{{ 'homeBentoSofaQuote' | translate }}</p>
       </article>
       <article class="bento__item bento__item--text">
         <div class="bento__emoji">🌙</div>
-        <h3>Ночной хранитель</h3>
-        <p>Мурчание кота - лучшее успокоительное. Научно доказано.</p>
+        <h3>{{ 'homeBentoMoonTitle' | translate }}</h3>
+        <p>{{ 'homeBentoMoonText' | translate }}</p>
       </article>
       <article class="bento__item bento__item--image">
         <img
@@ -87,37 +82,36 @@
         />
       </article>
       <article class="bento__item bento__item--cta">
-        <h3>Готовы стать семьей?</h3>
-        <p>
-          Мы поможем подобрать котенка именно под ваш образ жизни - активный или спокойный, для
-          большой семьи или уютного одиночества.
-        </p>
-        <a class="button button--light" href="#kittens">Смотреть котят →</a>
+        <h3>{{ 'homeBentoCtaTitle' | translate }}</h3>
+        <p>{{ 'homeBentoCtaText' | translate }}</p>
+        <a class="button button--light" href="#kittens">{{ 'homeBentoCtaButton' | translate }}</a>
       </article>
     </div>
   </section>
 
   <section class="kittens" id="kittens">
     <div class="section-head">
-      <span class="eyebrow">Доступные котята</span>
-      <h2>Познакомьтесь с нашими <span>маленькими принцами и принцессами</span></h2>
+      <span class="eyebrow">{{ 'homeKittensEyebrow' | translate }}</span>
+      <h2>
+        {{ 'homeKittensTitle1' | translate }} <span>{{ 'homeKittensTitle2' | translate }}</span>
+      </h2>
     </div>
     <div class="kittens__grid">
-      <a class="button button--primary" href="/kittens">Смотреть всех котят →</a>
+      <a class="button button--primary" href="/kittens">{{ 'homeKittensSeeAll' | translate }}</a>
     </div>
   </section>
 
   <section class="why">
     <div class="section-head">
-      <span class="eyebrow">Почему Arlen Fluffy Plush</span>
-      <h2>Котята с гарантией счастья</h2>
+      <span class="eyebrow">{{ 'homeWhyEyebrow' | translate }}</span>
+      <h2>{{ 'homeWhyTitle' | translate }}</h2>
     </div>
     <div class="why__grid">
-      @for (item of whyItems; track item.title) {
+      @for (item of whyItems; track item.titleKey) {
         <article class="why__card">
           <div class="why__icon">{{ item.icon }}</div>
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.text }}</p>
+          <h3>{{ item.titleKey | translate }}</h3>
+          <p>{{ item.textKey | translate }}</p>
         </article>
       }
     </div>
@@ -125,8 +119,10 @@
 
   <section class="reviews" id="reviews">
     <div class="section-head section-head--light">
-      <span class="eyebrow eyebrow--light">Отзывы</span>
-      <h2>Семьи, которые уже <span>нашли свою любовь</span></h2>
+      <span class="eyebrow eyebrow--light">{{ 'homeReviewsEyebrow' | translate }}</span>
+      <h2>
+        {{ 'homeReviewsTitle1' | translate }} <span>{{ 'homeReviewsTitle2' | translate }}</span>
+      </h2>
     </div>
     <div class="reviews__grid">
       @for (review of reviews; track review.id) {
@@ -136,12 +132,12 @@
               <span>★</span>
             }
           </div>
-          <p>"{{ review.text }}"</p>
+          <p>"{{ review.textKey | translate }}"</p>
           <div class="review-card__author">
             <div class="review-card__avatar">{{ review.avatar }}</div>
             <div>
-              <strong>{{ review.name }}</strong>
-              <small>{{ review.city }}</small>
+              <strong>{{ review.nameKey | translate }}</strong>
+              <small>{{ review.cityKey | translate }}</small>
             </div>
           </div>
         </article>
@@ -151,47 +147,24 @@
 
   <section class="contact" id="contact">
     <div class="contact__cat">🐱</div>
-    <span class="eyebrow">Начните путешествие</span>
-    <h2>Ваш дом ждет своего <span>пушистого члена семьи</span></h2>
-    <p>
-      Напишите нам - мы расскажем о свободных котятах, поможем с выбором и ответим на любые вопросы.
-    </p>
+    <span class="eyebrow">{{ 'homeContactEyebrow' | translate }}</span>
+    <h2>
+      {{ 'homeContactTitle1' | translate }} <span>{{ 'homeContactTitle2' | translate }}</span>
+    </h2>
+    <p>{{ 'homeContactDescription' | translate }}</p>
     <div class="contact__cards">
-      @for (contact of contacts; track contact.label) {
+      @for (contact of contacts; track contact.labelKey) {
         <a [href]="contact.link">
           <span class="contact__emoji">{{ contact.icon }}</span>
           <div>
-            <small>{{ contact.label }}</small>
+            <small>{{ contact.labelKey | translate }}</small>
             <strong>{{ contact.value }}</strong>
           </div>
         </a>
       }
     </div>
     <a href="https://t.me/arlen_fluffy_plush" class="button button--primary button--large">
-      Написать в Telegram →
+      {{ 'homeContactCta' | translate }}
     </a>
   </section>
-
-  <footer class="footer">
-    <div class="footer__top">
-      <div>
-        <div class="brand brand--footer">Arlen Fluffy Plush</div>
-        <p>Питомник котят с любовью и документами WCF. Харьков и вся Украина.</p>
-      </div>
-      <div class="footer__cols">
-        @for (col of footerColumns; track col.title) {
-          <div>
-            <h4>{{ col.title }}</h4>
-            @for (link of col.links; track link) {
-              <a href="#">{{ link }}</a>
-            }
-          </div>
-        }
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2024 Arlen Fluffy Plush. Все права защищены.</p>
-      <p>Сделано с любовью для котов и их семей</p>
-    </div>
-  </footer>
 </div>
