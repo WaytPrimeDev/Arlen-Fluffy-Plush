@@ -14,6 +14,7 @@ import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
+<<<<<<< HEAD
   imports: [
     RouterOutlet,
     RouterLink,
@@ -22,6 +23,9 @@ import { FooterComponent } from './components/footer/footer.component';
     TranslatePipe,
     FooterComponent,
   ],
+=======
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, LanguageSwitcherComponent, TranslatePipe, FooterComponent],
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

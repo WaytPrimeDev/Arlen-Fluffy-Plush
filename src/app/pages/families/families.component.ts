@@ -15,11 +15,14 @@ import { ParentsService, type ParentApiItem } from '../parents/parents.service';
 import { KittensService, type KittenApiItem } from '../kittens/kittens.service';
 import { I18nService } from '../../services/i18n.service';
 import { FiltersService, type Pagination } from '../../services/filters.service';
+<<<<<<< HEAD
 import {
   FilterPanelComponent,
   type FilterChange,
   type FilterConfig,
 } from '../../components/filter-panel/filter-panel.component';
+=======
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
 
 type KittenStatus = 'available' | 'reserved' | 'offline';
 
@@ -61,7 +64,11 @@ const LOOKUP_PER_PAGE = 1000;
 
 @Component({
   selector: 'app-families',
+<<<<<<< HEAD
   imports: [CommonModule, RouterLink, FilterPanelComponent],
+=======
+  imports: [CommonModule, RouterLink],
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   templateUrl: './families.component.html',
   styleUrl: './families.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -88,6 +95,7 @@ export class FamiliesComponent {
   protected readonly hasNextPage = computed(() => this.pagination()?.hasNextPage ?? false);
   protected readonly skeletons = SKELETON_ITEMS;
   protected readonly skeletonKittens = SKELETON_KITTEN_ITEMS;
+<<<<<<< HEAD
 
   protected readonly filterConfigs = computed<FilterConfig[]>(() => [
     {
@@ -100,6 +108,8 @@ export class FamiliesComponent {
       value: this.activeBreed(),
     },
   ]);
+=======
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
 
   constructor() {
     effect(() => {
@@ -112,6 +122,7 @@ export class FamiliesComponent {
     this.activeBreed.set(breed);
   }
 
+<<<<<<< HEAD
   protected onFilterChange(change: FilterChange): void {
     if (change.key === 'breed') {
       this.setBreed(change.value);
@@ -122,6 +133,8 @@ export class FamiliesComponent {
     this.setBreed('all');
   }
 
+=======
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   protected retry(): void {
     this.reload(this.activeBreed());
   }

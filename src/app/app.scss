@@ -95,6 +95,7 @@
     background: rgb(115 86 168 / 14%);
     color: var(--brand-purple);
     font-weight: 600;
+<<<<<<< HEAD
   }
 }
 
@@ -136,6 +137,8 @@
     span:nth-child(3) {
       transform: translateY(-7px) rotate(-45deg);
     }
+=======
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   }
 
   &:focus-visible {
@@ -233,6 +236,7 @@
     display: none;
   }
 
+<<<<<<< HEAD
   .app-header__nav,
   .app-header__lang-desktop {
     display: none;
@@ -247,6 +251,13 @@
   .app-mobile-drawer,
   .app-mobile-overlay {
     display: none;
+=======
+  .app-header__nav { gap: 0.1rem; }
+
+  .app-header__nav-link {
+    padding: 0.45rem 0.65rem;
+    font-size: 0.82rem;
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   }
 }
 

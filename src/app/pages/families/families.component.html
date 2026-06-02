@@ -6,11 +6,28 @@
   </header>
 
   <div class="families-page__select-filters">
+<<<<<<< HEAD
     <app-filter-panel
       [filters]="filterConfigs()"
       (filterChange)="onFilterChange($event)"
       (resetAll)="onResetFilters()"
     />
+=======
+    <label class="families-page__select-label">
+      <span>{{ i18n.t('filterByBreed') }}</span>
+      <select
+        class="families-page__select"
+        [value]="activeBreed()"
+        (change)="setBreed($any($event.target).value)"
+        [attr.aria-label]="i18n.t('filterByBreed')"
+      >
+        <option value="all">{{ i18n.t('allBreeds') }}</option>
+        @for (breed of breeds(); track breed) {
+          <option [value]="breed">{{ breed }}</option>
+        }
+      </select>
+    </label>
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   </div>
 
   @if (isLoading() && families().length === 0) {

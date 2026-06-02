@@ -96,6 +96,13 @@ export class HomeComponent {
     },
   ];
 
+<<<<<<< HEAD
+=======
+  setActiveKitten(id: number | null): void {
+    this.activeKittenId = id;
+  }
+
+>>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   getReviewStars(stars: number): number[] {
     return Array(stars).fill(0);
   }
