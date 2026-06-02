@@ -1,4 +1,4 @@
-import { Injectable, signal,  } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 
 export type Language = 'en' | 'uk';
 
@@ -31,7 +31,7 @@ export class I18nService {
 
       // Pages
       homeTitle: 'Welcome to Arlen Fluffy Plush',
-      homeDescription: 'Beautiful Kittens',
+      homeDescription: 'Beautiful British Shorthair Kittens',
 
       // Parents page
       parentsTitle: 'Our Parents',
@@ -98,10 +98,10 @@ export class I18nService {
 
       // Parent detail page
       backToParents: 'Back to Parents',
-      queen: 'Ladies',
-      stud: 'Gentlecat',
-      kittensOfThisQueen: 'Kittens of this Ladies',
-      kittensOfThisStud: 'Kittens of this gentlecat',
+      queen: 'Queen',
+      stud: 'Stud',
+      kittensOfThisQueen: 'Kittens of this Queen',
+      kittensOfThisStud: 'Kittens of this Stud',
       kittensOfThisParent: 'Kittens of this Parent',
 
       // Kitten detail page
@@ -126,8 +126,8 @@ export class I18nService {
       exploreOurKittensSubtitle: 'Find your perfect fluffy companion from our carefully bred kittens',
       availableKittensTab: 'Available Kittens',
       ourParentsTab: 'Our Parents',
-      ourQueens: 'Our ladies',
-      ourStuds: 'Our gentlecats',
+      ourQueens: 'Our Queens',
+      ourStuds: 'Our Studs',
       noParentsMatchFilter: 'No parents match your filter.',
       viewMode: 'View mode',
 
@@ -151,7 +151,7 @@ export class I18nService {
       // About page
       aboutHeroTitle: 'Our Story',
       aboutHeroSubtitle: 'A journey of passion, dedication, and love for exceptional fluffy kittens',
-      aboutIntroTitle: 'Breeding Excellence Since 2016',
+      aboutIntroTitle: 'Breeding Excellence Since 2018',
       aboutIntroP1: 'Arlen Fluffy Plush began with a simple yet profound mission: to breed the most beautiful, healthy, and affectionate fluffy kittens while maintaining the highest ethical standards in the industry.',
       aboutIntroP2: 'What started as a small passion project has grown into an internationally recognized cattery, known for producing champion-quality kittens with exceptional temperaments. Every kitten born here is a testament to our unwavering commitment to excellence.',
       aboutIntroP3: 'We believe that breeding is not just about producing beautiful cats — it\'s about creating healthy, happy companions that will bring joy to families for years to come. This philosophy guides every decision we make.',
@@ -164,7 +164,7 @@ export class I18nService {
       valueIntegrityDesc: 'Our ethical breeding practices and transparency have earned us the trust of families worldwide.',
       ourJourney: 'Our Journey',
       milestone2018Title: 'The Beginning',
-      milestone2018Desc: 'Arlen Fluffy Plush was founded with a passion for breeding exceptional fluffy kittens. Our journey started with our first Scottish Straight cat and a dream.',
+      milestone2018Desc: 'Arlen Fluffy Plush was founded with a passion for breeding exceptional fluffy kittens. Our journey started with two Persian cats and a dream.',
       milestone2019Title: 'First Champions',
       milestone2019Desc: 'Our first litter produced two champion-quality kittens, validating our commitment to excellence and ethical breeding practices.',
       milestone2021Title: 'International Recognition',
@@ -201,7 +201,7 @@ export class I18nService {
       ourPartnersSubtitle: 'We are proud members of these prestigious cat associations, committed to upholding the highest standards in breeding and cat welfare.',
 
       // Home page — hero
-      homeHeroTag: 'WCF cattery — with love since 2016',
+      homeHeroTag: 'WCF cattery — with love since 2014',
       homeHeroTitle1: 'A kitten is not',
       homeHeroTitle2: 'just a pet.',
       homeHeroTitle3: 'It\'s family.',
@@ -405,7 +405,7 @@ export class I18nService {
       // About page
       aboutHeroTitle: 'Наша історія',
       aboutHeroSubtitle: 'Подорож пристрасті, відданості та любові до виняткових пухнастих кошенят',
-      aboutIntroTitle: 'Досконалість у розведенні з 2016 року',
+      aboutIntroTitle: 'Досконалість у розведенні з 2018 року',
       aboutIntroP1: 'Arlen Fluffy Plush розпочав діяльність із простою, але глибокою місією: виводити найкрасивіших, найздоровіших та найлагідніших пухнастих кошенят, дотримуючись найвищих етичних стандартів галузі.',
       aboutIntroP2: 'Те, що починалося як невеликий пристрасний проект, перетворилося на міжнародно визнаний розплідник, відомий виробництвом кошенят чемпіонської якості з винятковим темпераментом. Кожне кошеня, народжене тут, є свідченням нашої незламної відданості досконалості.',
       aboutIntroP3: 'Ми вважаємо, що розведення — це не лише виробництво красивих котів, але й створення здорових, щасливих компаньйонів, які принесуть радість родинам на довгі роки.',
@@ -418,7 +418,7 @@ export class I18nService {
       valueIntegrityDesc: 'Наші етичні практики розведення та прозорість завоювали довіру родин по всьому світу.',
       ourJourney: 'Наш шлях',
       milestone2018Title: 'Початок',
-      milestone2018Desc: 'Arlen Fluffy Plush був заснований із пристрастю до розведення виняткових пухнастих кошенят. Наш шлях розпочався з першої шотландської прямоухої кішки і мрії.',
+      milestone2018Desc: 'Arlen Fluffy Plush був заснований із пристрастю до розведення виняткових пухнастих кошенят. Наш шлях розпочався з двох перських кішок і мрії.',
       milestone2019Title: 'Перші чемпіони',
       milestone2019Desc: 'Наш перший послід дав двох кошенят чемпіонської якості, підтвердивши нашу відданість досконалості та етичним практикам розведення.',
       milestone2021Title: 'Міжнародне визнання',
@@ -455,7 +455,7 @@ export class I18nService {
       ourPartnersSubtitle: 'Ми пишаємося членством у цих престижних кошачих асоціаціях, які підтримують найвищі стандарти розведення та благополуччя котів.',
 
       // Home page — hero
-      homeHeroTag: 'Розплідник WCF — з любов\'ю з 2016 року',
+      homeHeroTag: 'Розплідник WCF — з любов\'ю з 2014 року',
       homeHeroTitle1: 'Кошеня — це',
       homeHeroTitle2: 'не просто улюбленець.',
       homeHeroTitle3: 'Це родина.',

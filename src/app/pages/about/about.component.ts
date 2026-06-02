@@ -30,10 +30,7 @@ interface Award {
 })
 export class AboutComponent {
   protected readonly milestones: readonly Milestone[] = [
-
-    { year: '2016', titleKey: 'milestone2018Title', descriptionKey: 'milestone2018Desc' },
-
-
+    { year: '2018', titleKey: 'milestone2018Title', descriptionKey: 'milestone2018Desc' },
     { year: '2019', titleKey: 'milestone2019Title', descriptionKey: 'milestone2019Desc' },
     { year: '2021', titleKey: 'milestone2021Title', descriptionKey: 'milestone2021Desc' },
     { year: '2023', titleKey: 'milestone2023Title', descriptionKey: 'milestone2023Desc' },

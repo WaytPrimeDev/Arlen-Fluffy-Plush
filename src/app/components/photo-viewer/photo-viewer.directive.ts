@@ -2,35 +2,22 @@ import {
   AfterViewInit,
   Directive,
   ElementRef,
-<<<<<<< HEAD
-=======
-  Input,
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
   NgZone,
   OnDestroy,
   OnInit,
   PLATFORM_ID,
   inject,
-<<<<<<< HEAD
   input,
-=======
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
 
 @Directive({
   selector: '[appPhotoViewer]',
-<<<<<<< HEAD
   exportAs: 'appPhotoViewer',
 })
 export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
   readonly appPhotoViewer = input<string>('a');
-=======
-})
-export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
-  @Input() appPhotoViewer: string = 'a';
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly platformId = inject(PLATFORM_ID);
@@ -44,21 +31,13 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
 
     this.lightbox = new PhotoSwipeLightbox({
       gallery: this.host.nativeElement,
-<<<<<<< HEAD
       children: this.appPhotoViewer(),
-=======
-      children: this.appPhotoViewer,
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
       pswpModule: () => import('photoswipe'),
       bgOpacity: 0.92,
       showHideAnimationType: 'fade',
       padding: { top: 24, bottom: 24, left: 16, right: 16 },
     });
 
-<<<<<<< HEAD
-=======
-    // When PhotoSwipe asks for item data, swap in real dimensions if we've probed them.
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
     this.lightbox.addFilter(
       'domItemData',
       (itemData: { w?: number; h?: number; [k: string]: unknown }, _element: HTMLElement, linkEl: HTMLAnchorElement | null) => {
@@ -78,24 +57,12 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-<<<<<<< HEAD
     this.probeAll();
 
-=======
-    // Initial probe of whatever's already in the DOM.
-    this.probeAll();
-
-    // Re-probe when @for adds/removes anchors or `selectedImage` changes the main image's href.
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
     this.mutationObserver = new MutationObserver(() => this.probeAll());
     this.mutationObserver.observe(this.host.nativeElement, {
       subtree: true,
       childList: true,
-<<<<<<< HEAD
-=======
-      attributes: true,
-      attributeFilter: ['href'],
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
     });
   }
 
@@ -106,7 +73,6 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
     this.lightbox = null;
   }
 
-<<<<<<< HEAD
   open(index: number): void {
     if (!isPlatformBrowser(this.platformId) || !this.lightbox) return;
     this.lightbox.loadAndOpen(index);
@@ -114,10 +80,6 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
 
   private probeAll(): void {
     const anchors = this.host.nativeElement.querySelectorAll<HTMLAnchorElement>(this.appPhotoViewer());
-=======
-  private probeAll(): void {
-    const anchors = this.host.nativeElement.querySelectorAll<HTMLAnchorElement>(this.appPhotoViewer);
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
     anchors.forEach((a) => this.probeAnchor(a));
   }
 
@@ -131,10 +93,6 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-<<<<<<< HEAD
-=======
-    // Avoid Angular's zone churn for image probes — these are background loads.
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
     this.zone.runOutsideAngular(() => {
       const probe = new Image();
       probe.onload = () => {
@@ -142,14 +100,8 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
         const h = probe.naturalHeight;
         if (!w || !h) return;
         this.dimensions.set(url, { w, h });
-<<<<<<< HEAD
         this.host.nativeElement
           .querySelectorAll<HTMLAnchorElement>(this.appPhotoViewer())
-=======
-        // Apply to every anchor that points to this URL (main image + thumb may share a href).
-        this.host.nativeElement
-          .querySelectorAll<HTMLAnchorElement>(this.appPhotoViewer)
->>>>>>> f9e94954a118afdbd9fb2809f0de949b9977dae5
           .forEach((el) => {
             if (el.getAttribute('href') === url) this.applyDimensions(el, w, h);
           });

@@ -96,7 +96,7 @@
     >
       <div class="filter-panel__grid">
         @for (filter of filters(); track filter.key) {
-          <div class="filter-panel__field">
+          <label class="filter-panel__field">
             <span class="filter-panel__field-label">{{ filter.label }}</span>
             <app-select
               [options]="filter.options"
@@ -104,7 +104,7 @@
               [ariaLabel]="filter.label"
               (valueChange)="onSelect(filter.key, $event)"
             />
-          </div>
+          </label>
         }
       </div>
       @if (activeCount() > 0) {
