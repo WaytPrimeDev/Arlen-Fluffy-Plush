@@ -1,7 +1,9 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -10,7 +12,7 @@ import { forkJoin } from 'rxjs';
 import { KittensService, type KittenApiItem } from './kittens.service';
 import { FamiliesService, type FamilyApiItem } from '../families/families.service';
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
-import { I18nService } from '../../services/i18n.service';
+import { I18nService, type Language } from '../../services/i18n.service';
 import { FiltersService } from '../../services/filters.service';
 import { CommonModule } from '@angular/common';
 import { type SelectOption } from '../../components/select/select.component';
@@ -19,6 +21,8 @@ import {
   type FilterChange,
   type FilterConfig,
 } from '../../components/filter-panel/filter-panel.component';
+import { resolveDisplayName } from '../../services/translit.util';
+import { formatAge, type AgeLabels } from '../../services/age.util';
 
 type ViewMode = 'all' | 'grouped' | 'parents';
 type GenderFilter = 'all' | 'male' | 'female';
@@ -85,6 +89,7 @@ export class KittensComponent {
   private readonly familiesService = inject(FamiliesService);
   private readonly filtersService = inject(FiltersService);
   protected readonly i18n = inject(I18nService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   private readonly parentMap = new Map<string, ParentApiItem>();
 
@@ -93,26 +98,41 @@ export class KittensComponent {
   protected readonly selectedFather = signal<string>('all');
   protected readonly selectedGender = signal<GenderFilter>('all');
   protected readonly selectedBreed = signal<string>('all');
+  protected readonly selectedColor = signal<string>('all');
 
-  protected readonly kittens = signal<KittenListItem[]>([]);
+  private readonly rawKittens = signal<KittenApiItem[]>([]);
   protected readonly parents = signal<ParentApiItem[]>([]);
   protected readonly families = signal<FamilyApiItem[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal('');
 
   protected readonly breeds = this.filtersService.breeds;
+  protected readonly colors = this.filtersService.colors;
 
-  protected readonly mothers = computed<ParentOption[]>(() =>
-    this.parents()
+  /** Localized + transliterated kitten cards, recomputed on language change. */
+  protected readonly kittens = computed<KittenListItem[]>(() => {
+    const lang = this.i18n.language$();
+    const ageLabels = this.ageLabels();
+    return this.rawKittens().map((k) => this.mapKittenToListItem(k, lang, ageLabels));
+  });
+
+  private ageLabels(): AgeLabels {
+    return { mo: this.i18n.t('ageMonthsShort'), d: this.i18n.t('ageDaysShort') };
+  }
+
+  protected readonly mothers = computed<ParentOption[]>(() => {
+    const lang = this.i18n.language$();
+    return this.parents()
       .filter((p) => p.sex === 'female')
-      .map((p) => ({ id: p._id, name: p.nameUa || p.nameEn || '—' })),
-  );
+      .map((p) => ({ id: p._id, name: resolveDisplayName(p.nameUa, p.nameEn, lang, '—') }));
+  });
 
-  protected readonly fathers = computed<ParentOption[]>(() =>
-    this.parents()
+  protected readonly fathers = computed<ParentOption[]>(() => {
+    const lang = this.i18n.language$();
+    return this.parents()
       .filter((p) => p.sex === 'male')
-      .map((p) => ({ id: p._id, name: p.nameUa || p.nameEn || '—' })),
-  );
+      .map((p) => ({ id: p._id, name: resolveDisplayName(p.nameUa, p.nameEn, lang, '—') }));
+  });
 
   protected readonly motherOptions = computed<SelectOption[]>(() => [
     { value: 'all', label: this.i18n.t('allMothers') },
@@ -135,6 +155,11 @@ export class KittensComponent {
     ...this.breeds().map((b) => ({ value: b, label: b })),
   ]);
 
+  protected readonly colorOptions = computed<SelectOption[]>(() => [
+    { value: 'all', label: this.i18n.t('allColors') },
+    ...this.colors().map((c) => ({ value: c, label: c })),
+  ]);
+
   protected readonly showKittenOnlyFilters = computed(() => this.viewMode() !== 'parents');
 
   protected readonly filterConfigs = computed<FilterConfig[]>(() => {
@@ -144,8 +169,14 @@ export class KittensComponent {
       options: this.breedOptions(),
       value: this.selectedBreed(),
     };
+    const colorFilter: FilterConfig = {
+      key: 'color',
+      label: this.i18n.t('filterByColor'),
+      options: this.colorOptions(),
+      value: this.selectedColor(),
+    };
     if (!this.showKittenOnlyFilters()) {
-      return [breedFilter];
+      return [breedFilter, colorFilter];
     }
     return [
       {
@@ -167,6 +198,7 @@ export class KittensComponent {
         value: this.selectedGender(),
       },
       breedFilter,
+      colorFilter,
     ];
   });
 
@@ -175,7 +207,8 @@ export class KittensComponent {
       this.selectedMother() !== 'all' ||
       this.selectedFather() !== 'all' ||
       this.selectedGender() !== 'all' ||
-      this.selectedBreed() !== 'all',
+      this.selectedBreed() !== 'all' ||
+      this.selectedColor() !== 'all',
   );
 
   protected readonly filteredKittens = computed(() => {
@@ -183,17 +216,20 @@ export class KittensComponent {
     const father = this.selectedFather();
     const gender = this.selectedGender();
     const breed = this.selectedBreed();
+    const color = this.selectedColor();
 
     return this.kittens().filter((k) => {
       if (mother !== 'all' && k.motherId !== mother) return false;
       if (father !== 'all' && k.fatherId !== father) return false;
       if (gender !== 'all' && k.gender !== gender) return false;
       if (breed !== 'all' && k.breed !== breed) return false;
+      if (color !== 'all' && k.color !== color) return false;
       return true;
     });
   });
 
   protected readonly groupedByParents = computed<LitterView[]>(() => {
+    const lang = this.i18n.language$();
     const sorted = [...this.families()].sort(
       (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0),
     );
@@ -212,32 +248,43 @@ export class KittensComponent {
         return {
           key: family._id,
           familyName: family.name,
-          mother: momId ? toLitterParentView(this.parentMap.get(momId)) : null,
-          father: dadId ? toLitterParentView(this.parentMap.get(dadId)) : null,
+          mother: momId ? toLitterParentView(this.parentMap.get(momId), lang) : null,
+          father: dadId ? toLitterParentView(this.parentMap.get(dadId), lang) : null,
           kittens: litterKittens,
         } satisfies LitterView;
       })
       .filter((l): l is LitterView => l !== null);
   });
 
-  protected readonly parentsBreedFiltered = computed<ParentApiItem[]>(() => {
+  protected readonly parentsFiltered = computed<ParentApiItem[]>(() => {
     const breed = this.selectedBreed();
-    return this.parents().filter((p) => breed === 'all' || p.breed === breed);
+    const color = this.selectedColor();
+    return this.parents().filter(
+      (p) => (breed === 'all' || p.breed === breed) && (color === 'all' || p.color === color),
+    );
   });
 
-  protected readonly queens = computed<ParentDisplayCard[]>(() =>
-    this.parentsBreedFiltered()
+  protected readonly queens = computed<ParentDisplayCard[]>(() => {
+    const lang = this.i18n.language$();
+    return this.parentsFiltered()
       .filter((p) => p.sex === 'female')
-      .map(toParentCard),
-  );
+      .map((p) => toParentCard(p, lang));
+  });
 
-  protected readonly studs = computed<ParentDisplayCard[]>(() =>
-    this.parentsBreedFiltered()
+  protected readonly studs = computed<ParentDisplayCard[]>(() => {
+    const lang = this.i18n.language$();
+    return this.parentsFiltered()
       .filter((p) => p.sex === 'male')
-      .map(toParentCard),
-  );
+      .map((p) => toParentCard(p, lang));
+  });
 
   constructor() {
+    // The template binds many labels via i18n.t() (no translate pipe), so
+    // re-render this OnPush page whenever the language changes.
+    effect(() => {
+      this.i18n.language$();
+      this.cdr.markForCheck();
+    });
     this.loadAll();
   }
 
@@ -261,6 +308,10 @@ export class KittensComponent {
     this.selectedBreed.set(breed);
   }
 
+  protected setColor(color: string): void {
+    this.selectedColor.set(color);
+  }
+
   protected onFilterChange(change: FilterChange): void {
     switch (change.key) {
       case 'mother':
@@ -275,6 +326,9 @@ export class KittensComponent {
       case 'breed':
         this.setBreed(change.value);
         break;
+      case 'color':
+        this.setColor(change.value);
+        break;
     }
   }
 
@@ -283,6 +337,27 @@ export class KittensComponent {
     this.selectedFather.set('all');
     this.selectedGender.set('all');
     this.selectedBreed.set('all');
+    this.selectedColor.set('all');
+  }
+
+  private mapKittenToListItem(
+    kitten: KittenApiItem,
+    lang: Language,
+    ageLabels: AgeLabels,
+  ): KittenListItem {
+    return {
+      id: kitten._id,
+      name: resolveDisplayName(kitten.nameUa, kitten.nameEn, lang, this.i18n.t('noName')),
+      breed: kitten.breed || this.i18n.t('breedNotSpecified'),
+      age: formatAge(kitten.birthDay, ageLabels) ?? '',
+      color: kitten.color || this.i18n.t('colorNotSpecified'),
+      status: mapStatus(kitten.status),
+      priceLabel: formatPrice(kitten, this.i18n.t('priceOnRequest')),
+      image: pickImage(kitten.images),
+      gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
+      motherId: kitten.parentId?.mom ?? null,
+      fatherId: kitten.parentId?.dad ?? null,
+    };
   }
 
   private loadAll(): void {
@@ -299,7 +374,7 @@ export class KittensComponent {
         for (const p of parents.data ?? []) {
           this.parentMap.set(p._id, p);
         }
-        this.kittens.set((kittens.data ?? []).map(mapKittenToListItem));
+        this.rawKittens.set(kittens.data ?? []);
         this.parents.set(parents.data ?? []);
         this.families.set(families.data ?? []);
         this.isLoading.set(false);
@@ -312,46 +387,33 @@ export class KittensComponent {
   }
 }
 
-function toLitterParentView(parent: ParentApiItem | undefined): LitterParentView | null {
+function toLitterParentView(
+  parent: ParentApiItem | undefined,
+  lang: Language,
+): LitterParentView | null {
   if (!parent) return null;
   return {
     id: parent._id,
-    name: parent.nameUa || parent.nameEn || '—',
+    name: resolveDisplayName(parent.nameUa, parent.nameEn, lang, '—'),
     breed: parent.breed ?? '',
     color: parent.color ?? '',
     image: pickImage(parent.images),
   };
 }
 
-function toParentCard(parent: ParentApiItem): ParentDisplayCard {
+function toParentCard(parent: ParentApiItem, lang: Language): ParentDisplayCard {
   return {
     id: parent._id,
-    name: parent.nameUa || parent.nameEn || '—',
+    name: resolveDisplayName(parent.nameUa, parent.nameEn, lang, '—'),
     breed: parent.breed ?? '',
     color: parent.color ?? '',
     image: pickImage(parent.images),
   };
 }
 
-function pickImage(images: ReadonlyArray<{ full: string; isMain?: boolean }> | undefined): string {
+function pickImage(images: readonly { full: string; isMain?: boolean }[] | undefined): string {
   if (!images || images.length === 0) return FALLBACK_IMAGE;
   return images.find((i) => i.isMain)?.full ?? images[0].full ?? FALLBACK_IMAGE;
-}
-
-function mapKittenToListItem(kitten: KittenApiItem): KittenListItem {
-  return {
-    id: kitten._id,
-    name: kitten.nameUa || kitten.nameEn || 'Без имени',
-    breed: kitten.breed || 'Порода не указана',
-    age: formatBirthDay(kitten.birthDay),
-    color: kitten.color || 'Цвет не указан',
-    status: mapStatus(kitten.status),
-    priceLabel: formatPrice(kitten),
-    image: pickImage(kitten.images),
-    gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
-    motherId: kitten.parentId?.mom ?? null,
-    fatherId: kitten.parentId?.dad ?? null,
-  };
 }
 
 function mapStatus(status?: string): KittenStatus {
@@ -360,14 +422,7 @@ function mapStatus(status?: string): KittenStatus {
   return 'available';
 }
 
-function formatBirthDay(birthDay?: string): string {
-  if (!birthDay) return 'Возраст не указан';
-  const date = new Date(birthDay);
-  if (Number.isNaN(date.getTime())) return 'Возраст не указан';
-  return date.toLocaleDateString('uk-UA');
-}
-
-function formatPrice(kitten: KittenApiItem): string {
+function formatPrice(kitten: KittenApiItem, onRequest: string): string {
   const pet = kitten.price?.pet;
   const breeding = kitten.price?.breeding;
   if (pet || breeding) {
@@ -376,5 +431,5 @@ function formatPrice(kitten: KittenApiItem): string {
     if (breeding) parts.push(`breeding: ${breeding}`);
     return parts.join(' | ');
   }
-  return 'Цена по запросу';
+  return onRequest;
 }

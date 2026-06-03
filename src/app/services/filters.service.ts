@@ -23,13 +23,18 @@ export interface ListParams {
   color?: string;
 }
 
-type FiltersApiResponse = string[] | { data?: string[]; message?: string };
+type FiltersApiResponse =
+  | string[]
+  | { data?: string[]; breeds?: string[]; colors?: string[]; status?: number; message?: string };
 
-function extractList(response: FiltersApiResponse): string[] {
+function extractList(response: FiltersApiResponse, key: 'breeds' | 'colors'): string[] {
   if (Array.isArray(response)) {
     return response;
   }
-  return response?.data ?? [];
+  if (!response) {
+    return [];
+  }
+  return response[key] ?? response.data ?? [];
 }
 
 @Injectable({
@@ -60,7 +65,7 @@ export class FiltersService {
     this.http
       .get<FiltersApiResponse>(`${this.apiUrl}/filters/breeds`)
       .subscribe({
-        next: (response) => this.breedsSignal.set(extractList(response)),
+        next: (response) => this.breedsSignal.set(extractList(response, 'breeds')),
         error: () => {
           this.breedsLoaded = false;
         },
@@ -75,7 +80,7 @@ export class FiltersService {
     this.http
       .get<FiltersApiResponse>(`${this.apiUrl}/filters/colors`)
       .subscribe({
-        next: (response) => this.colorsSignal.set(extractList(response)),
+        next: (response) => this.colorsSignal.set(extractList(response, 'colors')),
         error: () => {
           this.colorsLoaded = false;
         },

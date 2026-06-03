@@ -2,14 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  EventEmitter,
-  HostListener,
-  Input,
-  Output,
-  ViewChild,
   computed,
   inject,
+  input,
+  output,
   signal,
+  viewChild,
 } from '@angular/core';
 
 export interface SelectOption {
@@ -20,6 +18,10 @@ export interface SelectOption {
 @Component({
   selector: 'app-select',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(keydown)': 'onHostKey($event)',
+    '(document:click)': 'onDocumentClick($event)',
+  },
   template: `
     <button
       type="button"
@@ -27,12 +29,12 @@ export interface SelectOption {
       [class.app-select__trigger--open]="isOpen()"
       [attr.aria-haspopup]="'listbox'"
       [attr.aria-expanded]="isOpen()"
-      [attr.aria-label]="ariaLabel"
+      [attr.aria-label]="ariaLabel()"
       (click)="toggle()"
       (keydown)="onTriggerKey($event)"
     >
       <span class="app-select__value" [class.app-select__value--placeholder]="!selectedLabel()">
-        {{ selectedLabel() || placeholder || '—' }}
+        {{ selectedLabel() || placeholder() || '—' }}
       </span>
       <svg
         class="app-select__chevron"
@@ -56,21 +58,21 @@ export interface SelectOption {
       <div
         class="app-select__panel"
         role="listbox"
-        [attr.aria-label]="ariaLabel"
+        [attr.aria-label]="ariaLabel()"
         #panel
       >
-        @for (opt of options; track opt.value; let i = $index) {
+        @for (opt of options(); track opt.value; let i = $index) {
           <button
             type="button"
             class="app-select__option"
-            [class.app-select__option--selected]="opt.value === value"
+            [class.app-select__option--selected]="opt.value === value()"
             [class.app-select__option--focused]="focusedIndex() === i"
             role="option"
-            [attr.aria-selected]="opt.value === value"
+            [attr.aria-selected]="opt.value === value()"
             (click)="select(opt.value)"
             (mouseenter)="focusedIndex.set(i)"
           >
-            @if (opt.value === value) {
+            @if (opt.value === value()) {
               <svg
                 class="app-select__check"
                 width="14"
@@ -265,21 +267,21 @@ export interface SelectOption {
   ],
 })
 export class SelectComponent {
-  @Input() options: SelectOption[] = [];
-  @Input() value: string = '';
-  @Input() ariaLabel: string = '';
-  @Input() placeholder: string = '';
-  @Output() valueChange = new EventEmitter<string>();
+  readonly options = input<SelectOption[]>([]);
+  readonly value = input<string>('');
+  readonly ariaLabel = input<string>('');
+  readonly placeholder = input<string>('');
+  readonly valueChange = output<string>();
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  @ViewChild('panel') private panelRef?: ElementRef<HTMLDivElement>;
+  private readonly panelRef = viewChild<ElementRef<HTMLDivElement>>('panel');
 
   protected readonly isOpen = signal(false);
   protected readonly focusedIndex = signal(-1);
 
   protected readonly selectedLabel = computed(() => {
-    const match = this.options.find((o) => o.value === this.value);
+    const match = this.options().find((o) => o.value === this.value());
     return match?.label ?? '';
   });
 
@@ -293,7 +295,7 @@ export class SelectComponent {
 
   protected open(): void {
     this.isOpen.set(true);
-    const idx = this.options.findIndex((o) => o.value === this.value);
+    const idx = this.options().findIndex((o) => o.value === this.value());
     this.focusedIndex.set(idx >= 0 ? idx : 0);
   }
 
@@ -303,7 +305,7 @@ export class SelectComponent {
   }
 
   protected select(value: string): void {
-    if (value !== this.value) {
+    if (value !== this.value()) {
       this.valueChange.emit(value);
     }
     this.close();
@@ -323,7 +325,6 @@ export class SelectComponent {
     }
   }
 
-  @HostListener('keydown', ['$event'])
   onHostKey(event: KeyboardEvent): void {
     if (!this.isOpen()) return;
     if (event.key === 'ArrowDown') {
@@ -335,8 +336,8 @@ export class SelectComponent {
     } else if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       const idx = this.focusedIndex();
-      if (idx >= 0 && idx < this.options.length) {
-        this.select(this.options[idx].value);
+      if (idx >= 0 && idx < this.options().length) {
+        this.select(this.options()[idx].value);
       }
     } else if (event.key === 'Escape') {
       event.preventDefault();
@@ -347,12 +348,11 @@ export class SelectComponent {
       this.scrollFocusedIntoView();
     } else if (event.key === 'End') {
       event.preventDefault();
-      this.focusedIndex.set(this.options.length - 1);
+      this.focusedIndex.set(this.options().length - 1);
       this.scrollFocusedIntoView();
     }
   }
 
-  @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.isOpen()) return;
     if (!this.host.nativeElement.contains(event.target as Node)) {
@@ -361,8 +361,8 @@ export class SelectComponent {
   }
 
   private moveFocus(delta: number): void {
-    if (!this.options.length) return;
-    const len = this.options.length;
+    if (!this.options().length) return;
+    const len = this.options().length;
     const current = this.focusedIndex();
     const next = current < 0 ? 0 : (current + delta + len) % len;
     this.focusedIndex.set(next);
@@ -371,7 +371,7 @@ export class SelectComponent {
 
   private scrollFocusedIntoView(): void {
     queueMicrotask(() => {
-      const panel = this.panelRef?.nativeElement;
+      const panel = this.panelRef()?.nativeElement;
       if (!panel) return;
       const el = panel.children[this.focusedIndex()] as HTMLElement | undefined;
       el?.scrollIntoView({ block: 'nearest' });

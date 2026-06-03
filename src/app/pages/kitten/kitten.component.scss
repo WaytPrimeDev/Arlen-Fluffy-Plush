@@ -44,6 +44,14 @@
   align-items: start;
 }
 
+/* Left column: gallery + personality + health */
+.kitten-page__left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: start;
+}
+
 /* Gallery */
 .kitten-page__gallery {
   display: flex;
@@ -85,6 +93,7 @@
 
 .kitten-page__thumb {
   display: block;
+  padding: 0;
   width: 72px;
   height: 72px;
   border-radius: 12px;

@@ -30,7 +30,7 @@
       <div class="parent-page__layout">
 
         <!-- Gallery -->
-        <div class="parent-page__gallery" appPhotoViewer=".parent-page__thumb" #viewer="appPhotoViewer">
+        <div class="parent-page__gallery">
           <button
             type="button"
             class="parent-page__main-image"
@@ -43,19 +43,20 @@
           @if (images().length > 1) {
             <div class="parent-page__thumbs" role="list">
               @for (img of images(); track img.full; let i = $index) {
-                <a
+                <button
+                  type="button"
                   class="parent-page__thumb"
-                  [href]="img.full"
-                  [attr.data-pswp-width]="1600"
-                  [attr.data-pswp-height]="1067"
-                  [attr.aria-label]="'Photo ' + (i + 1)"
+                  [attr.aria-label]="viewer.goToLabel(i)"
                   role="listitem"
+                  (click)="viewer.open(i)"
                 >
                   <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
-                </a>
+                </button>
               }
             </div>
           }
+
+          <app-photo-viewer #viewer [images]="images()" [label]="name()" />
         </div>
 
         <!-- Details -->
@@ -129,7 +130,9 @@
               >
                 <div class="kitten-card__media">
                   <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
-                  <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                  @if (kitten.age) {
+                    <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                  }
                 </div>
                 <div class="kitten-card__body">
                   <h3 class="kitten-card__name">{{ kitten.name }}</h3>

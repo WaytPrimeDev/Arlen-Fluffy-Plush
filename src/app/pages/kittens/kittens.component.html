@@ -85,7 +85,9 @@
                 >
                   <div class="kitten-card__media">
                     <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
-                    <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                    @if (kitten.age) {
+                      <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                    }
                   </div>
                   <div class="kitten-card__body">
                     <h3 class="kitten-card__name">{{ kitten.name }}</h3>
@@ -159,7 +161,9 @@
                     >
                       <div class="kitten-card__media">
                         <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
-                        <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                        @if (kitten.age) {
+                      <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                    }
                       </div>
                       <div class="kitten-card__body">
                         <h5 class="kitten-card__name">{{ kitten.name }}</h5>

@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   effect,
@@ -9,9 +10,10 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ParentsService, type ParentApiItem } from './parents.service';
-import { I18nService } from '../../services/i18n.service';
+import { I18nService, type Language } from '../../services/i18n.service';
 import { FiltersService, type Pagination } from '../../services/filters.service';
 import { CommonModule } from '@angular/common';
+import { resolveDisplayName } from '../../services/translit.util';
 
 type SexFilter = 'all' | 'male' | 'female';
 
@@ -46,6 +48,7 @@ export class ParentsComponent {
   private readonly parentsService = inject(ParentsService);
   private readonly filtersService = inject(FiltersService);
   protected readonly i18n = inject(I18nService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   protected readonly sexOptions = computed<SexOption[]>(() => [
     { value: 'all', label: this.i18n.t('all') },
@@ -58,12 +61,18 @@ export class ParentsComponent {
 
   protected readonly breeds = this.filtersService.breeds;
 
-  protected readonly parents = signal<ParentListItem[]>([]);
+  private readonly rawParents = signal<ParentApiItem[]>([]);
   protected readonly pagination = signal<Pagination | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal('');
 
   private readonly page = signal(1);
+
+  /** Localized + transliterated parent cards, recomputed on language change. */
+  protected readonly parents = computed<ParentListItem[]>(() => {
+    const lang = this.i18n.language$();
+    return this.rawParents().map((p) => this.mapParentToListItem(p, lang));
+  });
 
   protected readonly filteredParents = computed(() => {
     const sex = this.activeSex();
@@ -77,6 +86,11 @@ export class ParentsComponent {
     effect(() => {
       const breed = this.activeBreed();
       untracked(() => this.reload(breed));
+    });
+    // Re-render this OnPush page (i18n.t() labels) when the language changes.
+    effect(() => {
+      this.i18n.language$();
+      this.cdr.markForCheck();
     });
   }
 
@@ -102,9 +116,24 @@ export class ParentsComponent {
     this.fetch();
   }
 
+  private mapParentToListItem(parent: ParentApiItem, lang: Language): ParentListItem {
+    return {
+      id: parent._id,
+      name: resolveDisplayName(parent.nameUa, parent.nameEn, lang, this.i18n.t('noName')),
+      breed: parent.breed || this.i18n.t('breedNotSpecified'),
+      color: parent.color || this.i18n.t('colorNotSpecified'),
+      sex: parent.sex === 'male' ? 'male' : parent.sex === 'female' ? 'female' : 'unknown',
+      kittensCount: parent.Kittens?.length ?? 0,
+      image:
+        parent.images?.find((img) => img.isMain)?.full ??
+        parent.images?.[0]?.full ??
+        FALLBACK_IMAGE,
+    };
+  }
+
   private reload(breed: string): void {
     this.page.set(1);
-    this.parents.set([]);
+    this.rawParents.set([]);
     this.pagination.set(null);
     this.fetch(breed);
   }
@@ -120,8 +149,8 @@ export class ParentsComponent {
       })
       .subscribe({
         next: (response) => {
-          const mapped = (response.data ?? []).map(mapParentToListItem);
-          this.parents.update((prev) => (this.page() === 1 ? mapped : [...prev, ...mapped]));
+          const items = response.data ?? [];
+          this.rawParents.update((prev) => (this.page() === 1 ? items : [...prev, ...items]));
           this.pagination.set(response.pagination ?? null);
           this.isLoading.set(false);
         },
@@ -131,19 +160,4 @@ export class ParentsComponent {
         },
       });
   }
-}
-
-function mapParentToListItem(parent: ParentApiItem): ParentListItem {
-  return {
-    id: parent._id,
-    name: parent.nameUa || parent.nameEn || 'Без имени',
-    breed: parent.breed || 'Порода не указана',
-    color: parent.color || 'Не указан',
-    sex: parent.sex === 'male' ? 'male' : parent.sex === 'female' ? 'female' : 'unknown',
-    kittensCount: parent.Kittens?.length ?? 0,
-    image:
-      parent.images?.find((img) => img.isMain)?.full ??
-      parent.images?.[0]?.full ??
-      FALLBACK_IMAGE,
-  };
 }

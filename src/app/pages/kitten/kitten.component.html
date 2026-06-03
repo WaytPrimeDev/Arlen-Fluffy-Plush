@@ -27,36 +27,68 @@
     } @else if (kitten()) {
       <div class="kitten-page__layout">
 
-        <!-- Gallery -->
-        <div class="kitten-page__gallery" appPhotoViewer=".kitten-page__thumb" #viewer="appPhotoViewer">
-          <button
-            type="button"
-            class="kitten-page__main-image"
-            [attr.aria-label]="i18n.t('viewDetails') + ': ' + name()"
-            (click)="viewer.open(0)"
-          >
-            <img [src]="mainImage()" [alt]="name()" />
-          </button>
+        <!-- Left column: photos + personality + health -->
+        <div class="kitten-page__left">
 
-          @if (images().length > 1) {
-            <div class="kitten-page__thumbs" role="list" [attr.aria-label]="i18n.t('kittensTitle')">
-              @for (img of images(); track img.full; let i = $index) {
-                <a
-                  class="kitten-page__thumb"
-                  [href]="img.full"
-                  [attr.data-pswp-width]="1600"
-                  [attr.data-pswp-height]="1067"
-                  [attr.aria-label]="'Photo ' + (i + 1)"
-                  role="listitem"
-                >
-                  <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
-                </a>
-              }
+          <!-- Gallery -->
+          <div class="kitten-page__gallery">
+            <button
+              type="button"
+              class="kitten-page__main-image"
+              [attr.aria-label]="i18n.t('viewDetails') + ': ' + name()"
+              (click)="viewer.open(0)"
+            >
+              <img [src]="mainImage()" [alt]="name()" />
+            </button>
+
+            @if (images().length > 1) {
+              <div class="kitten-page__thumbs" role="list" [attr.aria-label]="i18n.t('kittensTitle')">
+                @for (img of images(); track img.full; let i = $index) {
+                  <button
+                    type="button"
+                    class="kitten-page__thumb"
+                    [attr.aria-label]="viewer.goToLabel(i)"
+                    role="listitem"
+                    (click)="viewer.open(i)"
+                  >
+                    <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
+                  </button>
+                }
+              </div>
+            }
+
+            <app-photo-viewer #viewer [images]="images()" [label]="name()" />
+          </div>
+
+          <!-- Personality -->
+          <section class="kitten-page__section">
+            <h2>{{ i18n.t('personality') }}</h2>
+            <p class="kitten-page__paragraph">{{ i18n.t('personalityPlaceholder') }}</p>
+          </section>
+
+          <!-- Health Information -->
+          <section class="kitten-page__section">
+            <h2>{{ i18n.t('healthInformation') }}</h2>
+            <div class="kitten-page__health-card">
+              <div class="kitten-page__health-item">
+                <svg class="kitten-page__check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>{{ i18n.t('fullyVaccinated') }}</span>
+              </div>
+              <div class="kitten-page__health-item">
+                <svg class="kitten-page__check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>{{ i18n.t('healthCertified') }}</span>
+              </div>
+              <p class="kitten-page__health-details">{{ i18n.t('healthDetailsPlaceholder') }}</p>
             </div>
-          }
+          </section>
+
         </div>
 
-        <!-- Details -->
+        <!-- Right column: title, specs, price, CTA, parents -->
         <div class="kitten-page__details">
 
           <!-- 1. Title row -->
@@ -109,30 +141,43 @@
             </div>
           </section>
 
-          <!-- 3. Personality -->
-          <section class="kitten-page__section">
-            <h2>{{ i18n.t('personality') }}</h2>
-            <p class="kitten-page__paragraph">{{ i18n.t('personalityPlaceholder') }}</p>
-          </section>
-
-          <!-- 4. Health Information -->
-          <section class="kitten-page__section">
-            <h2>{{ i18n.t('healthInformation') }}</h2>
-            <div class="kitten-page__health-card">
-              <div class="kitten-page__health-item">
-                <svg class="kitten-page__check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                <span>{{ i18n.t('fullyVaccinated') }}</span>
-              </div>
-              <div class="kitten-page__health-item">
-                <svg class="kitten-page__check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-                <span>{{ i18n.t('healthCertified') }}</span>
-              </div>
-              <p class="kitten-page__health-details">{{ i18n.t('healthDetailsPlaceholder') }}</p>
+          <!-- 3. Price block -->
+          <div class="kitten-page__price-block">
+            <h2>{{ i18n.t('price') }}</h2>
+            <div class="kitten-page__price-rows">
+              @if (kitten()!.price?.pet) {
+                <div class="kitten-page__price-row">
+                  <span>{{ i18n.t('petPrice') }}</span>
+                  <strong>{{ kitten()!.price!.pet }}</strong>
+                </div>
+              }
+              @if (kitten()!.price?.breeding) {
+                <div class="kitten-page__price-row">
+                  <span>{{ i18n.t('breedingPrice') }}</span>
+                  <strong>{{ kitten()!.price!.breeding }}</strong>
+                </div>
+              }
+              @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
+                <p class="kitten-page__price-inquiry">{{ i18n.t('priceOnRequest') }}</p>
+              }
             </div>
+          </div>
+
+          <!-- 4. Telegram CTA -->
+          <section class="kitten-page__cta-card">
+            <h3>{{ i18n.t('interestedIn') }} {{ name() }}?</h3>
+            <p class="kitten-page__cta-text">{{ i18n.t('telegramCtaSubtext') }}</p>
+            <a
+              class="kitten-page__cta-button"
+              href="https://t.me/arlenfluffyplush"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg class="kitten-page__cta-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
+              </svg>
+              {{ i18n.t('contactOnTelegram') }}
+            </a>
           </section>
 
           <!-- 5. Parents -->
@@ -169,45 +214,6 @@
               </div>
             </section>
           }
-
-          <!-- 6. Price block -->
-          <div class="kitten-page__price-block">
-            <h2>{{ i18n.t('price') }}</h2>
-            <div class="kitten-page__price-rows">
-              @if (kitten()!.price?.pet) {
-                <div class="kitten-page__price-row">
-                  <span>{{ i18n.t('petPrice') }}</span>
-                  <strong>{{ kitten()!.price!.pet }}</strong>
-                </div>
-              }
-              @if (kitten()!.price?.breeding) {
-                <div class="kitten-page__price-row">
-                  <span>{{ i18n.t('breedingPrice') }}</span>
-                  <strong>{{ kitten()!.price!.breeding }}</strong>
-                </div>
-              }
-              @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
-                <p class="kitten-page__price-inquiry">{{ i18n.t('noData') }}</p>
-              }
-            </div>
-          </div>
-
-          <!-- 7. Telegram CTA -->
-          <section class="kitten-page__cta-card">
-            <h3>{{ i18n.t('interestedIn') }} {{ name() }}?</h3>
-            <p class="kitten-page__cta-text">{{ i18n.t('telegramCtaSubtext') }}</p>
-            <a
-              class="kitten-page__cta-button"
-              href="https://t.me/arlenfluffyplush"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg class="kitten-page__cta-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
-              </svg>
-              {{ i18n.t('contactOnTelegram') }}
-            </a>
-          </section>
 
         </div>
       </div>

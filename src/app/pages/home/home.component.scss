@@ -458,6 +458,61 @@
   color: var(--text-muted);
 }
 
+/* "Night guardian" card — starry night sky */
+.bento__item--night {
+  position: relative;
+  isolation: isolate;
+  color: var(--warm-bg);
+  background:
+    radial-gradient(1.5px 1.5px at 20% 30%, #ffffff, transparent),
+    radial-gradient(1.5px 1.5px at 60% 20%, #ffffff, transparent),
+    radial-gradient(1px 1px at 80% 40%, rgb(255 255 255 / 90%), transparent),
+    radial-gradient(1.5px 1.5px at 40% 70%, #ffffff, transparent),
+    radial-gradient(1px 1px at 72% 72%, rgb(255 255 255 / 85%), transparent),
+    radial-gradient(1px 1px at 30% 85%, rgb(255 255 255 / 85%), transparent),
+    radial-gradient(1.5px 1.5px at 88% 62%, #ffffff, transparent),
+    radial-gradient(1px 1px at 12% 55%, rgb(255 255 255 / 80%), transparent),
+    radial-gradient(1px 1px at 50% 45%, rgb(255 255 255 / 70%), transparent),
+    linear-gradient(160deg, #14123a 0%, #221c52 45%, #342c66 100%);
+}
+
+.bento__item--night::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 35% 25%, rgb(255 255 255 / 80%), transparent),
+    radial-gradient(1px 1px at 65% 55%, rgb(255 255 255 / 70%), transparent),
+    radial-gradient(1px 1px at 25% 65%, rgb(255 255 255 / 75%), transparent),
+    radial-gradient(1px 1px at 82% 28%, rgb(255 255 255 / 70%), transparent);
+  animation: bento-twinkle 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes bento-twinkle {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento__item--night::after {
+    animation: none;
+  }
+}
+
+.bento__item--night h3 {
+  color: #ffffff;
+}
+
+.bento__item--night p {
+  color: rgb(251 248 245 / 82%);
+}
+
 .bento__emoji {
   font-size: 2.5rem;
   margin-bottom: 1rem;
@@ -484,6 +539,135 @@
 
 .kittens {
   background: #f5f0fa;
+}
+
+/* Home kittens carousel */
+.home-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.home-carousel__track {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0.25rem 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.home-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.home-carousel__item {
+  flex: 0 0 clamp(220px, 26vw, 280px);
+  scroll-snap-align: start;
+}
+
+.home-carousel__card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgb(28 24 39 / 6%);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.home-carousel__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px rgb(115 86 168 / 16%);
+}
+
+.home-carousel__card:focus-visible {
+  outline: 3px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+.home-carousel__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.home-carousel__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.home-carousel__card:hover .home-carousel__media img {
+  transform: scale(1.08);
+}
+
+.home-carousel__age {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 90%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgb(28 24 39 / 6%);
+}
+
+.home-carousel__body {
+  padding: 1.1rem 1.25rem 1.4rem;
+}
+
+.home-carousel__name {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.home-carousel__nav {
+  flex-shrink: 0;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand-purple);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgb(115 86 168 / 30%);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.home-carousel__nav:hover {
+  background: #5e4191;
+  transform: scale(1.05);
+}
+
+.home-carousel__nav:focus-visible {
+  outline: 3px solid var(--brand-purple);
+  outline-offset: 3px;
+}
+
+@media (max-width: 980px) {
+  .home-carousel__nav {
+    display: none;
+  }
 }
 
 .kittens__grid,

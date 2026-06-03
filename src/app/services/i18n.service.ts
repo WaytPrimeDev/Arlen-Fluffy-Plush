@@ -1,4 +1,4 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export type Language = 'en' | 'uk';
 
@@ -13,7 +13,7 @@ export class I18nService {
   private readonly language = signal<Language>('en');
   public readonly language$ = this.language.asReadonly();
 
-  private translations: Map<Language, Translations> = new Map();
+  private translations = new Map<Language, Translations>();
 
   constructor() {
     this.initializeTranslations();
@@ -95,6 +95,27 @@ export class I18nService {
       noKittensMatchFilters:
         'No kittens match your filters. Try adjusting your selection.',
       viewDetails: 'View Details',
+
+      // Display fallbacks & age
+      kittenFallbackName: 'Kitten',
+      noName: 'Unnamed',
+      breedNotSpecified: 'Breed not specified',
+      colorNotSpecified: 'Color not specified',
+      ageNotSpecified: 'Age not specified',
+      priceOnRequest: 'Price on request',
+      kittenLoadError: 'Failed to load kitten data.',
+      ageMonthsShort: 'mo',
+      ageDaysShort: 'd',
+      carouselPrev: 'Previous kittens',
+      carouselNext: 'Next kittens',
+
+      // Photo viewer
+      viewerClose: 'Close gallery',
+      viewerPrev: 'Previous image',
+      viewerNext: 'Next image',
+      viewerCounter: '{current} / {total}',
+      viewerImageAlt: '{label} — photo {index}',
+      viewerGoToImage: 'Go to image {index}',
 
       // Parent detail page
       backToParents: 'Back to Parents',
@@ -350,6 +371,27 @@ export class I18nService {
         'Жодне кошеня не відповідає фільтрам. Спробуйте змінити вибір.',
       viewDetails: 'Детальніше',
 
+      // Display fallbacks & age
+      kittenFallbackName: 'Кошеня',
+      noName: 'Без імені',
+      breedNotSpecified: 'Порода не вказана',
+      colorNotSpecified: 'Колір не вказано',
+      ageNotSpecified: 'Вік не вказано',
+      priceOnRequest: 'Ціна за запитом',
+      kittenLoadError: 'Не вдалося завантажити дані про кошеня.',
+      ageMonthsShort: 'міс.',
+      ageDaysShort: 'дн.',
+      carouselPrev: 'Попередні кошенята',
+      carouselNext: 'Наступні кошенята',
+
+      // Photo viewer
+      viewerClose: 'Закрити галерею',
+      viewerPrev: 'Попереднє фото',
+      viewerNext: 'Наступне фото',
+      viewerCounter: '{current} / {total}',
+      viewerImageAlt: '{label} — фото {index}',
+      viewerGoToImage: 'Перейти до фото {index}',
+
       // Parent detail page
       backToParents: 'Назад до батьків',
       queen: 'Мама',
@@ -574,11 +616,11 @@ export class I18nService {
     }
 
     const keys = key.split('.');
-    let value: any = translations;
+    let value: string | Translations = translations;
 
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+      if (typeof value === 'object' && value !== null && k in value) {
+        value = (value as Translations)[k];
       } else {
         return key;
       }

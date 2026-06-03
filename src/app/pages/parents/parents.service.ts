@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { I18nService } from '../../services/i18n.service';
 import type { ListParams, PaginatedResponse } from '../../services/filters.service';
 import { buildListParams } from '../../services/http-params.util';
+import { resolveDisplayName } from '../../services/translit.util';
 
 export interface ParentImage {
   full: string;
@@ -57,10 +58,7 @@ export class ParentsService {
    * Get the localized name for a parent based on current language
    */
   getLocalizedName(parent: ParentApiItem): string {
-    const lang = this.i18n.getLanguage();
-    return lang === 'uk'
-      ? parent.nameUa || parent.nameEn || ''
-      : parent.nameEn || parent.nameUa || '';
+    return resolveDisplayName(parent.nameUa, parent.nameEn, this.i18n.getLanguage(), '');
   }
 
   /**

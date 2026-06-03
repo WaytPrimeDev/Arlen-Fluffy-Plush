@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, forkJoin } from 'rxjs';
 import { KittensService, type KittenApiItem } from '../kittens/kittens.service';
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
 import { I18nService } from '../../services/i18n.service';
-import { PhotoViewerDirective } from '../../components/photo-viewer/photo-viewer.directive';
+import { PhotoViewerComponent } from '../../components/photo-viewer/photo-viewer.component';
+import { resolveDisplayName } from '../../services/translit.util';
+import { formatAge } from '../../services/age.util';
 
 interface LoadState {
   kitten: KittenApiItem | null;
@@ -20,7 +29,7 @@ const FALLBACK_IMAGE =
 
 @Component({
   selector: 'app-kitten',
-  imports: [RouterLink, PhotoViewerDirective],
+  imports: [RouterLink, PhotoViewerComponent],
   templateUrl: './kitten.component.html',
   styleUrl: './kitten.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +39,16 @@ export class KittenComponent {
   private readonly kittensService = inject(KittensService);
   private readonly parentsService = inject(ParentsService);
   protected readonly i18n = inject(I18nService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    // The template binds via i18n.t()/method calls (no translate pipe), so
+    // re-render this OnPush page whenever the language changes.
+    effect(() => {
+      this.i18n.language$();
+      this.cdr.markForCheck();
+    });
+  }
 
   private readonly loadState = toSignal(
     this.route.paramMap.pipe(
@@ -55,7 +74,7 @@ export class KittenComponent {
               kitten: null,
               mother: null,
               father: null,
-              error: 'Не удалось загрузить данные о котенке.',
+              error: this.i18n.t('kittenLoadError'),
               loaded: true,
             }),
           ),
@@ -73,7 +92,7 @@ export class KittenComponent {
 
   protected readonly name = computed(() => {
     const k = this.kitten();
-    return k?.nameUa || k?.nameEn || 'Котенок';
+    return resolveDisplayName(k?.nameUa, k?.nameEn, this.i18n.language$(), this.i18n.t('kittenFallbackName'));
   });
 
   protected readonly genderLabel = computed(() => {
@@ -90,7 +109,13 @@ export class KittenComponent {
     return null;
   });
 
-  protected readonly ageLabel = computed(() => computeAge(this.kitten()?.birthDay));
+  protected readonly ageLabel = computed(() => {
+    this.i18n.language$();
+    return formatAge(this.kitten()?.birthDay, {
+      mo: this.i18n.t('ageMonthsShort'),
+      d: this.i18n.t('ageDaysShort'),
+    });
+  });
 
   protected readonly images = computed(() => {
     const kitten = this.kitten();
@@ -115,7 +140,7 @@ export class KittenComponent {
   }
 
   protected parentName(parent: ParentApiItem): string {
-    return parent.nameUa || parent.nameEn || '—';
+    return resolveDisplayName(parent.nameUa, parent.nameEn, this.i18n.language$(), '—');
   }
 
   protected pickParentImage(parent: ParentApiItem): string {
@@ -123,20 +148,4 @@ export class KittenComponent {
     if (!images || images.length === 0) return FALLBACK_IMAGE;
     return images.find((i) => i.isMain)?.full ?? images[0].full ?? FALLBACK_IMAGE;
   }
-}
-
-function computeAge(birthDay?: string): string | null {
-  if (!birthDay) return null;
-  const date = new Date(birthDay);
-  if (Number.isNaN(date.getTime())) return null;
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays < 7) return `${diffDays}д`;
-  const diffWeeks = Math.floor(diffDays / 7);
-  if (diffWeeks < 8) return `${diffWeeks} нед.`;
-  const diffMonths = Math.floor(diffDays / 30.44);
-  if (diffMonths < 24) return `${diffMonths} мес.`;
-  const diffYears = Math.floor(diffMonths / 12);
-  return `${diffYears} г.`;
 }

@@ -1,11 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
 import { KittensService, type KittenApiItem } from '../kittens/kittens.service';
-import { I18nService } from '../../services/i18n.service';
-import { PhotoViewerDirective } from '../../components/photo-viewer/photo-viewer.directive';
+import { I18nService, type Language } from '../../services/i18n.service';
+import { PhotoViewerComponent } from '../../components/photo-viewer/photo-viewer.component';
+import { resolveDisplayName } from '../../services/translit.util';
+import { formatAge, type AgeLabels } from '../../services/age.util';
 
 interface KittenCard {
   id: string;
@@ -20,7 +29,7 @@ interface KittenCard {
 
 interface LoadState {
   parent: ParentApiItem | null;
-  kittens: KittenCard[];
+  kittens: KittenApiItem[];
   error: string;
   loaded: boolean;
 }
@@ -30,7 +39,7 @@ const FALLBACK_IMAGE =
 
 @Component({
   selector: 'app-parent',
-  imports: [RouterLink, PhotoViewerDirective],
+  imports: [RouterLink, PhotoViewerComponent],
   templateUrl: './parent.component.html',
   styleUrl: './parent.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +49,7 @@ export class ParentComponent {
   private readonly parentsService = inject(ParentsService);
   private readonly kittensService = inject(KittensService);
   protected readonly i18n = inject(I18nService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   private readonly loadState = toSignal(
     this.route.paramMap.pipe(
@@ -55,7 +65,7 @@ export class ParentComponent {
               map(
                 (kittens): LoadState => ({
                   parent,
-                  kittens: kittens.map((k) => mapKittenApiToCard(k, this.i18n)),
+                  kittens,
                   error: '',
                   loaded: true,
                 }),
@@ -80,7 +90,15 @@ export class ParentComponent {
   protected readonly isLoading = computed(() => !this.loadState().loaded);
   protected readonly loadError = computed(() => this.loadState().error);
   protected readonly parent = computed(() => this.loadState().parent);
-  protected readonly kittens = computed(() => this.loadState().kittens);
+
+  protected readonly kittens = computed<KittenCard[]>(() => {
+    const lang = this.i18n.language$();
+    const ageLabels: AgeLabels = {
+      mo: this.i18n.t('ageMonthsShort'),
+      d: this.i18n.t('ageDaysShort'),
+    };
+    return this.loadState().kittens.map((k) => mapKittenApiToCard(k, lang, ageLabels));
+  });
 
   protected readonly images = computed(() => {
     const parent = this.parent();
@@ -99,9 +117,7 @@ export class ParentComponent {
   protected readonly name = computed(() => {
     const p = this.parent();
     if (!p) return '';
-    return this.i18n.getLanguage() === 'uk'
-      ? p.nameUa || p.nameEn || '—'
-      : p.nameEn || p.nameUa || '—';
+    return resolveDisplayName(p.nameUa, p.nameEn, this.i18n.language$(), '—');
   });
 
   protected readonly sexLabel = computed(() => {
@@ -125,39 +141,30 @@ export class ParentComponent {
     return this.i18n.t('kittensOfThisParent');
   });
 
+  constructor() {
+    // The template binds via i18n.t()/method calls (no translate pipe), so
+    // re-render this OnPush page whenever the language changes.
+    effect(() => {
+      this.i18n.language$();
+      this.cdr.markForCheck();
+    });
+  }
 }
 
-function mapKittenApiToCard(kitten: KittenApiItem, i18n: I18nService): KittenCard {
-  const lang = i18n.getLanguage();
+function mapKittenApiToCard(kitten: KittenApiItem, lang: Language, ageLabels: AgeLabels): KittenCard {
   return {
     id: kitten._id,
-    name: lang === 'uk' ? kitten.nameUa || kitten.nameEn || '—' : kitten.nameEn || kitten.nameUa || '—',
+    name: resolveDisplayName(kitten.nameUa, kitten.nameEn, lang, '—'),
     breed: kitten.breed || '—',
     color: kitten.color || '—',
     gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
-    age: formatAge(kitten.birthDay),
+    age: formatAge(kitten.birthDay, ageLabels) ?? '',
     image:
       kitten.images?.find((img) => img.isMain === true)?.full ??
       kitten.images?.[0]?.full ??
       FALLBACK_IMAGE,
     priceLabel: formatPrice(kitten),
   };
-}
-
-function formatAge(birthDay?: string): string {
-  if (!birthDay) return '—';
-  const date = new Date(birthDay);
-  if (Number.isNaN(date.getTime())) return '—';
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays < 7) return `${diffDays}d`;
-  const diffWeeks = Math.floor(diffDays / 7);
-  if (diffWeeks < 8) return `${diffWeeks}w`;
-  const diffMonths = Math.floor(diffDays / 30.44);
-  if (diffMonths < 24) return `${diffMonths}mo`;
-  const diffYears = Math.floor(diffMonths / 12);
-  return `${diffYears}y`;
 }
 
 function formatPrice(kitten: KittenApiItem): string {

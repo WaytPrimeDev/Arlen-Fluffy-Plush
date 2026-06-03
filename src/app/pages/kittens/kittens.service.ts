@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { I18nService } from '../../services/i18n.service';
 import type { ListParams, PaginatedResponse } from '../../services/filters.service';
 import { buildListParams } from '../../services/http-params.util';
+import { resolveDisplayName } from '../../services/translit.util';
 
 export interface KittenImage {
   full: string;
@@ -34,6 +35,8 @@ export interface KittenApiItem {
   images?: KittenImage[];
   price?: KittenPrice;
   parentId?: KittenParentRef;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface KittenDisplayItem extends KittenApiItem {
@@ -69,8 +72,7 @@ export class KittensService {
    * Get the localized name for a kitten based on current language
    */
   getLocalizedName(kitten: KittenApiItem): string {
-    const lang = this.i18n.getLanguage();
-    return lang === 'uk' ? kitten.nameUa || kitten.nameEn || '' : kitten.nameEn || kitten.nameUa || '';
+    return resolveDisplayName(kitten.nameUa, kitten.nameEn, this.i18n.getLanguage(), '');
   }
 
   /**
