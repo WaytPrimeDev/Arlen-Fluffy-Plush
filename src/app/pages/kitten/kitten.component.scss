@@ -44,6 +44,14 @@
   align-items: start;
 }
 
+/* Left column: gallery + personality + health */
+.kitten-page__left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: start;
+}
+
 /* Gallery */
 .kitten-page__gallery {
   display: flex;
@@ -52,7 +60,6 @@
 }
 
 .kitten-page__main-image {
-  display: block;
   display: block;
   position: relative;
   width: 100%;
@@ -75,10 +82,6 @@
   &:focus-visible {
     outline: 3px solid var(--brand-purple);
     outline-offset: 3px;
-
-  &:focus-visible {
-    outline: 3px solid var(--brand-purple);
-    outline-offset: 3px;
   }
 }
 
@@ -90,7 +93,7 @@
 
 .kitten-page__thumb {
   display: block;
-  display: block;
+  padding: 0;
   width: 72px;
   height: 72px;
   border-radius: 12px;
@@ -98,7 +101,6 @@
   border: 2px solid transparent;
   cursor: pointer;
   background: var(--brand-light);
-  text-decoration: none;
   text-decoration: none;
   transition: border-color 0.2s ease, transform 0.2s ease;
   flex-shrink: 0;
@@ -134,32 +136,6 @@
   padding-top: 0.5rem;
 }
 
-/* Title row */
-.kitten-page__title-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-
-  h1 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    line-height: 1.1;
-    color: var(--text-primary);
-  }
-}
-
-.kitten-page__title-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.kitten-page__badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.35rem 0.75rem;
 /* Title row */
 .kitten-page__title-row {
   display: flex;
@@ -232,65 +208,7 @@
   width: 22px;
   height: 22px;
   flex-shrink: 0;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.kitten-page__badge-pill--age {
-  background: rgb(115 86 168 / 12%);
   color: var(--brand-purple);
-}
-
-.kitten-page__badge-pill--gender {
-  background: #fff;
-  border: 1px solid transparent;
-}
-
-.kitten-page__badge-pill--male {
-  border-color: rgb(37 99 235 / 35%);
-  color: #1d4ed8;
-}
-
-.kitten-page__badge-pill--female {
-  border-color: rgb(219 39 119 / 35%);
-  color: #be185d;
-}
-
-/* Specifications gradient card */
-.kitten-page__spec-card {
-  border-radius: 20px;
-  padding: 1.4rem 1.4rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  background: linear-gradient(135deg, rgb(115 86 168 / 10%) 0%, rgb(86 132 168 / 10%) 100%);
-  border: 1px solid rgb(115 86 168 / 14%);
-}
-
-.kitten-page__spec-row {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.kitten-page__spec-icon {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  color: var(--brand-purple);
-}
-
-.kitten-page__spec-label {
-  margin: 0;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.kitten-page__spec-value {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 0.98rem;
 }
 
 .kitten-page__spec-label {
@@ -318,37 +236,7 @@
 }
 
 .kitten-page__paragraph {
-/* Generic section */
-.kitten-page__section {
-  h2 {
-    margin: 0 0 0.85rem;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    color: var(--text-primary);
-  }
-}
-
-.kitten-page__paragraph {
   margin: 0;
-  color: var(--text-muted);
-  line-height: 1.7;
-}
-
-/* Health card */
-.kitten-page__health-card {
-  background: #fff;
-  border: 1px solid rgb(115 86 168 / 12%);
-  border-radius: 16px;
-  padding: 1.2rem 1.2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.kitten-page__health-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
   color: var(--text-muted);
   line-height: 1.7;
 }
@@ -387,14 +275,6 @@
   color: var(--text-muted);
   font-size: 0.86rem;
   line-height: 1.6;
-}
-
-.kitten-page__check {
-  width: 20px;
-  height: 20px;
-  margin-top: 0.1rem;
-  flex-shrink: 0;
-  color: #2d9a65;
 }
 
 /* Parents grid */
@@ -508,60 +388,6 @@
   margin: 0;
   color: var(--text-muted);
   font-style: italic;
-}
-
-/* Telegram CTA */
-.kitten-page__cta-card {
-  background: linear-gradient(135deg, #7356a8 0%, #3d7aad 100%);
-  color: #fff;
-  border-radius: 20px;
-  padding: 1.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-
-  h3 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.35rem;
-  }
-}
-
-.kitten-page__cta-text {
-  margin: 0;
-  color: rgb(255 255 255 / 88%);
-  line-height: 1.6;
-  font-size: 0.92rem;
-}
-
-.kitten-page__cta-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: #fff;
-  color: var(--brand-purple);
-  border-radius: 14px;
-  padding: 0.85rem 1.25rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
-
-  &:hover {
-    background: #f5f0fa;
-    transform: translateY(-1px);
-  }
-
-  &:focus-visible {
-    outline: 3px solid #fff;
-    outline-offset: 3px;
-  }
-}
-
-.kitten-page__cta-icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
 }
 
 /* Telegram CTA */
@@ -742,4 +568,3 @@
     grid-template-columns: 1fr 1fr;
   }
 }
-}}}
