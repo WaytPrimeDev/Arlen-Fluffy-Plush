@@ -4,6 +4,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
+    /* Pinned so the output layout does not shift with the set of spec files
+       TypeScript happens to find; without it TS reports the inferred root. */
+    "rootDir": "./src",
     "types": ["vitest/globals"]
   },
   "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]

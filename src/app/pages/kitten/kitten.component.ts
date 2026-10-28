@@ -1,11 +1,38 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, forkJoin } from 'rxjs';
 import { KittensService, type KittenApiItem } from '../kittens/kittens.service';
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
 import { I18nService } from '../../services/i18n.service';
+import {
+  formatAgeShort,
+  mapStatus,
+  KITTEN_PLACEHOLDER,
+  PARENT_PLACEHOLDER,
+} from '../../services/kitten-view.util';
 import { PhotoViewerDirective } from '../../components/photo-viewer/photo-viewer.directive';
+import { SeoService } from '../../services/seo.service';
+import { AnalyticsService } from '../../services/analytics.service';
+import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
+import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
+import { STAGE_WIDTH, VIEWER_WIDTH, scaledImage } from '../../services/image-url.util';
+
+interface GalleryImage {
+  /** Shown on the page, at the photo's own aspect ratio. */
+  display: string;
+  /** Opened by the lightbox — the same photo, larger. */
+  zoom: string;
+  /** Square crop, which is what the thumbnail strip wants. */
+  thumb: string;
+}
 
 interface LoadState {
   kitten: KittenApiItem | null;
@@ -15,12 +42,9 @@ interface LoadState {
   loaded: boolean;
 }
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1518288774672-b94e808873ff?auto=format&fit=crop&w=1200&q=80';
-
 @Component({
   selector: 'app-kitten',
-  imports: [RouterLink, PhotoViewerDirective],
+  imports: [RouterLink, PhotoViewerDirective, LocalizedPathPipe, ImageFallbackDirective],
   templateUrl: './kitten.component.html',
   styleUrl: './kitten.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,7 +55,16 @@ export class KittenComponent {
   private readonly parentsService = inject(ParentsService);
   protected readonly i18n = inject(I18nService);
 
-  protected readonly selectedImageIndex = signal(0);
+  /** Stand-in for a grown cat whose photo is missing, read by the template. */
+  protected readonly parentPlaceholder = PARENT_PLACEHOLDER;
+  private readonly seo = inject(SeoService);
+  private readonly analytics = inject(AnalyticsService);
+
+  /** Handed to the photo viewer so it can size slides from the page's own image. */
+  protected readonly stageWidth = STAGE_WIDTH;
+  protected readonly viewerWidth = VIEWER_WIDTH;
+
+  private readonly requestedImageIndex = signal(0);
 
   private readonly loadState = toSignal(
     this.route.paramMap.pipe(
@@ -49,7 +82,15 @@ export class KittenComponent {
                 ? this.parentsService.getParentById(dadId).pipe(catchError(() => of(null)))
                 : of(null),
             }).pipe(
-              map(({ mother, father }): LoadState => ({ kitten, mother, father, error: '', loaded: true })),
+              map(
+                ({ mother, father }): LoadState => ({
+                  kitten,
+                  mother,
+                  father,
+                  error: '',
+                  loaded: true,
+                }),
+              ),
             );
           }),
           catchError(() =>
@@ -57,14 +98,22 @@ export class KittenComponent {
               kitten: null,
               mother: null,
               father: null,
-              error: 'Не удалось загрузить данные о котенке.',
+              error: this.i18n.t('error'),
               loaded: true,
             }),
           ),
         ),
       ),
     ),
-    { initialValue: { kitten: null, mother: null, father: null, error: '', loaded: false } satisfies LoadState },
+    {
+      initialValue: {
+        kitten: null,
+        mother: null,
+        father: null,
+        error: '',
+        loaded: false,
+      } satisfies LoadState,
+    },
   );
 
   protected readonly isLoading = computed(() => !this.loadState().loaded);
@@ -75,7 +124,11 @@ export class KittenComponent {
 
   protected readonly name = computed(() => {
     const k = this.kitten();
-    return k?.nameUa || k?.nameEn || 'Котенок';
+    if (!k) return this.i18n.t('kittens');
+    // Matches ParentComponent: show (and index) the name in the active language.
+    return this.i18n.getLanguage() === 'uk'
+      ? k.nameUa || k.nameEn || this.i18n.t('kittens')
+      : k.nameEn || k.nameUa || this.i18n.t('kittens');
   });
 
   protected readonly genderLabel = computed(() => {
@@ -92,9 +145,11 @@ export class KittenComponent {
     return null;
   });
 
-  protected readonly ageLabel = computed(() => computeAge(this.kitten()?.birthDay));
+  protected readonly ageLabel = computed(() =>
+    formatAgeShort(this.kitten()?.birthDay, this.i18n),
+  );
 
-  protected readonly images = computed(() => {
+  private readonly sortedImages = computed(() => {
     const kitten = this.kitten();
     if (!kitten?.images?.length) return [];
     const mainIdx = kitten.images.findIndex((img) => img.isMain);
@@ -107,21 +162,92 @@ export class KittenComponent {
     return kitten.images;
   });
 
-  protected readonly selectedImage = computed(() => {
-    const imgs = this.images();
-    if (!imgs.length) return FALLBACK_IMAGE;
-    return imgs[this.selectedImageIndex()]?.full ?? imgs[0]?.full ?? FALLBACK_IMAGE;
+  protected readonly images = computed<GalleryImage[]>(() =>
+    this.sortedImages().map((img) => ({
+      display: scaledImage(img.full, STAGE_WIDTH),
+      zoom: scaledImage(img.full, VIEWER_WIDTH),
+      thumb: img.thumbnail || img.mobile || scaledImage(img.full, STAGE_WIDTH),
+    })),
+  );
+
+  /** Clamped so a leftover index from the previous kitten can't blank the stage. */
+  protected readonly selectedImageIndex = computed(() => {
+    const count = this.sortedImages().length;
+    if (!count) return 0;
+    return Math.min(Math.max(this.requestedImageIndex(), 0), count - 1);
   });
 
+  /** The original, for `og:image` and for the empty-gallery fallback. */
+  protected readonly selectedImage = computed(() => {
+    const imgs = this.sortedImages();
+    if (!imgs.length) return KITTEN_PLACEHOLDER;
+    return imgs[this.selectedImageIndex()]?.full ?? imgs[0]?.full ?? KITTEN_PLACEHOLDER;
+  });
+
+  constructor() {
+    // Opening a different kitten starts the gallery from its first photo again.
+    effect(() => {
+      void this.kitten()?._id;
+      this.requestedImageIndex.set(0);
+    });
+
+    // Detail pages are server-rendered, so the crawler already receives the
+    // kitten's own title, snippet and social image rather than a generic one.
+    effect(() => {
+      const kitten = this.kitten();
+      if (!kitten) {
+        return;
+      }
+
+      this.seo.applyKitten({
+        path: `/kittens/${kitten._id}`,
+        name: this.name(),
+        breed: kitten.breed ?? '',
+        color: kitten.color ?? '',
+        age: this.formatBirthDay(kitten.birthDay),
+        image: this.selectedImage(),
+        // Status and price turn the page into an offer in the structured data,
+        // which is what a "kittens for sale" query can match.
+        status: mapStatus(kitten.status),
+        prices: [kitten.price?.pet ?? null, kitten.price?.breeding ?? null],
+      });
+    });
+
+    // Reported from here rather than from the router, because the name and
+    // breed only exist once the API has answered. The guard keeps a language
+    // switch or a photo change from counting as a second view of the same
+    // kitten; a real navigation destroys the component and resets it.
+    let reportedId = '';
+    effect(() => {
+      const kitten = this.kitten();
+      if (!kitten || kitten._id === reportedId) {
+        return;
+      }
+
+      reportedId = kitten._id;
+      this.analytics.trackKittenView({
+        id: kitten._id,
+        name: this.name(),
+        breed: kitten.breed,
+        sex: kitten.sex,
+        status: kitten.status,
+      });
+    });
+  }
+
   protected selectImage(index: number): void {
-    this.selectedImageIndex.set(index);
+    this.requestedImageIndex.set(index);
+    // Photo browsing is the clearest sign of interest on this page, so it is
+    // worth seeing next to the kittens visitors leave without looking at.
+    this.analytics.noteInteraction('gallery_photo');
   }
 
   protected formatBirthDay(birthDay?: string): string {
     if (!birthDay) return '—';
     const date = new Date(birthDay);
     if (Number.isNaN(date.getTime())) return '—';
-    return date.toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' });
+    const locale = this.i18n.getLanguage() === 'uk' ? 'uk-UA' : 'en-GB';
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   protected parentName(parent: ParentApiItem): string {
@@ -130,23 +256,8 @@ export class KittenComponent {
 
   protected pickParentImage(parent: ParentApiItem): string {
     const images = parent.images;
-    if (!images || images.length === 0) return FALLBACK_IMAGE;
-    return images.find((i) => i.isMain)?.full ?? images[0].full ?? FALLBACK_IMAGE;
+    if (!images || images.length === 0) return PARENT_PLACEHOLDER;
+    return images.find((i) => i.isMain)?.full ?? images[0].full ?? PARENT_PLACEHOLDER;
   }
 }
 
-function computeAge(birthDay?: string): string | null {
-  if (!birthDay) return null;
-  const date = new Date(birthDay);
-  if (Number.isNaN(date.getTime())) return null;
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays < 7) return `${diffDays}д`;
-  const diffWeeks = Math.floor(diffDays / 7);
-  if (diffWeeks < 8) return `${diffWeeks} нед.`;
-  const diffMonths = Math.floor(diffDays / 30.44);
-  if (diffMonths < 24) return `${diffMonths} мес.`;
-  const diffYears = Math.floor(diffMonths / 12);
-  return `${diffYears} г.`;
-}

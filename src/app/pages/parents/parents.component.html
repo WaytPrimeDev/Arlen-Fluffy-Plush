@@ -1,42 +1,117 @@
 <section class="parents-page">
   <header class="parents-page__header">
-    <p class="parents-page__eyebrow">Наши питомцы</p>
-    <h1>Родители</h1>
-    <p class="parents-page__subtitle">
-      Познакомьтесь с нашими кошками и котами — гордостью питомника и родителями всех малышей.
-    </p>
+    <p class="parents-page__eyebrow">{{ i18n.t('parentsEyebrow') }}</p>
+    <h1>{{ i18n.t('parentsTitle') }}</h1>
+    <p class="parents-page__subtitle">{{ i18n.t('parentsSubtitle') }}</p>
   </header>
 
-  <div class="parents-page__filters" aria-label="Фильтрация по полу">
-    @for (option of sexOptions(); track option.value) {
-      <button
-        type="button"
-        class="parents-page__filter"
-        [class.parents-page__filter--active]="activeSex() === option.value"
-        (click)="setSex(option.value)"
-        [attr.aria-label]="'Показать: ' + option.label"
+  <div class="parents-page__filter-bar" [attr.aria-label]="i18n.t('filterAndSort')" role="group">
+    <button
+      #filtersToggle
+      type="button"
+      class="parents-page__filters-toggle"
+      [class.parents-page__filters-toggle--open]="filtersOpen()"
+      [attr.aria-expanded]="filtersOpen()"
+      aria-controls="parents-filters"
+      (click)="toggleFilters()"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
       >
-        {{ option.label }}
+        <line x1="4" y1="6" x2="20" y2="6" />
+        <line x1="7" y1="12" x2="17" y2="12" />
+        <line x1="10" y1="18" x2="14" y2="18" />
+      </svg>
+      {{ i18n.t('filters') }}
+      @if (activeFilterCount()) {
+        <span class="parents-page__filters-count" aria-hidden="true">
+          {{ activeFilterCount() }}
+        </span>
+        <span class="visually-hidden">{{ activeFilterCount() }} {{ i18n.t('filtersActive') }}</span>
+      }
+      <span class="parents-page__filters-chevron" aria-hidden="true">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          focusable="false"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </span>
+    </button>
+
+    @if (activeFilterCount()) {
+      <button type="button" class="parents-page__filters-reset" (click)="resetFilters()">
+        {{ i18n.t('resetAllFilters') }}
+        <span aria-hidden="true">×</span>
       </button>
     }
   </div>
 
-  <div class="parents-page__select-filters">
-    <label class="parents-page__select-label">
-      <span>{{ i18n.t('filterByBreed') }}</span>
-      <select
-        class="parents-page__select"
-        [value]="activeBreed()"
-        (change)="setBreed($any($event.target).value)"
-        [attr.aria-label]="i18n.t('filterByBreed')"
-      >
-        <option value="all">{{ i18n.t('allBreeds') }}</option>
-        @for (breed of breeds(); track breed) {
-          <option [value]="breed">{{ breed }}</option>
+  @if (filtersOpen()) {
+    <div class="parents-page__filters-panel" id="parents-filters">
+      <div class="parents-page__filters" role="group" [attr.aria-label]="i18n.t('filterBySex')">
+        @for (option of sexOptions(); track option.value) {
+          <button
+            type="button"
+            class="parents-page__filter"
+            [class.parents-page__filter--active]="activeSex() === option.value"
+            (click)="setSex(option.value)"
+            [attr.aria-label]="i18n.t('showLabel') + ': ' + option.label"
+          >
+            {{ option.label }}
+          </button>
         }
-      </select>
-    </label>
-  </div>
+      </div>
+
+      <div class="parents-page__select-filters">
+        <label class="parents-page__select-label">
+          <span>{{ i18n.t('filterByBreed') }}</span>
+          <select
+            class="parents-page__select"
+            [value]="activeBreed()"
+            (change)="setBreed($any($event.target).value)"
+            [attr.aria-label]="i18n.t('filterByBreed')"
+          >
+            <option value="all">{{ i18n.t('allBreeds') }}</option>
+            @for (breed of breeds(); track breed) {
+              <option [value]="breed">{{ breed }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="parents-page__select-label">
+          <span>{{ i18n.t('filterByColor') }}</span>
+          <select
+            class="parents-page__select"
+            [value]="activeColor()"
+            (change)="setColor($any($event.target).value)"
+            [attr.aria-label]="i18n.t('filterByColor')"
+          >
+            <option value="all">{{ i18n.t('allColors') }}</option>
+            @for (color of colors(); track color) {
+              <option [value]="color">{{ color }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+  }
 
   @if (isLoading() && parents().length === 0) {
     <div class="parents-page__grid" aria-busy="true">
@@ -53,7 +128,7 @@
     </div>
   } @else if (loadError()) {
     <div class="parents-page__empty" role="alert">
-      <h2>Ошибка загрузки</h2>
+      <h2>{{ i18n.t('loadErrorTitle') }}</h2>
       <p>{{ loadError() }}</p>
     </div>
   } @else if (filteredParents().length) {
@@ -62,11 +137,16 @@
         <li role="listitem">
           <a
             class="parent-card"
-            [routerLink]="['/parents', parent.id]"
-            [attr.aria-label]="'Подробнее о ' + parent.name"
+            [routerLink]="['/parents', parent.id] | locPath"
+            [attr.aria-label]="i18n.t('moreAbout') + ' ' + parent.name"
           >
             <div class="parent-card__media">
-              <img [src]="parent.image" [alt]="parent.name" loading="lazy" />
+              <img
+                [appImageFallback]="parentPlaceholder"
+                [src]="parent.image"
+                [alt]="parent.name"
+                loading="lazy"
+              />
               <span
                 class="parent-card__sex-badge"
                 [class.parent-card__sex-badge--female]="parent.sex === 'female'"
@@ -75,7 +155,10 @@
                 {{ formatSex(parent.sex) }}
               </span>
               @if (parent.kittensCount > 0) {
-                <span class="parent-card__kittens-count" aria-label="{{ parent.kittensCount }} котят">
+                <span
+                  class="parent-card__kittens-count"
+                  attr.aria-label="{{ parent.kittensCount }} {{ i18n.t('kittensWord') }}"
+                >
                   {{ parent.kittensCount }}
                 </span>
               }
@@ -85,7 +168,10 @@
               <h2>{{ parent.name }}</h2>
               <p class="parent-card__breed">{{ parent.breed }}</p>
               <div class="parent-card__meta">
-                <span class="parent-card__color-dot" [style.background]="'var(--brand-light)'"></span>
+                <span
+                  class="parent-card__color-dot"
+                  [style.background]="'var(--brand-light)'"
+                ></span>
                 <span class="parent-card__color-label">{{ parent.color }}</span>
               </div>
             </div>
@@ -108,8 +194,8 @@
     }
   } @else {
     <div class="parents-page__empty" role="status">
-      <h2>Никого не найдено</h2>
-      <p>Попробуйте выбрать другой фильтр.</p>
+      <h2>{{ i18n.t('nothingFoundTitle') }}</h2>
+      <p>{{ i18n.t('nothingFoundText') }}</p>
     </div>
   }
 </section>

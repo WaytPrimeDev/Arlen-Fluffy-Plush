@@ -1,5 +1,6 @@
 import { Injectable, Signal, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { API_PATH } from './api';
 
 export interface Pagination {
   page: number;
@@ -23,13 +24,21 @@ export interface ListParams {
   color?: string;
 }
 
-type FiltersApiResponse = string[] | { data?: string[]; message?: string };
+/**
+ * The backend answers `/filters/breeds` with `{ status, breeds: [...] }` and
+ * `/filters/colors` with `{ status, colors: [...] }`, so the list lives under a
+ * key named after the endpoint. The other shapes are kept as fallbacks in case
+ * the response ever switches to `data` or to a bare array.
+ */
+type FiltersApiResponse =
+  | string[]
+  | { breeds?: string[]; colors?: string[]; data?: string[]; message?: string };
 
-function extractList(response: FiltersApiResponse): string[] {
+function extractList(response: FiltersApiResponse, key: 'breeds' | 'colors'): string[] {
   if (Array.isArray(response)) {
     return response;
   }
-  return response?.data ?? [];
+  return response?.[key] ?? response?.data ?? [];
 }
 
 @Injectable({
@@ -37,7 +46,7 @@ function extractList(response: FiltersApiResponse): string[] {
 })
 export class FiltersService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'https://arlenback-production.up.railway.app/api';
+  private readonly apiUrl = API_PATH;
 
   private readonly breedsSignal = signal<string[]>([]);
   private readonly colorsSignal = signal<string[]>([]);
@@ -57,14 +66,12 @@ export class FiltersService {
       return;
     }
     this.breedsLoaded = true;
-    this.http
-      .get<FiltersApiResponse>(`${this.apiUrl}/filters/breeds`)
-      .subscribe({
-        next: (response) => this.breedsSignal.set(extractList(response)),
-        error: () => {
-          this.breedsLoaded = false;
-        },
-      });
+    this.http.get<FiltersApiResponse>(`${this.apiUrl}/filters/breeds`).subscribe({
+      next: (response) => this.breedsSignal.set(extractList(response, 'breeds')),
+      error: () => {
+        this.breedsLoaded = false;
+      },
+    });
   }
 
   private loadColors(): void {
@@ -72,13 +79,11 @@ export class FiltersService {
       return;
     }
     this.colorsLoaded = true;
-    this.http
-      .get<FiltersApiResponse>(`${this.apiUrl}/filters/colors`)
-      .subscribe({
-        next: (response) => this.colorsSignal.set(extractList(response)),
-        error: () => {
-          this.colorsLoaded = false;
-        },
-      });
+    this.http.get<FiltersApiResponse>(`${this.apiUrl}/filters/colors`).subscribe({
+      next: (response) => this.colorsSignal.set(extractList(response, 'colors')),
+      error: () => {
+        this.colorsLoaded = false;
+      },
+    });
   }
 }

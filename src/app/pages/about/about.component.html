@@ -7,26 +7,26 @@
     </div>
   </section>
 
-  <div class="about-page__body">
-    <!-- Introduction -->
-    <section class="about-page__section">
-      <div class="about-page__intro-grid">
-        <div class="about-page__intro-text">
-          <h2>{{ 'aboutIntroTitle' | translate }}</h2>
-          <p>{{ 'aboutIntroP1' | translate }}</p>
-          <p>{{ 'aboutIntroP2' | translate }}</p>
-          <p>{{ 'aboutIntroP3' | translate }}</p>
-        </div>
-        <div class="about-page__intro-image">
-          <img
-            src="https://images.unsplash.com/photo-1582018214674-8e2151fcd190?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Our cattery"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </section>
+  <!-- Introduction: full-bleed, the photo runs to the right edge -->
+  <section class="about-page__intro">
+    <div class="about-page__intro-text">
+      <h2>{{ 'aboutIntroTitle' | translate }}</h2>
+      <p>{{ 'aboutIntroP1' | translate }}</p>
+      <p>{{ 'aboutIntroP2' | translate }}</p>
+      <p>{{ 'aboutIntroP3' | translate }}</p>
+    </div>
+    <div class="about-page__intro-image">
+      <img
+        ngSrc="/assets/img/about_us.jpg"
+        fill
+        sizes="(max-width: 900px) 100vw, 55vw"
+        [alt]="'aboutIntroImageAlt' | translate"
+      />
+      <div class="about-page__intro-fade" aria-hidden="true"></div>
+    </div>
+  </section>
 
+  <div class="about-page__body">
     <!-- Core Values -->
     <section class="about-page__section">
       <h2 class="about-page__section-title">{{ 'coreValues' | translate }}</h2>
@@ -82,27 +82,49 @@
       </div>
     </section>
 
-    <!-- Awards & Achievements -->
+    <!-- What a kitten comes with -->
     <section class="about-page__section">
-      <h2 class="about-page__section-title">{{ 'awardsTitle' | translate }}</h2>
-      <div class="about-page__awards-grid">
-        @for (award of awards; track award.id) {
-          <article class="about-page__award-card">
-            <div class="about-page__award-icon" aria-hidden="true">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="6"/>
-                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
-              </svg>
+      <h2 class="about-page__section-title">{{ 'readinessTitle' | translate }}</h2>
+      <div class="about-page__values-grid about-page__values-grid--four">
+        @for (item of readiness; track item.id) {
+          <article class="about-page__value-card">
+            <div class="about-page__value-icon">
+              @switch (item.iconName) {
+                @case ('paw') {
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="6.5" cy="9" r="2.2"/><circle cx="10.5" cy="5.5" r="2.2"/>
+                    <circle cx="15.5" cy="5.5" r="2.2"/><circle cx="19" cy="9.5" r="2.2"/>
+                    <path d="M8.5 15.5c1-2 2.1-3 4.1-3s3.1 1 4.1 3c.8 1.6.4 3.4-1.3 4-1 .4-1.9.2-2.8.2s-1.8.2-2.8-.2c-1.7-.6-2.1-2.4-1.3-4z"/>
+                  </svg>
+                }
+                @case ('shield') {
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22c4.42-1.12 8-5 8-10V5l-8-3-8 3v7c0 5 3.58 8.88 8 10z"/>
+                    <path d="M9 11.5l2 2 4-4"/>
+                  </svg>
+                }
+                @case ('document') {
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="8" y1="13" x2="14" y2="13"/>
+                    <line x1="8" y1="17" x2="16" y2="17"/>
+                  </svg>
+                }
+                @case ('home') {
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10.5 12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <path d="M12 17.5c-1.8-1.2-3-2.2-3-3.6a1.7 1.7 0 0 1 3-1 1.7 1.7 0 0 1 3 1c0 1.4-1.2 2.4-3 3.6z"/>
+                  </svg>
+                }
+              }
             </div>
-            <div class="about-page__award-body">
-              <div class="about-page__award-header">
-                <h3>{{ award.titleKey | translate }}</h3>
-                <span class="about-page__award-year">{{ award.year }}</span>
-              </div>
-              <p class="about-page__award-org">{{ award.organizationKey | translate }}</p>
-              <p class="about-page__award-desc">{{ award.descriptionKey | translate }}</p>
-            </div>
+            <h3>{{ item.titleKey | translate }}</h3>
+            <p>{{ item.descriptionKey | translate }}</p>
           </article>
         }
       </div>

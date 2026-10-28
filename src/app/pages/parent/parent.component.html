@@ -1,7 +1,7 @@
 <article class="parent-page">
   <div class="parent-page__container">
 
-    <a class="parent-page__back" routerLink="/parents" [attr.aria-label]="i18n.t('backToParents')">
+    <a class="parent-page__back" [routerLink]="'/parents' | locPath" [attr.aria-label]="i18n.t('backToParents')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
       </svg>
@@ -23,40 +23,75 @@
         <p class="parent-page__eyebrow">{{ i18n.t('error') }}</p>
         <h1>{{ i18n.t('error') }}</h1>
         <p>{{ loadError() }}</p>
-        <a class="parent-page__back-cta" routerLink="/parents">{{ i18n.t('backToParents') }}</a>
+        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{ i18n.t('backToParents') }}</a>
       </div>
     } @else if (parent()) {
 
       <div class="parent-page__layout">
 
         <!-- Gallery -->
-        <div class="parent-page__gallery" appPhotoViewer="a">
-          <a
-            class="parent-page__main-image"
-            [href]="selectedImage()"
-            [attr.data-pswp-width]="1600"
-            [attr.data-pswp-height]="1067"
-            [attr.data-pswp-index]="selectedImageIndex()"
-          >
-            <img [src]="selectedImage()" [alt]="name()" />
-          </a>
+        <div class="parent-page__gallery">
+          @if (images().length) {
+            <!-- Buttons rather than links: a link to the photo file is a live
+                 destination before the page has hydrated, so an early click
+                 would leave the site for a bare image. Every photo is here so
+                 the viewer gets the whole set; only the selected one is
+                 visible and reachable. -->
+            <div
+              class="parent-page__stage"
+              appPhotoViewer=".parent-page__slide"
+              [pageImageWidth]="stageWidth"
+              [viewerImageWidth]="viewerWidth"
+            >
+              @for (img of images(); track img.zoom; let i = $index) {
+                <button
+                  type="button"
+                  class="parent-page__slide"
+                  [class.parent-page__slide--active]="selectedImageIndex() === i"
+                  [attr.data-pswp-src]="img.zoom"
+                  [attr.tabindex]="selectedImageIndex() === i ? null : -1"
+                  [attr.aria-hidden]="selectedImageIndex() === i ? null : 'true'"
+                  [attr.aria-label]="
+                    i18n.t('openPhotoFullscreen') +
+                    ': ' +
+                    i18n.t('viewerCounter', { current: i + 1, total: images().length })
+                  "
+                >
+                  <img
+                    [src]="img.display"
+                    [alt]="i18n.t('viewerImageAlt', { label: name(), index: i + 1 })"
+                    [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                    [attr.fetchpriority]="i === 0 ? 'high' : null"
+                  />
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="parent-page__stage parent-page__stage--static">
+              <img
+                class="parent-page__slide parent-page__slide--active"
+                [appImageFallback]="parentPlaceholder"
+                [src]="selectedImage()"
+                [alt]="name()"
+              />
+            </div>
+          }
 
           @if (images().length > 1) {
-            <div class="parent-page__thumbs" role="list">
-              @for (img of images(); track img.full; let i = $index) {
-                <a
-                  class="parent-page__thumb"
-                  [class.parent-page__thumb--active]="selectedImageIndex() === i"
-                  [href]="img.full"
-                  [attr.data-pswp-width]="1600"
-                  [attr.data-pswp-height]="1067"
-                  [attr.data-pswp-index]="i"
-                  (click)="selectImage(i); $event.preventDefault()"
-                  [attr.aria-label]="'Photo ' + (i + 1)"
-                  role="listitem"
-                >
-                  <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
-                </a>
+            <div class="parent-page__thumbs" role="list" [attr.aria-label]="i18n.t('galleryThumbnails')">
+              @for (img of images(); track img.zoom; let i = $index) {
+                <div role="listitem">
+                  <button
+                    type="button"
+                    class="parent-page__thumb"
+                    [class.parent-page__thumb--active]="selectedImageIndex() === i"
+                    [attr.aria-current]="selectedImageIndex() === i ? 'true' : null"
+                    [attr.aria-label]="i18n.t('viewerGoToImage', { index: i + 1 })"
+                    (click)="selectImage(i)"
+                  >
+                    <img [src]="img.thumb" alt="" loading="lazy" />
+                  </button>
+                </div>
               }
             </div>
           }
@@ -128,11 +163,11 @@
             @for (kitten of kittens(); track kitten.id) {
               <a
                 class="kitten-card"
-                [routerLink]="['/kittens', kitten.id]"
+                [routerLink]="['/kittens', kitten.id] | locPath"
                 [attr.aria-label]="kitten.name + ', ' + kitten.breed"
               >
                 <div class="kitten-card__media">
-                  <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                  <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
                   <span class="kitten-card__age-badge">{{ kitten.age }}</span>
                 </div>
                 <div class="kitten-card__body">
@@ -164,7 +199,7 @@
       <div class="parent-page__empty" role="status">
         <p class="parent-page__eyebrow">404</p>
         <h1>{{ i18n.t('noData') }}</h1>
-        <a class="parent-page__back-cta" routerLink="/parents">{{ i18n.t('backToParents') }}</a>
+        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{ i18n.t('backToParents') }}</a>
       </div>
     }
 

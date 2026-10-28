@@ -210,11 +210,24 @@
   overflow: hidden;
 }
 
+/*
+ * Out of flow on purpose. In flow the photo is both the thing being sized by
+ * `height: 100%` and the thing giving `.hero__media` the height that percentage
+ * resolves against, so the browser lays it out once at its intrinsic size and
+ * again once the file arrives — a visible squash-then-settle for as long as the
+ * photo takes to load. Absolute positioning takes the image out of that loop:
+ * the box is sized by `min-height` and the grid row alone, from the first paint.
+ */
 .hero__image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+
+  /* Biased to the right of the frame: the cat sits off-centre in the photo and
+     a centred crop cuts its head off at desktop widths. */
+  object-position: 80% center;
 }
 
 .hero__overlay {
@@ -414,7 +427,13 @@
 .bento {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(2, minmax(220px, auto));
+  /*
+   * Uneven rows. The top one carries the night panel and the portrait family
+   * photo, which both want height; the bottom one only has to fit the CTA's
+   * heading, a short paragraph and a button. The two still add up to the same
+   * total, so the sofa tile spanning both keeps its size.
+   */
+  grid-template-rows: minmax(470px, auto) minmax(250px, auto);
   gap: 1rem;
 }
 
@@ -424,8 +443,8 @@
 }
 
 .bento__item--big {
-  grid-column: span 5;
-  grid-row: span 2;
+  grid-column: 1 / span 5;
+  grid-row: 1 / span 2;
   position: relative;
 }
 
@@ -443,9 +462,50 @@
 }
 
 .bento__item--text {
-  grid-column: span 4;
-  background: var(--brand-light);
+  grid-column: 6 / span 4;
+  grid-row: 1;
+  background:
+    radial-gradient(circle at 78% 18%, rgb(146 118 199 / 35%), transparent 55%),
+    linear-gradient(160deg, #241c3d 0%, #15102a 55%, #0d0a1c 100%);
   padding: 2rem;
+  position: relative;
+  isolation: isolate;
+}
+
+.bento__item--text::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 22%, rgb(255 255 255 / 90%), transparent 100%),
+    radial-gradient(1.2px 1.2px at 28% 62%, rgb(255 255 255 / 70%), transparent 100%),
+    radial-gradient(2px 2px at 44% 14%, rgb(255 255 255 / 95%), transparent 100%),
+    radial-gradient(1.2px 1.2px at 58% 44%, rgb(255 255 255 / 65%), transparent 100%),
+    radial-gradient(1.6px 1.6px at 70% 76%, rgb(255 255 255 / 85%), transparent 100%),
+    radial-gradient(1.2px 1.2px at 86% 34%, rgb(255 255 255 / 75%), transparent 100%),
+    radial-gradient(1.4px 1.4px at 92% 68%, rgb(255 255 255 / 80%), transparent 100%),
+    radial-gradient(1.2px 1.2px at 20% 88%, rgb(255 255 255 / 60%), transparent 100%),
+    radial-gradient(1px 1px at 50% 92%, rgb(255 255 255 / 55%), transparent 100%),
+    radial-gradient(1px 1px at 66% 8%, rgb(255 255 255 / 60%), transparent 100%);
+  animation: bento-twinkle 6s ease-in-out infinite alternate;
+}
+
+@keyframes bento-twinkle {
+  from {
+    opacity: 0.55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento__item--text::before {
+    animation: none;
+    opacity: 0.85;
+  }
 }
 
 .bento__item--text h3,
@@ -454,8 +514,12 @@
   margin-bottom: 0.5rem;
 }
 
+.bento__item--text h3 {
+  color: var(--warm-bg);
+}
+
 .bento__item--text p {
-  color: var(--text-muted);
+  color: rgb(251 248 245 / 82%);
 }
 
 .bento__emoji {
@@ -464,17 +528,48 @@
 }
 
 .bento__item--image {
-  grid-column: span 3;
+  grid-column: 10 / span 3;
+  grid-row: 1;
+  position: relative;
 }
 
 .bento__item--cta {
-  grid-column: span 7;
+  grid-column: 6 / span 7;
+  grid-row: 2;
   background: var(--brand-purple);
   padding: 2.4rem;
   color: var(--warm-bg);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: relative;
+  isolation: isolate;
+}
+
+.bento__item--cta::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 46%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff'%3E%3Cellipse cx='50' cy='68' rx='25' ry='21'/%3E%3Cellipse cx='21' cy='39' rx='10' ry='13'/%3E%3Cellipse cx='40' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='60' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='79' cy='39' rx='10' ry='13'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff'%3E%3Cellipse cx='50' cy='68' rx='25' ry='21'/%3E%3Cellipse cx='21' cy='39' rx='10' ry='13'/%3E%3Cellipse cx='40' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='60' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='79' cy='39' rx='10' ry='13'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff'%3E%3Cellipse cx='50' cy='68' rx='25' ry='21'/%3E%3Cellipse cx='21' cy='39' rx='10' ry='13'/%3E%3Cellipse cx='40' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='60' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='79' cy='39' rx='10' ry='13'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff'%3E%3Cellipse cx='50' cy='68' rx='25' ry='21'/%3E%3Cellipse cx='21' cy='39' rx='10' ry='13'/%3E%3Cellipse cx='40' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='60' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='79' cy='39' rx='10' ry='13'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff'%3E%3Cellipse cx='50' cy='68' rx='25' ry='21'/%3E%3Cellipse cx='21' cy='39' rx='10' ry='13'/%3E%3Cellipse cx='40' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='60' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='79' cy='39' rx='10' ry='13'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffffff'%3E%3Cellipse cx='50' cy='68' rx='25' ry='21'/%3E%3Cellipse cx='21' cy='39' rx='10' ry='13'/%3E%3Cellipse cx='40' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='60' cy='21' rx='10' ry='14'/%3E%3Cellipse cx='79' cy='39' rx='10' ry='13'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position:
+    78% 14%,
+    38% 30%,
+    92% 48%,
+    58% 62%,
+    24% 78%,
+    84% 90%;
+  background-size:
+    74px 74px,
+    44px 44px,
+    52px 52px,
+    88px 88px,
+    38px 38px,
+    58px 58px;
 }
 
 .bento__item--cta p {
@@ -486,101 +581,16 @@
   background: #f5f0fa;
 }
 
-.kittens__grid,
 .why__grid,
 .reviews__grid {
   display: grid;
   gap: 1.25rem;
 }
 
-.kittens__grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.kitten-card {
-  background: #fff;
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgb(0 0 0 / 6%);
-  transition: all 0.3s ease;
-}
-
-.kitten-card--active {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 60px rgb(115 86 168 / 22%);
-}
-
-.kitten-card__media {
-  position: relative;
-  height: 280px;
-}
-
-.kitten-card__badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.kitten-card__body {
-  padding: 1.75rem;
-}
-
-.kitten-card__head {
+.kittens__more {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.kitten-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.4rem;
-}
-
-.kitten-card__head p {
-  color: #9e87c0;
-  font-size: 0.8rem;
-}
-
-.kitten-card__head strong {
-  color: var(--brand-purple);
-  font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
-}
-
-.kitten-card__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0 1.2rem;
-}
-
-.kitten-card__tags span {
-  background: #f5f0fa;
-  color: var(--brand-purple);
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-}
-
-.kitten-card__body > a {
-  display: block;
-  text-align: center;
-  border-radius: 16px;
-  background: #f5f0fa;
-  color: var(--brand-purple);
-  padding: 0.75rem;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.kitten-card--active .kitten-card__body > a {
-  background: var(--brand-purple);
-  color: #fff;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 .why__grid {
@@ -751,6 +761,11 @@
 }
 
 @media (max-width: 980px) {
+  .bento__item--cta::after {
+    width: 100%;
+    opacity: 0.07;
+  }
+
   .topbar__nav {
     display: none;
   }

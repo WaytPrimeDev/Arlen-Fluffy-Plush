@@ -4,22 +4,31 @@ import {
   computed,
   inject,
   signal,
+  viewChild,
+  type ElementRef,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { forkJoin, map } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { KittensService, type KittenApiItem } from './kittens.service';
-import { FamiliesService, type FamilyApiItem } from '../families/families.service';
+import {
+  formatAgeShort,
+  mapKittenToListItem,
+  pickImage,
+  type KittenListItem,
+  PARENT_PLACEHOLDER,
+} from '../../services/kitten-view.util';
+import { FamiliesService, type FamilyApiItem } from '../../services/families.service';
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
 import { I18nService } from '../../services/i18n.service';
 import { FiltersService } from '../../services/filters.service';
-import { CommonModule } from '@angular/common';
 import { SelectComponent, type SelectOption } from '../../components/select/select.component';
+import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
+import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
 
 type ViewMode = 'all' | 'grouped';
 type GenderFilter = 'all' | 'male' | 'female';
 type Tab = 'kittens' | 'parents';
-type KittenStatus = 'available' | 'reserved' | 'offline'; // kept for mapStatus return type
 
 interface ParentOption {
   id: string;
@@ -36,23 +45,11 @@ interface LitterParentView {
 
 interface LitterView {
   key: string;
+  /** The family's own `name` from the API, e.g. "литер Т". */
+  name: string;
   mother: LitterParentView | null;
   father: LitterParentView | null;
   kittens: KittenListItem[];
-}
-
-interface KittenListItem {
-  id: string;
-  name: string;
-  breed: string;
-  age: string;
-  color: string;
-  status: KittenStatus;
-  priceLabel: string;
-  image: string;
-  gender: 'male' | 'female' | 'unknown';
-  motherId: string | null;
-  fatherId: string | null;
 }
 
 interface ParentDisplayCard {
@@ -63,17 +60,15 @@ interface ParentDisplayCard {
   image: string;
 }
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1518288774672-b94e808873ff?auto=format&fit=crop&w=1200&q=80';
-
 const LOOKUP_PER_PAGE = 1000;
 
 @Component({
   selector: 'app-kittens',
-  imports: [RouterLink, CommonModule, SelectComponent],
+  imports: [RouterLink, SelectComponent, LocalizedPathPipe, ImageFallbackDirective],
   templateUrl: './kittens.component.html',
   styleUrl: './kittens.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(keydown.escape)': 'closeFilters()' },
 })
 export class KittensComponent {
   private readonly kittensService = inject(KittensService);
@@ -84,6 +79,9 @@ export class KittensComponent {
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
+  /** Stand-in for a grown cat whose photo is missing, read by the template. */
+  protected readonly parentPlaceholder = PARENT_PLACEHOLDER;
+
   private readonly parentMap = new Map<string, ParentApiItem>();
 
   private readonly queryParams = toSignal(this.route.queryParamMap, { initialValue: null });
@@ -93,19 +91,41 @@ export class KittensComponent {
     return params?.get('tab') === 'parents' ? 'parents' : 'kittens';
   });
 
-  protected readonly viewMode = signal<ViewMode>('grouped');
+  /** The page opens on the full list of kittens; litters are one click away. */
+  protected readonly viewMode = signal<ViewMode>('all');
+  /** All filters live behind the toolbar button, so the panel starts closed. */
+  protected readonly filtersOpen = signal(false);
+
+  private readonly filtersToggle = viewChild<ElementRef<HTMLButtonElement>>('filtersToggle');
   protected readonly selectedMother = signal<string>('all');
   protected readonly selectedFather = signal<string>('all');
   protected readonly selectedGender = signal<GenderFilter>('all');
   protected readonly selectedBreed = signal<string>('all');
+  protected readonly selectedColor = signal<string>('all');
 
-  protected readonly kittens = signal<KittenListItem[]>([]);
+  private readonly rawKittens = signal<readonly KittenApiItem[]>([]);
+
+  /**
+   * Mapped in a `computed` rather than on arrival, so the cards re-read the
+   * dictionary when the visitor switches language.
+   *
+   * The shared mapper puts the birth date in `age`; this listing wants how old
+   * the kitten is instead, so it overrides that one field. The date is left
+   * alone everywhere else, including the carousel on the home page.
+   */
+  protected readonly kittens = computed<KittenListItem[]>(() =>
+    this.rawKittens().map((kitten) => ({
+      ...mapKittenToListItem(kitten, this.i18n),
+      age: formatAgeShort(kitten.birthDay, this.i18n) ?? this.i18n.t('fallbackNoAge'),
+    })),
+  );
   protected readonly parents = signal<ParentApiItem[]>([]);
   protected readonly families = signal<FamilyApiItem[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal('');
 
   protected readonly breeds = this.filtersService.breeds;
+  protected readonly colors = this.filtersService.colors;
 
   protected readonly mothers = computed<ParentOption[]>(() =>
     this.parents()
@@ -140,14 +160,44 @@ export class KittensComponent {
     ...this.breeds().map((b) => ({ value: b, label: b })),
   ]);
 
+  protected readonly colorOptions = computed<SelectOption[]>(() => [
+    { value: 'all', label: this.i18n.t('allColors') },
+    ...this.colors().map((c) => ({ value: c, label: c })),
+  ]);
+
   protected readonly showKittenOnlyFilters = computed(() => this.activeTab() === 'kittens');
+
+  /** Numbers for the hero strip, derived from what is already loaded. */
+  protected readonly availableCount = computed(
+    () => this.kittens().filter((kitten) => kitten.status === 'available').length,
+  );
+
+  protected readonly litterCount = computed(() => this.groupedByParents().length);
+
+  protected readonly parentCount = computed(() => this.parents().length);
+
+  /** How many filters are narrowing the list, shown next to the reset chip. */
+  protected readonly activeFilterCount = computed(
+    () =>
+      [
+        this.selectedMother(),
+        this.selectedFather(),
+        this.selectedGender(),
+        this.selectedBreed(),
+        this.selectedColor(),
+      ].filter((value) => value !== 'all').length,
+  );
+
+  /** Placeholder cards shown while the first request is in flight. */
+  protected readonly skeletons = [0, 1, 2, 3, 4, 5];
 
   protected readonly hasActiveFilters = computed(
     () =>
       this.selectedMother() !== 'all' ||
       this.selectedFather() !== 'all' ||
       this.selectedGender() !== 'all' ||
-      this.selectedBreed() !== 'all',
+      this.selectedBreed() !== 'all' ||
+      this.selectedColor() !== 'all',
   );
 
   protected readonly filteredKittens = computed(() => {
@@ -155,12 +205,14 @@ export class KittensComponent {
     const father = this.selectedFather();
     const gender = this.selectedGender();
     const breed = this.selectedBreed();
+    const color = this.selectedColor();
 
     return this.kittens().filter((k) => {
       if (mother !== 'all' && k.motherId !== mother) return false;
       if (father !== 'all' && k.fatherId !== father) return false;
       if (gender !== 'all' && k.gender !== gender) return false;
       if (breed !== 'all' && k.breed !== breed) return false;
+      if (color !== 'all' && k.color !== color) return false;
       return true;
     });
   });
@@ -184,10 +236,17 @@ export class KittensComponent {
         );
         if (litterKittens.length === 0) return null;
 
+        const mother = momId ? toLitterParentView(this.parentMap.get(momId)) : null;
+        const father = dadId ? toLitterParentView(this.parentMap.get(dadId)) : null;
+
         return {
           key: family._id,
-          mother: momId ? toLitterParentView(this.parentMap.get(momId)) : null,
-          father: dadId ? toLitterParentView(this.parentMap.get(dadId)) : null,
+          // A family without a name of its own keeps the old parents-based title.
+          name:
+            family.name?.trim() ||
+            `${this.i18n.t('litterFrom')} ${mother?.name ?? '—'} & ${father?.name ?? '—'}`,
+          mother,
+          father,
           kittens: litterKittens,
         } satisfies LitterView;
       })
@@ -196,7 +255,10 @@ export class KittensComponent {
 
   protected readonly parentsBreedFiltered = computed<ParentApiItem[]>(() => {
     const breed = this.selectedBreed();
-    return this.parents().filter((p) => breed === 'all' || p.breed === breed);
+    const color = this.selectedColor();
+    return this.parents().filter(
+      (p) => (breed === 'all' || p.breed === breed) && (color === 'all' || p.color === color),
+    );
   });
 
   protected readonly queens = computed<ParentDisplayCard[]>(() =>
@@ -227,6 +289,24 @@ export class KittensComponent {
     this.viewMode.set(mode);
   }
 
+  protected toggleFilters(): void {
+    this.filtersOpen.update((open) => !open);
+  }
+
+  /**
+   * The panel is not a dialog, so it keeps the page keyboard-navigable: Escape
+   * closes it and hands focus back to the button that opened it. Bound on the
+   * host, because the panel itself is not an interactive element.
+   */
+  protected closeFilters(): void {
+    if (!this.filtersOpen()) {
+      return;
+    }
+
+    this.filtersOpen.set(false);
+    this.filtersToggle()?.nativeElement.focus();
+  }
+
   protected setMother(id: string): void {
     this.selectedMother.set(id);
   }
@@ -243,11 +323,38 @@ export class KittensComponent {
     this.selectedBreed.set(breed);
   }
 
+  protected setColor(color: string): void {
+    this.selectedColor.set(color);
+  }
+
   protected resetFilters(): void {
     this.selectedMother.set('all');
     this.selectedFather.set('all');
     this.selectedGender.set('all');
     this.selectedBreed.set('all');
+    this.selectedColor.set('all');
+  }
+
+  /**
+   * `role="tablist"` promises arrow-key navigation, so the tabs honour it
+   * instead of leaving keyboard users with two separate tab stops.
+   */
+  protected onTabKeydown(event: KeyboardEvent): void {
+    const order: Tab[] = ['kittens', 'parents'];
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (step === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    const next = order[(order.indexOf(this.activeTab()) + step + order.length) % order.length];
+    this.setTab(next);
+
+    const pressed = event.currentTarget as HTMLElement | null;
+    pressed
+      ?.closest('[role="tablist"]')
+      ?.querySelector<HTMLElement>(`[data-tab="${next}"]`)
+      ?.focus();
   }
 
   private loadAll(): void {
@@ -264,7 +371,7 @@ export class KittensComponent {
         for (const p of parents.data ?? []) {
           this.parentMap.set(p._id, p);
         }
-        this.kittens.set((kittens.data ?? []).map(mapKittenToListItem));
+        this.rawKittens.set(kittens.data ?? []);
         this.parents.set(parents.data ?? []);
         this.families.set(families.data ?? []);
         this.isLoading.set(false);
@@ -284,7 +391,7 @@ function toLitterParentView(parent: ParentApiItem | undefined): LitterParentView
     name: parent.nameUa || parent.nameEn || '—',
     breed: parent.breed ?? '',
     color: parent.color ?? '',
-    image: pickImage(parent.images),
+    image: pickImage(parent.images, PARENT_PLACEHOLDER),
   };
 }
 
@@ -294,52 +401,6 @@ function toParentCard(parent: ParentApiItem): ParentDisplayCard {
     name: parent.nameUa || parent.nameEn || '—',
     breed: parent.breed ?? '',
     color: parent.color ?? '',
-    image: pickImage(parent.images),
+    image: pickImage(parent.images, PARENT_PLACEHOLDER),
   };
-}
-
-function pickImage(images: ReadonlyArray<{ full: string; isMain?: boolean }> | undefined): string {
-  if (!images || images.length === 0) return FALLBACK_IMAGE;
-  return images.find((i) => i.isMain)?.full ?? images[0].full ?? FALLBACK_IMAGE;
-}
-
-function mapKittenToListItem(kitten: KittenApiItem): KittenListItem {
-  return {
-    id: kitten._id,
-    name: kitten.nameUa || kitten.nameEn || 'Без имени',
-    breed: kitten.breed || 'Порода не указана',
-    age: formatBirthDay(kitten.birthDay),
-    color: kitten.color || 'Цвет не указан',
-    status: mapStatus(kitten.status),
-    priceLabel: formatPrice(kitten),
-    image: pickImage(kitten.images),
-    gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
-    motherId: kitten.parentId?.mom ?? null,
-    fatherId: kitten.parentId?.dad ?? null,
-  };
-}
-
-function mapStatus(status?: string): KittenStatus {
-  if (status === 'reserved') return 'reserved';
-  if (status === 'offline' || status === 'sold') return 'offline';
-  return 'available';
-}
-
-function formatBirthDay(birthDay?: string): string {
-  if (!birthDay) return 'Возраст не указан';
-  const date = new Date(birthDay);
-  if (Number.isNaN(date.getTime())) return 'Возраст не указан';
-  return date.toLocaleDateString('uk-UA');
-}
-
-function formatPrice(kitten: KittenApiItem): string {
-  const pet = kitten.price?.pet;
-  const breeding = kitten.price?.breeding;
-  if (pet || breeding) {
-    const parts: string[] = [];
-    if (pet) parts.push(`pet: ${pet}`);
-    if (breeding) parts.push(`breeding: ${breeding}`);
-    return parts.join(' | ');
-  }
-  return 'Цена по запросу';
 }

@@ -1,14 +1,6 @@
-/* PhotoSwipe overlay safety — ensures lightbox renders fixed even if photoswipe.css is delayed/missing.
-   Photoswipe's own stylesheet has stronger rules (animations, controls); these are just the bare overlay. */
-.pswp {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 100000;
-  background: #000;
-}
+/* PhotoSwipe's own stylesheet is loaded globally via angular.json ("styles").
+   Nothing is restated here: a hand-rolled `.pswp` overlay would override the
+   backdrop fade and the open/close animations. */
 
 *,
 *::before,
@@ -59,92 +51,163 @@ select {
   font: inherit;
 }
 
-/* ─── Kitten card — global so KittensComponent and ParentComponent share styles ─── */
+/* ─── Utilities ─────────────────────────────────────────────────────────── */
+
+/* Visible to screen readers only — used for loading announcements. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Kitten card — global so the catalogue, the home carousel and the
+       parent page all show the same card ───────────────────────────────── */
+
 .kitten-card {
   display: flex;
   flex-direction: column;
-  border-radius: 24px;
+  position: relative;
+  border-radius: 22px;
   overflow: hidden;
   background: #fff;
-  border: 1px solid rgb(115 86 168 / 10%);
-  box-shadow: 0 10px 24px rgb(28 24 39 / 6%);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border: 1px solid rgb(28 24 39 / 7%);
+  box-shadow:
+    0 2px 4px rgb(28 24 39 / 3%),
+    0 12px 28px rgb(28 24 39 / 5%);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
 
 .kitten-card:hover {
-  transform: translateY(-4px);
-  border-color: rgb(115 86 168 / 24%);
-  box-shadow: 0 18px 36px rgb(115 86 168 / 16%);
+  transform: translateY(-6px);
+  border-color: rgb(115 86 168 / 26%);
+  box-shadow:
+    0 6px 12px rgb(115 86 168 / 8%),
+    0 22px 44px rgb(115 86 168 / 16%);
 }
 
 .kitten-card:focus-visible {
   outline: 3px solid var(--brand-purple);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .kitten-card__media {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
+  background: var(--brand-light);
 }
 
 .kitten-card__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .kitten-card:hover .kitten-card__media img {
-  transform: scale(1.1);
+  transform: scale(1.06);
+}
+
+/* Keeps the badges legible over a light photo. */
+.kitten-card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 38%;
+  background: linear-gradient(to bottom, rgb(28 24 39 / 22%), transparent);
+  pointer-events: none;
 }
 
 .kitten-card__age-badge {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  padding: 0.32rem 0.7rem;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 1;
+  padding: 0.3rem 0.65rem;
   border-radius: 999px;
-  background: rgb(255 255 255 / 90%);
+  background: rgb(255 255 255 / 92%);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   color: var(--text-primary);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 8px rgb(28 24 39 / 6%);
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px rgb(28 24 39 / 10%);
 }
 
 .kitten-card__body {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.25rem;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 1.1rem 1.15rem 1.2rem;
+  flex: 1;
 }
 
 .kitten-card__name {
+  margin: 0;
   font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   line-height: 1.15;
   color: var(--text-primary);
-  margin: 0 0 0.4rem;
 }
 
 .kitten-card__meta {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
 }
 
+.kitten-card__footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgb(28 24 39 / 7%);
+}
+
+.kitten-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--brand-purple);
+  white-space: nowrap;
+}
+
+.kitten-card__cta-arrow {
+  transition: transform 0.25s ease;
+}
+
+.kitten-card:hover .kitten-card__cta-arrow {
+  transform: translateX(3px);
+}
+
+/* Kept for the older markup that still renders the gender as a text row. */
 .kitten-card__gender {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
 }
 
@@ -155,40 +218,68 @@ select {
 }
 
 .kitten-card__gender-symbol--male {
-  color: #2563eb;
+  color: #1e40af;
 }
 
 .kitten-card__gender-symbol--female {
-  color: #db2777;
+  color: #9d174d;
 }
 
-.kitten-card__footer {
+/* ─── Badges and price, shared by every card ────────────────────────────── */
+
+.gender-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgb(28 24 39 / 5%);
+  color: var(--text-muted);
+}
+
+.gender-pill--male {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.gender-pill--female {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.price {
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.5rem;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
-.kitten-card__price {
-  color: var(--brand-purple);
-  font-family: 'Playfair Display', serif;
-  font-size: 1.28rem;
+.price__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
 }
 
-.kitten-card__cta {
-  display: block;
-  width: 100%;
-  padding: 0.62rem 0.9rem;
-  border-radius: 12px;
-  background: var(--brand-purple);
-  color: #fff;
-  text-align: center;
-  font-size: 0.92rem;
+.price__row dt {
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: background 0.2s ease, transform 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
 }
 
-.kitten-card:hover .kitten-card__cta {
-  background: #5e3fa3;
+.price__row dd {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--brand-purple);
+}
+
+.price--ask {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-muted);
 }

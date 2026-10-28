@@ -3,7 +3,10 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "schematicCollections": ["angular-eslint"]
+    "schematicCollections": [
+      "angular-eslint"
+    ],
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -30,11 +33,20 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "node_modules/photoswipe/dist/photoswipe.css",
+              "src/styles.scss"
+            ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": [
+                "koshenya.com",
+                "www.koshenya.com",
+                "*.vercel.app",
+                "localhost",
+                "127.0.0.1"
+              ]
             },
             "ssr": {
               "entry": "src/server.ts"
@@ -43,17 +55,17 @@
           "configurations": {
             "production": {
               "budgets": [
-  {
-    "type": "initial",
-    "maximumWarning": "500kB",
-    "maximumError": "1MB"
-  },
-  {
-    "type": "anyComponentStyle",
-    "maximumWarning": "15kb", 
-    "maximumError": "30kb"
-  }
-],
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "15kb",
+                  "maximumError": "30kb"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
@@ -66,6 +78,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "Arlen-Fluffy-Plush:build:production"
@@ -82,7 +97,10 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         }
       }

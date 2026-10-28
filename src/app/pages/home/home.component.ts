@@ -1,5 +1,9 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { KittenCarouselComponent } from '../../components/kitten-carousel/kitten-carousel.component';
+import { I18nService } from '../../services/i18n.service';
+import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 
 interface WhyItem {
   icon: string;
@@ -23,77 +27,56 @@ interface ContactItem {
   value: string;
 }
 
+/** Three hard-coded stars per review; the copy itself comes from the dictionary. */
+const REVIEW_STARS = 5;
+
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  imports: [RouterLink, KittenCarouselComponent, LocalizedPathPipe, NgOptimizedImage],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  activeKittenId: number | null = null;
+  protected readonly i18n = inject(I18nService);
 
-  philosophyPoints: string[] = [
-    'Встречает у двери каждый день',
-    'Создает атмосферу уюта без усилий',
-    'Слышит вас, когда никто другой не слышит',
-  ];
+  /**
+   * Every list on this page is derived from the dictionary, so switching the
+   * language re-renders the copy instead of leaving one language behind.
+   */
+  protected readonly philosophyPoints = computed<string[]>(() => [
+    this.i18n.t('homePhilosophyPoint1'),
+    this.i18n.t('homePhilosophyPoint2'),
+    this.i18n.t('homePhilosophyPoint3'),
+  ]);
 
-  whyItems: WhyItem[] = [
-    {
-      icon: '🏠',
-      title: 'Рождены дома',
-      text: 'Котята растут в квартире с первого дня - никаких клеток, только тепло и забота.',
-    },
-    {
-      icon: '🩺',
-      title: 'Здоровье на 100%',
-      text: 'Ветеринарные справки, прививки, чипирование и генетические тесты родителей.',
-    },
-    {
-      icon: '💜',
-      title: 'Поддержка навсегда',
-      text: 'Мы остаемся на связи - консультируем по питанию, здоровью и воспитанию.',
-    },
-    {
-      icon: '📋',
-      title: 'Документы WCF',
-      text: 'Метрики и родословные международного стандарта для каждого котенка.',
-    },
-  ];
+  protected readonly whyItems = computed<WhyItem[]>(() => [
+    { icon: '🏠', title: this.i18n.t('homeWhy1Title'), text: this.i18n.t('homeWhy1Text') },
+    { icon: '🩺', title: this.i18n.t('homeWhy2Title'), text: this.i18n.t('homeWhy2Text') },
+    { icon: '💜', title: this.i18n.t('homeWhy3Title'), text: this.i18n.t('homeWhy3Text') },
+    { icon: '📋', title: this.i18n.t('homeWhy4Title'), text: this.i18n.t('homeWhy4Text') },
+  ]);
 
-  reviews: Review[] = [
-    {
-      id: 1,
-      name: 'Анастасия М.',
-      city: 'Львов',
-      text: 'Взяли Луну два года назад. Теперь без нее невозможно представить наш дом. Она встречает нас с работы, спит с нами и знает по имени каждого.',
-      stars: 5,
-      avatar: 'А',
-    },
-    {
-      id: 2,
-      name: 'Дмитрий К.',
-      city: 'Харьков',
-      text: 'Сначала жена долго уговаривала. Теперь я сам не могу без нашего Графа. Это что-то большее, чем питомец - это маленькая личность.',
-      stars: 5,
-      avatar: 'Д',
-    },
-    {
-      id: 3,
-      name: 'Ольга Р.',
-      city: 'Вильнюс',
-      text: 'Питомник с душой. Котята здоровые, социализированные, сразу адаптировались. Помогли выбрать подходящего именно для нашей семьи.',
-      stars: 5,
-      avatar: 'О',
-    },
-  ];
+  protected readonly reviews = computed<Review[]>(() =>
+    [1, 2, 3].map((id) => {
+      const name = this.i18n.t(`homeReview${id}Name`);
+      return {
+        id,
+        name,
+        city: this.i18n.t(`homeReview${id}City`),
+        text: this.i18n.t(`homeReview${id}Text`),
+        stars: REVIEW_STARS,
+        avatar: name.charAt(0),
+      };
+    }),
+  );
 
-  contacts: ContactItem[] = [
+  protected readonly contacts: readonly ContactItem[] = [
     {
       icon: '💬',
       label: 'Telegram',
-      link: 'https://t.me/arlen_fluffy_plush',
-      value: '@arlen_fluffy_plush',
+      link: 'https://t.me/kittensarlenfluffyplush',
+      value: '@arlenfluffyplush',
     },
     {
       icon: '📱',
@@ -109,11 +92,7 @@ export class HomeComponent {
     },
   ];
 
-  setActiveKitten(id: number | null): void {
-    this.activeKittenId = id;
-  }
-
-  getReviewStars(stars: number): number[] {
+  protected getReviewStars(stars: number): number[] {
     return Array(stars).fill(0);
   }
 }

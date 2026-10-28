@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { I18nService } from '../../services/i18n.service';
 import type { ListParams, PaginatedResponse } from '../../services/filters.service';
 import { buildListParams } from '../../services/http-params.util';
+import { API_PATH } from '../../services/api';
 
 export interface ParentImage {
   full: string;
@@ -39,7 +40,7 @@ interface ParentApiResponse {
 export class ParentsService {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
-  private readonly apiUrl = 'https://arlenback-production.up.railway.app/api';
+  private readonly apiUrl = API_PATH;
 
   getParents(params: ListParams = {}): Observable<PaginatedResponse<ParentApiItem>> {
     return this.http.get<PaginatedResponse<ParentApiItem>>(`${this.apiUrl}/cats/parents`, {

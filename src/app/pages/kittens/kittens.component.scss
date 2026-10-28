@@ -2,49 +2,113 @@
   display: block;
 }
 
-/* Root wrapper — no padding so hero spans full width */
 .kittens-page-root {
   display: block;
 }
 
-/* Hero banner */
+/* ─── Hero ──────────────────────────────────────────────────────────────── */
 
-.kittens-page__hero {
+.kittens-hero {
   position: relative;
-  padding: 4rem 1.25rem;
-  background: linear-gradient(90deg,
-    rgb(115 86 168 / 14%) 0%,
-    rgb(86 132 168 / 14%) 50%,
-    rgb(115 86 168 / 14%) 100%
-  );
+  overflow: hidden;
+  padding: 4.5rem 1.25rem 3.5rem;
   text-align: center;
-  margin-bottom: 3rem;
+  background: linear-gradient(180deg, var(--brand-light) 0%, var(--warm-bg) 100%);
+  border-bottom: 1px solid rgb(115 86 168 / 10%);
+  margin-bottom: 2.5rem;
 }
 
-.kittens-page__hero-inner {
-  max-width: 760px;
+/* A soft brand glow instead of a flat band of colour. */
+.kittens-hero__glow {
+  position: absolute;
+  top: -55%;
+  left: 50%;
+  width: min(900px, 120%);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgb(115 86 168 / 18%) 0%, transparent 62%);
+  pointer-events: none;
+}
+
+.kittens-hero__inner {
+  position: relative;
+  max-width: 720px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-
-  h1 {
-    margin: 0;
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.25rem, 5vw, 3rem);
-    color: var(--text-primary);
-    line-height: 1.15;
-  }
-
-  p {
-    margin: 0;
-    color: var(--text-muted);
-    line-height: 1.7;
-    font-size: 1.02rem;
-  }
+  align-items: center;
+  gap: 0.9rem;
 }
 
-/* Page body */
+.kittens-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 70%);
+  border: 1px solid rgb(115 86 168 / 18%);
+  color: var(--brand-purple);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.kittens-hero__title {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.1rem, 5.5vw, 3.2rem);
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.kittens-hero__subtitle {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 1.02rem;
+}
+
+.kittens-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 1.1rem 0 0;
+}
+
+.kittens-hero__stat {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 118px;
+  padding: 0.75rem 1.1rem;
+  border-radius: 16px;
+  background: rgb(255 255 255 / 76%);
+  border: 1px solid rgb(115 86 168 / 12%);
+  box-shadow: 0 4px 14px rgb(28 24 39 / 4%);
+}
+
+.kittens-hero__stat dt {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.kittens-hero__stat dd {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--brand-purple);
+}
+
+/* ─── Page body ─────────────────────────────────────────────────────────── */
 
 .kittens-page {
   max-width: 1240px;
@@ -52,149 +116,30 @@
   padding: 0 1.25rem 5rem;
 }
 
-/* Filter & Sort block */
-
-.kittens-page__filter-block {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 20px;
-  border: 1px solid rgb(115 86 168 / 12%);
-  box-shadow: 0 8px 24px rgb(28 24 39 / 4%);
-  margin-bottom: 2rem;
-}
-
-.kittens-page__filter-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.kittens-page__filter-header h2 {
-  margin: 0;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
-  color: var(--text-primary);
-}
-
-/* View toggle */
-
-.kittens-page__view-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.kittens-page__view-label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.kittens-page__view-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  border: 1px solid rgb(115 86 168 / 20%);
-  background: #fff;
-  color: var(--brand-purple);
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.kittens-page__view-toggle-btn:hover {
-  border-color: var(--brand-purple);
-  transform: translateY(-1px);
-}
-
-.kittens-page__view-toggle-btn:focus-visible {
-  outline: 3px solid var(--brand-purple);
-  outline-offset: 2px;
-}
-
-.kittens-page__view-toggle-btn--active {
-  background: var(--brand-purple);
-  color: #fff;
-  box-shadow: 0 8px 24px rgb(115 86 168 / 25%);
-}
-
-/* Filters grid */
-
-.kittens-page__filters-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1.25rem;
-}
-
-.kittens-page__filters-grid--single {
-  grid-template-columns: minmax(0, 320px);
-}
-
-.kittens-page__select-label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-
-/* Reset button */
-
-.kittens-page__reset-button {
-  margin-top: 1rem;
-  border: none;
-  background: none;
-  color: var(--brand-purple);
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0.25rem 0;
-  transition: text-decoration 0.15s ease;
-}
-
-.kittens-page__reset-button:hover {
-  text-decoration: underline;
-}
-
-.kittens-page__reset-button:focus-visible {
-  outline: 3px solid var(--brand-purple);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Tab bar */
+/* ─── Tabs ──────────────────────────────────────────────────────────────── */
 
 .kittens-page__tabs {
   display: inline-flex;
   gap: 0.25rem;
-  padding: 0.35rem;
-  border-radius: 14px;
-  background: rgb(115 86 168 / 8%);
-  margin-bottom: 2rem;
+  padding: 0.3rem;
+  border-radius: 999px;
+  background: rgb(115 86 168 / 9%);
+  margin-bottom: 1.25rem;
 }
 
 .kittens-page__tab {
   background: transparent;
   border: none;
-  padding: 0.55rem 1.1rem;
-  border-radius: 10px;
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
   cursor: pointer;
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   font-weight: 600;
   color: var(--text-muted);
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease;
 
   &:hover {
     color: var(--brand-purple);
@@ -209,63 +154,298 @@
 .kittens-page__tab--active {
   background: #fff;
   color: var(--brand-purple);
-  box-shadow: 0 4px 12px rgb(28 24 39 / 6%);
+  box-shadow: 0 2px 10px rgb(28 24 39 / 8%);
 }
 
-/* Section title */
+/* ─── Toolbar ───────────────────────────────────────────────────────────── */
 
-.kittens-page__section-title {
-  margin: 0 0 1.5rem;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.75rem;
-  color: var(--text-primary);
-}
-
-/* Kittens grid */
-
-.kittens-page__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.2rem;
-}
-
-/* Litter */
-
-.kittens-page__litter {
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem 1.25rem;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 2.25rem;
   background: #fff;
-  padding: 1.5rem;
+  border: 1px solid rgb(28 24 39 / 7%);
   border-radius: 20px;
-  border: 1px solid rgb(115 86 168 / 12%);
-  box-shadow: 0 8px 24px rgb(28 24 39 / 4%);
-  margin-bottom: 2rem;
+  box-shadow:
+    0 2px 4px rgb(28 24 39 / 3%),
+    0 10px 26px rgb(28 24 39 / 4%);
 }
 
-.kittens-page__litter h3 {
-  margin: 0 0 1.25rem;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.4rem;
-  color: var(--text-primary);
+.toolbar__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1.25rem;
 }
 
-.kittens-page__litter-count {
-  margin: 0 0 1rem;
+/* The button that holds every filter, and the count of the active ones. */
+.toolbar__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.05rem;
+  border: 1px solid rgb(115 86 168 / 25%);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand-purple);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: rgb(115 86 168 / 8%);
+    border-color: var(--brand-purple);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+.toolbar__toggle--open {
+  background: rgb(115 86 168 / 10%);
+  border-color: var(--brand-purple);
+}
+
+.toolbar__toggle-count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--brand-purple);
+  color: #fff;
   font-size: 0.72rem;
   font-weight: 700;
+}
+
+.toolbar__toggle-chevron {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+
+  .toolbar__toggle--open & {
+    transform: rotate(180deg);
+  }
+}
+
+.toolbar__filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.85rem;
+  min-width: 0;
+  padding-top: 0.95rem;
+  border-top: 1px solid rgb(28 24 39 / 8%);
+  animation: toolbar-filters-in 0.18s ease-out;
+}
+
+@keyframes toolbar-filters-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolbar__filters {
+    animation: none;
+  }
+
+  .toolbar__toggle-chevron {
+    transition: none;
+  }
+}
+
+.toolbar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.toolbar__field-label {
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.07em;
   color: var(--text-muted);
 }
 
-/* Parent mini-cards */
+.toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
 
-.kittens-page__litter-parents {
+.toolbar__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid rgb(115 86 168 / 25%);
+  border-radius: 999px;
+  background: rgb(115 86 168 / 7%);
+  color: var(--brand-purple);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: rgb(115 86 168 / 14%);
+    border-color: var(--brand-purple);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+.toolbar__reset-count {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--brand-purple);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ─── Segmented control ─────────────────────────────────────────────────── */
+
+.segmented {
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: rgb(28 24 39 / 5%);
+}
+
+.segmented__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    color: var(--brand-purple);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 2px;
+  }
+}
+
+.segmented__btn--active {
+  background: #fff;
+  color: var(--brand-purple);
+  box-shadow: 0 2px 8px rgb(28 24 39 / 10%);
+}
+
+/* ─── Section heading with a count ──────────────────────────────────────── */
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 1.4rem;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+  color: var(--text-primary);
+}
+
+.section-head__count {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  background: rgb(115 86 168 / 12%);
+  color: var(--brand-purple);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ─── Grids ─────────────────────────────────────────────────────────────── */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: 1.35rem;
+}
+
+.parent-section {
+  margin-bottom: 3.25rem;
+}
+
+/* ─── Litter ────────────────────────────────────────────────────────────── */
+
+.litter {
+  position: relative;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background: #fff;
+  border: 1px solid rgb(28 24 39 / 7%);
+  border-radius: 24px;
+  box-shadow:
+    0 2px 4px rgb(28 24 39 / 3%),
+    0 12px 30px rgb(28 24 39 / 4%);
+}
+
+.litter__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgb(28 24 39 / 7%);
+}
+
+/* The pairing reads as mother and father, which is what groups the litter. */
+.litter__pair {
+  flex-basis: 100%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
-  margin-bottom: 1.75rem;
 }
 
-.kittens-page__litter-parent {
+.litter__parent {
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -273,8 +453,9 @@
   border-radius: 14px;
   text-decoration: none;
   color: inherit;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -287,210 +468,347 @@
   }
 }
 
-.kittens-page__litter-parent img {
+.litter__parent img {
   width: 96px;
   height: 96px;
+  flex-shrink: 0;
   object-fit: cover;
   border-radius: 12px;
-  flex-shrink: 0;
 }
 
-.kittens-page__litter-parent-info {
+.litter__parent-info {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+
+  strong {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
 }
 
-.kittens-page__litter-parent-info strong {
-  font-size: 0.95rem;
-  color: var(--text-primary);
+.litter__parent--mom {
+  background: rgb(115 86 168 / 10%);
+
+  .litter__parent-info strong {
+    color: var(--brand-purple);
+  }
 }
 
-.kittens-page__litter-parent-info span {
-  font-size: 0.82rem;
+.litter__parent--dad {
+  background: rgb(86 132 168 / 10%);
+
+  .litter__parent-info strong {
+    color: #3d7aad;
+  }
+}
+
+.litter__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
   color: var(--text-muted);
 }
 
-.kittens-page__litter-parent--mom {
-  background: rgb(115 86 168 / 10%);
-}
-
-.kittens-page__litter-parent--mom .kittens-page__litter-parent-info strong {
-  color: var(--brand-purple);
-}
-
-.kittens-page__litter-parent--dad {
-  background: rgb(86 132 168 / 10%);
-}
-
-.kittens-page__litter-parent--dad .kittens-page__litter-parent-info strong {
-  color: #3d7aad;
-}
-
-/* Parents tab */
-
-.kittens-page__parent-section {
-  margin-bottom: 3rem;
-}
-
-.kittens-page__parent-grid {
+.litter__count {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgb(115 86 168 / 12%);
+  color: var(--brand-purple);
+  font-family: Inter, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
+
+/* ─── Parent card ───────────────────────────────────────────────────────── */
 
 .parent-card {
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-radius: 20px;
+  border-radius: 22px;
   overflow: hidden;
-  border: 1px solid rgb(115 86 168 / 12%);
-  box-shadow: 0 6px 18px rgb(28 24 39 / 4%);
+  border: 1px solid rgb(28 24 39 / 7%);
+  box-shadow:
+    0 2px 4px rgb(28 24 39 / 3%),
+    0 12px 28px rgb(28 24 39 / 5%);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
     border-color: rgb(115 86 168 / 26%);
-    box-shadow: 0 16px 32px rgb(115 86 168 / 14%);
+    box-shadow:
+      0 6px 12px rgb(115 86 168 / 8%),
+      0 22px 44px rgb(115 86 168 / 16%);
   }
 
   &:focus-visible {
     outline: 3px solid var(--brand-purple);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
 }
 
 .parent-card__media {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
+  background: var(--brand-light);
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
 .parent-card:hover .parent-card__media img {
-  transform: scale(1.05);
-}
-
-.parent-card__crown {
-  position: absolute;
-  top: 0.85rem;
-  right: 0.85rem;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  filter: drop-shadow(0 2px 4px rgb(28 24 39 / 18%));
+  transform: scale(1.06);
 }
 
 .parent-card__body {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 1.1rem 1.1rem 1.2rem;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 1.1rem 1.15rem 1.2rem;
 
   h3 {
-    margin: 0 0 0.2rem;
+    margin: 0;
     font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
-    line-height: 1.2;
+    font-size: 1.28rem;
+    line-height: 1.18;
     color: var(--text-primary);
   }
 }
 
 .parent-card__line {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
 }
 
 .parent-card__breed-badge {
-  align-self: flex-start;
-  margin-top: 0.35rem;
-  border: 1px solid rgb(115 86 168 / 35%);
-  color: var(--brand-purple);
+  margin-top: 0.3rem;
+  padding: 0.22rem 0.65rem;
   border-radius: 999px;
-  padding: 0.25rem 0.65rem;
+  background: rgb(115 86 168 / 10%);
+  color: var(--brand-purple);
   font-size: 0.74rem;
   font-weight: 600;
 }
 
-/* Empty / loading states */
+/* ─── Empty, error and loading states ───────────────────────────────────── */
 
-.kittens-page__empty {
-  border: 1px dashed rgb(115 86 168 / 30%);
-  background: rgb(237 232 245 / 40%);
-  border-radius: 20px;
-  padding: 2rem 1.25rem;
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3.25rem 1.5rem;
+  border-radius: 24px;
+  background: rgb(255 255 255 / 60%);
+  border: 1px dashed rgb(115 86 168 / 28%);
   text-align: center;
 }
 
-.kittens-page__empty h2 {
-  margin: 0 0 0.4rem;
+.state h2 {
+  margin: 0;
   font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--text-primary);
 }
 
-.kittens-page__empty p {
+.state p {
   margin: 0;
   color: var(--text-muted);
 }
 
-/* Responsive */
+.state__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgb(115 86 168 / 10%);
+  font-size: 1.4rem;
+}
 
-@media (max-width: 1024px) {
-  .kittens-page__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.state--error {
+  background: rgb(254 242 242 / 80%);
+  border-color: rgb(185 28 28 / 30%);
+}
+
+.state--error .state__icon {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.state__action {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.3rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand-purple);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #5e3fa3;
   }
 
-  .kittens-page__filters-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .kittens-page__parent-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  &:focus-visible {
+    outline: 3px solid var(--brand-purple);
+    outline-offset: 3px;
   }
 }
 
-@media (max-width: 900px) {
-  .kittens-page__litter-parents {
-    grid-template-columns: 1fr;
+/* ─── Skeletons ─────────────────────────────────────────────────────────── */
+
+.skeleton-card {
+  border-radius: 22px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgb(28 24 39 / 7%);
+}
+
+.skeleton-card__media {
+  aspect-ratio: 4 / 5;
+}
+
+.skeleton-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.1rem 1.15rem 1.4rem;
+}
+
+.skeleton-card__line {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.skeleton-card__line--title {
+  height: 20px;
+  width: 65%;
+}
+
+.skeleton-card__line--short {
+  width: 40%;
+}
+
+.skeleton-card__media,
+.skeleton-card__line {
+  background: linear-gradient(
+    90deg,
+    rgb(115 86 168 / 7%) 25%,
+    rgb(115 86 168 / 14%) 37%,
+    rgb(115 86 168 / 7%) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-card__media,
+  .skeleton-card__line {
+    animation: none;
+  }
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .toolbar__bar {
+    align-items: stretch;
+  }
+
+  .toolbar__toggle {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .toolbar__actions {
+    justify-content: space-between;
+    width: 100%;
   }
 }
 
 @media (max-width: 720px) {
-  .kittens-page {
-    padding-top: 0;
-  }
-
-  .kittens-page__hero {
-    padding: 3rem 1rem;
+  .kittens-hero {
+    padding: 3.25rem 1rem 2.5rem;
     margin-bottom: 2rem;
   }
 
-  .kittens-page__filter-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .kittens-hero__stat {
+    min-width: 96px;
+    padding: 0.6rem 0.85rem;
   }
 
-  .kittens-page__grid {
+  .kittens-page__tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .kittens-page__tab {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .litter {
+    padding: 1.1rem;
+  }
+
+  .litter__pair {
     grid-template-columns: 1fr;
   }
 
-  .kittens-page__parent-grid {
-    grid-template-columns: 1fr;
+  .segmented {
+    width: 100%;
+  }
+
+  .segmented__btn {
+    flex: 1;
+    justify-content: center;
   }
 }
 
-@media (max-width: 640px) {
-  .kittens-page__filters-grid {
+@media (max-width: 420px) {
+  .card-grid {
     grid-template-columns: 1fr;
   }
 }

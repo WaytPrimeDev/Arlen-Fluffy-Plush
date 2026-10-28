@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 import { I18nService } from '../../services/i18n.service';
 import type { ListParams, PaginatedResponse } from '../../services/filters.service';
 import { buildListParams } from '../../services/http-params.util';
+import { API_PATH } from '../../services/api';
 
 export interface KittenImage {
   full: string;
@@ -49,7 +50,7 @@ interface KittenApiResponse {
   providedIn: 'root',
 })
 export class KittensService {
-  private readonly apiUrl = 'https://arlenback-production.up.railway.app/api';
+  private readonly apiUrl = API_PATH;
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
 
@@ -70,7 +71,9 @@ export class KittensService {
    */
   getLocalizedName(kitten: KittenApiItem): string {
     const lang = this.i18n.getLanguage();
-    return lang === 'uk' ? kitten.nameUa || kitten.nameEn || '' : kitten.nameEn || kitten.nameUa || '';
+    return lang === 'uk'
+      ? kitten.nameUa || kitten.nameEn || ''
+      : kitten.nameEn || kitten.nameUa || '';
   }
 
   /**

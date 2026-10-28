@@ -1,11 +1,14 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { I18nService, type Language } from '../../services/i18n.service';
+import { Router } from '@angular/router';
+import {
+  I18nService,
+  localizedPath,
+  stripLanguagePrefix,
+  type Language,
+} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-language-switcher',
-  standalone: true,
-  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="language-switcher">
@@ -64,8 +67,19 @@ import { I18nService, type Language } from '../../services/i18n.service';
 })
 export class LanguageSwitcherComponent {
   protected readonly i18n = inject(I18nService);
+  private readonly router = inject(Router);
 
+  /**
+   * Switching language means moving to the same page under the other prefix:
+   * each language lives at its own URL so both can be indexed, which makes the
+   * language a property of the URL rather than of hidden state.
+   */
   switchLanguage(lang: Language) {
     this.i18n.setLanguage(lang);
+
+    const [pathname, query] = this.router.url.split('?');
+    this.router.navigateByUrl(
+      localizedPath(lang, stripLanguagePrefix(pathname)) + (query ? `?${query}` : ''),
+    );
   }
 }

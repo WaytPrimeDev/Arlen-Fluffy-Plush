@@ -1,6 +1,6 @@
 <section class="kitten-page">
   <div class="kitten-page__container">
-    <a class="kitten-page__back" routerLink="/kittens" [attr.aria-label]="i18n.t('backToKittens')">
+    <a class="kitten-page__back" [routerLink]="'/kittens' | locPath" [attr.aria-label]="i18n.t('backToKittens')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
       </svg>
@@ -22,39 +22,74 @@
         <p class="kitten-page__eyebrow">{{ i18n.t('error') }}</p>
         <h1>{{ i18n.t('error') }}</h1>
         <p>{{ loadError() }}</p>
-        <a class="kitten-page__back-cta" routerLink="/kittens">{{ i18n.t('backToKittens') }}</a>
+        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{ i18n.t('backToKittens') }}</a>
       </div>
     } @else if (kitten()) {
       <div class="kitten-page__layout">
 
         <!-- Gallery -->
-        <div class="kitten-page__gallery" appPhotoViewer="a">
-          <a
-            class="kitten-page__main-image"
-            [href]="selectedImage()"
-            [attr.data-pswp-width]="1600"
-            [attr.data-pswp-height]="1067"
-            [attr.data-pswp-index]="selectedImageIndex()"
-          >
-            <img [src]="selectedImage()" [alt]="name()" />
-          </a>
+        <div class="kitten-page__gallery">
+          @if (images().length) {
+            <!-- Buttons rather than links: a link to the photo file is a live
+                 destination before the page has hydrated, so an early click
+                 would leave the site for a bare image. Every photo is here so
+                 the viewer gets the whole set; only the selected one is
+                 visible and reachable. -->
+            <div
+              class="kitten-page__stage"
+              appPhotoViewer=".kitten-page__slide"
+              [pageImageWidth]="stageWidth"
+              [viewerImageWidth]="viewerWidth"
+            >
+              @for (img of images(); track img.zoom; let i = $index) {
+                <button
+                  type="button"
+                  class="kitten-page__slide"
+                  [class.kitten-page__slide--active]="selectedImageIndex() === i"
+                  [attr.data-pswp-src]="img.zoom"
+                  [attr.tabindex]="selectedImageIndex() === i ? null : -1"
+                  [attr.aria-hidden]="selectedImageIndex() === i ? null : 'true'"
+                  [attr.aria-label]="
+                    i18n.t('openPhotoFullscreen') +
+                    ': ' +
+                    i18n.t('viewerCounter', { current: i + 1, total: images().length })
+                  "
+                >
+                  <img
+                    [src]="img.display"
+                    [alt]="i18n.t('viewerImageAlt', { label: name(), index: i + 1 })"
+                    [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                    [attr.fetchpriority]="i === 0 ? 'high' : null"
+                  />
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="kitten-page__stage kitten-page__stage--static">
+              <img
+                class="kitten-page__slide kitten-page__slide--active"
+                appImageFallback
+                [src]="selectedImage()"
+                [alt]="name()"
+              />
+            </div>
+          }
 
           @if (images().length > 1) {
-            <div class="kitten-page__thumbs" role="list" [attr.aria-label]="i18n.t('kittensTitle')">
-              @for (img of images(); track img.full; let i = $index) {
-                <a
-                  class="kitten-page__thumb"
-                  [class.kitten-page__thumb--active]="selectedImageIndex() === i"
-                  [href]="img.full"
-                  [attr.data-pswp-width]="1600"
-                  [attr.data-pswp-height]="1067"
-                  [attr.data-pswp-index]="i"
-                  (click)="selectImage(i); $event.preventDefault()"
-                  [attr.aria-label]="'Photo ' + (i + 1)"
-                  role="listitem"
-                >
-                  <img [src]="img.thumbnail || img.mobile || img.full" alt="" loading="lazy" />
-                </a>
+            <div class="kitten-page__thumbs" role="list" [attr.aria-label]="i18n.t('galleryThumbnails')">
+              @for (img of images(); track img.zoom; let i = $index) {
+                <div role="listitem">
+                  <button
+                    type="button"
+                    class="kitten-page__thumb"
+                    [class.kitten-page__thumb--active]="selectedImageIndex() === i"
+                    [attr.aria-current]="selectedImageIndex() === i ? 'true' : null"
+                    [attr.aria-label]="i18n.t('viewerGoToImage', { index: i + 1 })"
+                    (click)="selectImage(i)"
+                  >
+                    <img [src]="img.thumb" alt="" loading="lazy" />
+                  </button>
+                </div>
               }
             </div>
           }
@@ -113,6 +148,43 @@
             </div>
           </section>
 
+          <div class="kitten-page__price-block">
+            <h2>{{ i18n.t('price') }}</h2>
+            <div class="kitten-page__price-rows">
+              @if (kitten()!.price?.pet) {
+                <div class="kitten-page__price-row">
+                  <span>{{ i18n.t('petPrice') }}</span>
+                  <strong>{{ kitten()!.price!.pet }}</strong>
+                </div>
+              }
+              @if (kitten()!.price?.breeding) {
+                <div class="kitten-page__price-row">
+                  <span>{{ i18n.t('breedingPrice') }}</span>
+                  <strong>{{ kitten()!.price!.breeding }}</strong>
+                </div>
+              }
+              @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
+                <p class="kitten-page__price-inquiry">{{ i18n.t('priceOnRequest') }}</p>
+              }
+            </div>
+          </div>
+
+          <section class="kitten-page__cta-card">
+            <h3>{{ i18n.t('interestedIn') }} {{ name() }}?</h3>
+            <p class="kitten-page__cta-text">{{ i18n.t('telegramCtaSubtext') }}</p>
+            <a
+              class="kitten-page__cta-button"
+              href="https://t.me/kittensarlenfluffyplush"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg class="kitten-page__cta-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
+              </svg>
+              {{ i18n.t('contactOnTelegram') }}
+            </a>
+          </section>
+
           <!-- 3. Personality -->
           <section class="kitten-page__section">
             <h2>{{ i18n.t('personality') }}</h2>
@@ -147,10 +219,15 @@
                 @if (mother(); as mom) {
                   <a
                     class="kitten-page__parent-card kitten-page__parent-card--mom"
-                    [routerLink]="['/parents', mom._id]"
+                    [routerLink]="['/parents', mom._id] | locPath"
                   >
                     <p class="kitten-page__parent-role">{{ i18n.t('mother') }}</p>
-                    <img [src]="pickParentImage(mom)" [alt]="parentName(mom)" loading="lazy" />
+                    <img
+                      [appImageFallback]="parentPlaceholder"
+                      [src]="pickParentImage(mom)"
+                      [alt]="parentName(mom)"
+                      loading="lazy"
+                    />
                     <p class="kitten-page__parent-name">{{ parentName(mom) }}</p>
                     @if (mom.breed) {
                       <p class="kitten-page__parent-breed">{{ mom.breed }}</p>
@@ -160,10 +237,15 @@
                 @if (father(); as dad) {
                   <a
                     class="kitten-page__parent-card kitten-page__parent-card--dad"
-                    [routerLink]="['/parents', dad._id]"
+                    [routerLink]="['/parents', dad._id] | locPath"
                   >
                     <p class="kitten-page__parent-role">{{ i18n.t('father') }}</p>
-                    <img [src]="pickParentImage(dad)" [alt]="parentName(dad)" loading="lazy" />
+                    <img
+                      [appImageFallback]="parentPlaceholder"
+                      [src]="pickParentImage(dad)"
+                      [alt]="parentName(dad)"
+                      loading="lazy"
+                    />
                     <p class="kitten-page__parent-name">{{ parentName(dad) }}</p>
                     @if (dad.breed) {
                       <p class="kitten-page__parent-breed">{{ dad.breed }}</p>
@@ -191,36 +273,22 @@
                 </div>
               }
               @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
-                <p class="kitten-page__price-inquiry">{{ i18n.t('noData') }}</p>
+                <p class="kitten-page__price-inquiry">{{ i18n.t('priceOnRequest') }}</p>
               }
             </div>
           </div>
 
           <!-- 7. Telegram CTA -->
-          <section class="kitten-page__cta-card">
-            <h3>{{ i18n.t('interestedIn') }} {{ name() }}?</h3>
-            <p class="kitten-page__cta-text">{{ i18n.t('telegramCtaSubtext') }}</p>
-            <a
-              class="kitten-page__cta-button"
-              href="https://t.me/arlenfluffyplush"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg class="kitten-page__cta-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
-              </svg>
-              {{ i18n.t('contactOnTelegram') }}
-            </a>
-          </section>
+
 
         </div>
       </div>
     } @else {
       <div class="kitten-page__empty" role="status">
         <p class="kitten-page__eyebrow">404</p>
-        <h1>{{ i18n.t('noData') }}</h1>
-        <p>{{ i18n.t('noData') }}</p>
-        <a class="kitten-page__back-cta" routerLink="/kittens">{{ i18n.t('backToKittens') }}</a>
+        <h1>{{ i18n.t('priceOnRequest') }}</h1>
+        <p>{{ i18n.t('priceOnRequest') }}</p>
+        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{ i18n.t('backToKittens') }}</a>
       </div>
     }
   </div>

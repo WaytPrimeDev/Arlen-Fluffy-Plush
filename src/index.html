@@ -2,18 +2,55 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>ArlenFluffyPlush</title>
+    <!-- Title, description, canonical, Open Graph and JSON-LD are written per
+         route and per language by SeoService, during server-side rendering too. -->
+    <!-- Fallback for the few clients that read the HTML before Angular runs;
+         every rendered response carries the per-route copy instead. -->
+    <title>Arlen Fluffy Plush (Arlen Cat) — розплідник кошенят / kitten cattery</title>
+    <meta
+      name="description"
+      content="Розплідник кошенят Arlen Fluffy Plush (Arlen Cat): кошенята регдол, британські та шотландські з документами WCF. Kitten cattery in Ternopil, Ukraine."
+    />
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#7356a8" />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png" />
+    <!-- iOS paints transparency black, so this icon carries a solid background. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
       rel="stylesheet"
     />
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-KMX2RSN4');
+    </script>
+    <!-- End Google Tag Manager -->
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-KMX2RSN4"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <app-root></app-root>
   </body>
 </html>

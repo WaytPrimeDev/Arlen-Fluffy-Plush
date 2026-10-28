@@ -2,14 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  EventEmitter,
-  HostListener,
-  Input,
-  Output,
-  ViewChild,
   computed,
   inject,
+  input,
+  output,
   signal,
+  viewChild,
 } from '@angular/core';
 
 export interface SelectOption {
@@ -17,22 +15,31 @@ export interface SelectOption {
   label: string;
 }
 
+/** Feeds the `id`s that tie the trigger to its panel and the active option. */
+let nextSelectId = 0;
+
 @Component({
   selector: 'app-select',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(keydown)': 'onKeydown($event)',
+    '(document:click)': 'onDocumentClick($event)',
+  },
   template: `
     <button
       type="button"
       class="app-select__trigger"
       [class.app-select__trigger--open]="isOpen()"
-      [attr.aria-haspopup]="'listbox'"
+      role="combobox"
+      aria-haspopup="listbox"
       [attr.aria-expanded]="isOpen()"
-      [attr.aria-label]="ariaLabel"
+      [attr.aria-controls]="panelId"
+      [attr.aria-activedescendant]="activeOptionId()"
+      [attr.aria-label]="ariaLabel()"
       (click)="toggle()"
-      (keydown)="onTriggerKey($event)"
     >
       <span class="app-select__value" [class.app-select__value--placeholder]="!selectedLabel()">
-        {{ selectedLabel() || placeholder || '—' }}
+        {{ selectedLabel() || placeholder() || '—' }}
       </span>
       <svg
         class="app-select__chevron"
@@ -53,24 +60,21 @@ export interface SelectOption {
     </button>
 
     @if (isOpen()) {
-      <div
-        class="app-select__panel"
-        role="listbox"
-        [attr.aria-label]="ariaLabel"
-        #panel
-      >
-        @for (opt of options; track opt.value; let i = $index) {
+      <div class="app-select__panel" role="listbox" [id]="panelId" [attr.aria-label]="ariaLabel()" #panel>
+        @for (opt of options(); track opt.value; let i = $index) {
           <button
             type="button"
             class="app-select__option"
-            [class.app-select__option--selected]="opt.value === value"
+            [class.app-select__option--selected]="opt.value === value()"
             [class.app-select__option--focused]="focusedIndex() === i"
             role="option"
-            [attr.aria-selected]="opt.value === value"
+            [id]="optionId(i)"
+            tabindex="-1"
+            [attr.aria-selected]="opt.value === value()"
             (click)="select(opt.value)"
             (mouseenter)="focusedIndex.set(i)"
           >
-            @if (opt.value === value) {
+            @if (opt.value === value()) {
               <svg
                 class="app-select__check"
                 width="14"
@@ -265,23 +269,40 @@ export interface SelectOption {
   ],
 })
 export class SelectComponent {
-  @Input() options: SelectOption[] = [];
-  @Input() value: string = '';
-  @Input() ariaLabel: string = '';
-  @Input() placeholder: string = '';
-  @Output() valueChange = new EventEmitter<string>();
+  readonly options = input<readonly SelectOption[]>([]);
+  readonly value = input('');
+  readonly ariaLabel = input('');
+  readonly placeholder = input('');
+  readonly valueChange = output<string>();
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  @ViewChild('panel') private panelRef?: ElementRef<HTMLDivElement>;
+  private readonly panelRef = viewChild<ElementRef<HTMLDivElement>>('panel');
+
+  /** Ties the trigger to the panel and to the option it currently points at. */
+  protected readonly panelId = `app-select-panel-${nextSelectId++}`;
 
   protected readonly isOpen = signal(false);
   protected readonly focusedIndex = signal(-1);
 
   protected readonly selectedLabel = computed(() => {
-    const match = this.options.find((o) => o.value === this.value);
+    const match = this.options().find((o) => o.value === this.value());
     return match?.label ?? '';
   });
+
+  /**
+   * What a screen reader reads out as the highlight moves. Focus itself stays
+   * on the trigger - the options are only pointed at, never focused - so
+   * without this the highlight would be invisible to anyone not watching it.
+   */
+  protected readonly activeOptionId = computed(() => {
+    const index = this.focusedIndex();
+    return this.isOpen() && index >= 0 ? this.optionId(index) : null;
+  });
+
+  protected optionId(index: number): string {
+    return `${this.panelId}-option-${index}`;
+  }
 
   protected toggle(): void {
     if (this.isOpen()) {
@@ -293,7 +314,7 @@ export class SelectComponent {
 
   protected open(): void {
     this.isOpen.set(true);
-    const idx = this.options.findIndex((o) => o.value === this.value);
+    const idx = this.options().findIndex((o) => o.value === this.value());
     this.focusedIndex.set(idx >= 0 ? idx : 0);
   }
 
@@ -303,57 +324,81 @@ export class SelectComponent {
   }
 
   protected select(value: string): void {
-    if (value !== this.value) {
+    if (value !== this.value()) {
       this.valueChange.emit(value);
     }
     this.close();
   }
 
-  protected onTriggerKey(event: KeyboardEvent): void {
-    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      if (!this.isOpen()) this.open();
-      else this.moveFocus(1);
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      if (!this.isOpen()) this.open();
-      else this.moveFocus(-1);
-    } else if (event.key === 'Escape') {
-      if (this.isOpen()) this.close();
-    }
-  }
+  /**
+   * Every key the control answers to, handled in one place. It listens on the
+   * host so a keystroke is seen whether it lands on the trigger or on an
+   * option, and one handler is what keeps a single press from being counted
+   * twice: the trigger used to have a listener of its own, which made the
+   * arrows skip an option and Enter pick the one after the highlight.
+   *
+   * `preventDefault` on Enter and Space also suppresses the click the browser
+   * would synthesise from them on the trigger, which would reopen the panel
+   * the moment a choice closed it.
+   */
+  protected onKeydown(event: KeyboardEvent): void {
+    const options = this.options();
 
-  @HostListener('keydown', ['$event'])
-  onHostKey(event: KeyboardEvent): void {
-    if (!this.isOpen()) return;
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      this.moveFocus(1);
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.moveFocus(-1);
-    } else if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      const idx = this.focusedIndex();
-      if (idx >= 0 && idx < this.options.length) {
-        this.select(this.options[idx].value);
+    if (!this.isOpen()) {
+      const opensPanel =
+        event.key === 'ArrowDown' ||
+        event.key === 'ArrowUp' ||
+        event.key === 'Enter' ||
+        event.key === ' ';
+
+      if (opensPanel) {
+        event.preventDefault();
+        this.open();
       }
-    } else if (event.key === 'Escape') {
-      event.preventDefault();
-      this.close();
-    } else if (event.key === 'Home') {
-      event.preventDefault();
-      this.focusedIndex.set(0);
-      this.scrollFocusedIntoView();
-    } else if (event.key === 'End') {
-      event.preventDefault();
-      this.focusedIndex.set(this.options.length - 1);
-      this.scrollFocusedIntoView();
+
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.moveFocus(1);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.moveFocus(-1);
+        break;
+      case 'Enter':
+      case ' ': {
+        event.preventDefault();
+        const index = this.focusedIndex();
+        if (index >= 0 && index < options.length) {
+          this.select(options[index].value);
+        }
+        break;
+      }
+      case 'Escape':
+        event.preventDefault();
+        this.close();
+        break;
+      case 'Tab':
+        // Leaving the control settles nothing, so the panel just goes away.
+        this.close();
+        break;
+      case 'Home':
+        event.preventDefault();
+        this.focusedIndex.set(0);
+        this.scrollFocusedIntoView();
+        break;
+      case 'End':
+        event.preventDefault();
+        this.focusedIndex.set(options.length - 1);
+        this.scrollFocusedIntoView();
+        break;
     }
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
+  protected onDocumentClick(event: MouseEvent): void {
     if (!this.isOpen()) return;
     if (!this.host.nativeElement.contains(event.target as Node)) {
       this.close();
@@ -361,8 +406,8 @@ export class SelectComponent {
   }
 
   private moveFocus(delta: number): void {
-    if (!this.options.length) return;
-    const len = this.options.length;
+    const len = this.options().length;
+    if (!len) return;
     const current = this.focusedIndex();
     const next = current < 0 ? 0 : (current + delta + len) % len;
     this.focusedIndex.set(next);
@@ -371,10 +416,13 @@ export class SelectComponent {
 
   private scrollFocusedIntoView(): void {
     queueMicrotask(() => {
-      const panel = this.panelRef?.nativeElement;
+      const panel = this.panelRef()?.nativeElement;
       if (!panel) return;
       const el = panel.children[this.focusedIndex()] as HTMLElement | undefined;
-      el?.scrollIntoView({ block: 'nearest' });
+
+      // Guarded rather than called outright: scrolling an element into view is
+      // absent from jsdom, and nothing here depends on it having happened.
+      el?.scrollIntoView?.({ block: 'nearest' });
     });
   }
 }

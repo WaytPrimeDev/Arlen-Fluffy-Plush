@@ -1,0 +1,100 @@
+@if (isLoading()) {
+  <p class="kitten-carousel__notice" role="status">{{ i18n.t('loading') }}</p>
+} @else if (hasError()) {
+  <p class="kitten-carousel__notice" role="alert">{{ i18n.t('error') }}</p>
+} @else if (kittens().length) {
+  <div
+    class="kitten-carousel"
+    role="group"
+    [attr.aria-roledescription]="i18n.t('kittenCarousel')"
+    [attr.aria-label]="i18n.t('availableKittens')"
+  >
+    <button
+      type="button"
+      class="kitten-carousel__arrow kitten-carousel__arrow--prev"
+      [attr.aria-label]="i18n.t('scrollToPreviousKittens')"
+      [disabled]="!canScrollPrev()"
+      (click)="scrollPrev()"
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+    </button>
+
+    <ul #track class="kitten-carousel__track" (scroll)="updateScrollState()">
+      @for (kitten of kittens(); track kitten.id) {
+        <li class="kitten-carousel__item">
+          <!-- The home page sends every card to the catalogue rather than to the
+               kitten itself, so the label has to name that destination too. -->
+          <a
+            class="kitten-card"
+            [routerLink]="'/kittens' | locPath"
+            [attr.aria-label]="kitten.name + ', ' + kitten.breed + ' — ' + i18n.t('viewAllKittens')"
+          >
+            <div class="kitten-card__media">
+              <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+              <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+            </div>
+            <div class="kitten-card__body">
+              <h3 class="kitten-card__name">{{ kitten.name }}</h3>
+              <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
+              @if (kitten.gender !== 'unknown') {
+                <span
+                  class="gender-pill"
+                  [class.gender-pill--male]="kitten.gender === 'male'"
+                  [class.gender-pill--female]="kitten.gender === 'female'"
+                >
+                  <span aria-hidden="true">{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
+                  {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
+                </span>
+              }
+              <div class="kitten-card__footer">
+                <p class="price price--ask">{{ kitten.priceLabel }}</p>
+                <span class="kitten-card__cta" aria-hidden="true">
+                  {{ i18n.t('viewAllKittens') }}
+                  <span class="kitten-card__cta-arrow">→</span>
+                </span>
+              </div>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+
+    <button
+      type="button"
+      class="kitten-carousel__arrow kitten-carousel__arrow--next"
+      [attr.aria-label]="i18n.t('scrollToNextKittens')"
+      [disabled]="!canScrollNext()"
+      (click)="scrollNext()"
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M9 18l6-6-6-6" />
+      </svg>
+    </button>
+  </div>
+} @else {
+  <p class="kitten-carousel__notice" role="status">{{ i18n.t('noKittensYet') }}</p>
+}

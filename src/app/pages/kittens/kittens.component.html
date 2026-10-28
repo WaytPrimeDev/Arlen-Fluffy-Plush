@@ -1,344 +1,532 @@
 <div class="kittens-page-root">
+  <section class="kittens-hero">
+    <div class="kittens-hero__glow" aria-hidden="true"></div>
+    <div class="kittens-hero__inner">
+      <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
+      <h1 class="kittens-hero__title">{{ i18n.t('exploreOurKittens') }}</h1>
+      <p class="kittens-hero__subtitle">{{ i18n.t('exploreOurKittensSubtitle') }}</p>
 
-  <section class="kittens-page__hero">
-    <div class="kittens-page__hero-inner">
-      <h1>{{ i18n.t('exploreOurKittens') }}</h1>
-      <p>{{ i18n.t('exploreOurKittensSubtitle') }}</p>
+      <!-- @if (!isLoading() && !loadError()) {
+        <dl class="kittens-hero__stats">
+          <div class="kittens-hero__stat">
+            <dt>{{ i18n.t('availableKittens') }}</dt>
+            <dd>{{ availableCount() }}</dd>
+          </div>
+          <div class="kittens-hero__stat">
+            <dt>{{ i18n.t('litters') }}</dt>
+            <dd>{{ litterCount() }}</dd>
+          </div>
+          <div class="kittens-hero__stat">
+            <dt>{{ i18n.t('ourParentsTab') }}</dt>
+            <dd>{{ parentCount() }}</dd>
+          </div>
+        </dl>
+      } -->
     </div>
   </section>
 
   <div class="kittens-page">
-
-    <section class="kittens-page__filter-block" [attr.aria-label]="i18n.t('filterAndSort')">
-      <div class="kittens-page__filter-header">
-        <h2>{{ i18n.t('filterAndSort') }}</h2>
-        @if (showKittenOnlyFilters()) {
-          <div class="kittens-page__view-toggle" role="group" [attr.aria-label]="i18n.t('view')">
-            <span class="kittens-page__view-label">{{ i18n.t('view') }}:</span>
-            <button
-              type="button"
-              class="kittens-page__view-toggle-btn"
-              [class.kittens-page__view-toggle-btn--active]="viewMode() === 'all'"
-              [attr.aria-pressed]="viewMode() === 'all'"
-              (click)="setViewMode('all')"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-              </svg>
-              {{ i18n.t('allKittens') }}
-            </button>
-            <button
-              type="button"
-              class="kittens-page__view-toggle-btn"
-              [class.kittens-page__view-toggle-btn--active]="viewMode() === 'grouped'"
-              [attr.aria-pressed]="viewMode() === 'grouped'"
-              (click)="setViewMode('grouped')"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-              </svg>
-              {{ i18n.t('byParents') }}
-            </button>
-          </div>
-        }
-      </div>
-
-      <div
-        class="kittens-page__filters-grid"
-        [class.kittens-page__filters-grid--single]="activeTab() === 'parents'"
-      >
-        @if (showKittenOnlyFilters()) {
-          <div class="kittens-page__select-label">
-            <span>{{ i18n.t('filterByMother') }}</span>
-            <app-select
-              [options]="motherOptions()"
-              [value]="selectedMother()"
-              [ariaLabel]="i18n.t('filterByMother')"
-              (valueChange)="setMother($event)"
-            />
-          </div>
-
-          <div class="kittens-page__select-label">
-            <span>{{ i18n.t('filterByFather') }}</span>
-            <app-select
-              [options]="fatherOptions()"
-              [value]="selectedFather()"
-              [ariaLabel]="i18n.t('filterByFather')"
-              (valueChange)="setFather($event)"
-            />
-          </div>
-
-          <div class="kittens-page__select-label">
-            <span>{{ i18n.t('filterByGender') }}</span>
-            <app-select
-              [options]="genderOptions()"
-              [value]="selectedGender()"
-              [ariaLabel]="i18n.t('filterByGender')"
-              (valueChange)="setGender($event)"
-            />
-          </div>
-        }
-
-        <div class="kittens-page__select-label">
-          <span>{{ i18n.t('filterByBreed') }}</span>
-          <app-select
-            [options]="breedOptions()"
-            [value]="selectedBreed()"
-            [ariaLabel]="i18n.t('filterByBreed')"
-            (valueChange)="setBreed($event)"
-          />
-        </div>
-      </div>
-
-      @if (hasActiveFilters()) {
-        <button type="button" class="kittens-page__reset-button" (click)="resetFilters()">
-          {{ i18n.t('resetAllFilters') }}
-        </button>
-      }
-    </section>
-
-    <nav class="kittens-page__tabs" role="tablist" [attr.aria-label]="i18n.t('viewMode')">
+    <div class="kittens-page__tabs" role="tablist" [attr.aria-label]="i18n.t('viewMode')">
       <button
         type="button"
         role="tab"
+        id="tab-kittens"
+        data-tab="kittens"
         class="kittens-page__tab"
         [class.kittens-page__tab--active]="activeTab() === 'kittens'"
         [attr.aria-selected]="activeTab() === 'kittens'"
         [attr.tabindex]="activeTab() === 'kittens' ? 0 : -1"
         aria-controls="kittens-tab-panel"
         (click)="setTab('kittens')"
+        (keydown)="onTabKeydown($event)"
       >
         {{ i18n.t('availableKittensTab') }}
       </button>
       <button
         type="button"
         role="tab"
+        id="tab-parents"
+        data-tab="parents"
         class="kittens-page__tab"
         [class.kittens-page__tab--active]="activeTab() === 'parents'"
         [attr.aria-selected]="activeTab() === 'parents'"
         [attr.tabindex]="activeTab() === 'parents' ? 0 : -1"
         aria-controls="kittens-tab-panel"
         (click)="setTab('parents')"
+        (keydown)="onTabKeydown($event)"
       >
         {{ i18n.t('ourParentsTab') }}
       </button>
-    </nav>
+    </div>
 
-    <div id="kittens-tab-panel" role="tabpanel">
-      @if (activeTab() === 'kittens') {
-        @if (isLoading()) {
-          <div class="kittens-page__empty" role="status">
-            <h2>{{ i18n.t('loading') }}</h2>
+    <section class="toolbar" [attr.aria-label]="i18n.t('filterAndSort')">
+      <div class="toolbar__bar">
+        <button
+          #filtersToggle
+          type="button"
+          class="toolbar__toggle"
+          [class.toolbar__toggle--open]="filtersOpen()"
+          [attr.aria-expanded]="filtersOpen()"
+          aria-controls="kittens-filters"
+          (click)="toggleFilters()"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="7" y1="12" x2="17" y2="12" />
+            <line x1="10" y1="18" x2="14" y2="18" />
+          </svg>
+          {{ i18n.t('filters') }}
+          @if (activeFilterCount()) {
+            <span class="toolbar__toggle-count" aria-hidden="true">{{ activeFilterCount() }}</span>
+            <span class="visually-hidden">
+              {{ activeFilterCount() }} {{ i18n.t('filtersActive') }}
+            </span>
+          }
+          <span class="toolbar__toggle-chevron" aria-hidden="true">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              focusable="false"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </span>
+        </button>
+
+        <div class="toolbar__actions">
+          @if (hasActiveFilters()) {
+            <button type="button" class="toolbar__reset" (click)="resetFilters()">
+              <span class="toolbar__reset-count" aria-hidden="true">{{ activeFilterCount() }}</span>
+              {{ i18n.t('resetAllFilters') }}
+              <span aria-hidden="true">×</span>
+            </button>
+          }
+
+          @if (showKittenOnlyFilters()) {
+            <div class="segmented" role="group" [attr.aria-label]="i18n.t('view')">
+              <button
+                type="button"
+                class="segmented__btn"
+                [class.segmented__btn--active]="viewMode() === 'all'"
+                [attr.aria-pressed]="viewMode() === 'all'"
+                (click)="setViewMode('all')"
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                {{ i18n.t('allKittens') }}
+              </button>
+              <button
+                type="button"
+                class="segmented__btn"
+                [class.segmented__btn--active]="viewMode() === 'grouped'"
+                [attr.aria-pressed]="viewMode() === 'grouped'"
+                (click)="setViewMode('grouped')"
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <line x1="8" y1="6" x2="21" y2="6" />
+                  <line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3.01" y2="6" />
+                  <line x1="3" y1="12" x2="3.01" y2="12" />
+                  <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                {{ i18n.t('byParents') }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (filtersOpen()) {
+        <div class="toolbar__filters" id="kittens-filters">
+          @if (showKittenOnlyFilters()) {
+            <div class="toolbar__field">
+              <span class="toolbar__field-label">{{ i18n.t('filterByMother') }}</span>
+              <app-select
+                [options]="motherOptions()"
+                [value]="selectedMother()"
+                [ariaLabel]="i18n.t('filterByMother')"
+                (valueChange)="setMother($event)"
+              />
+            </div>
+
+            <div class="toolbar__field">
+              <span class="toolbar__field-label">{{ i18n.t('filterByFather') }}</span>
+              <app-select
+                [options]="fatherOptions()"
+                [value]="selectedFather()"
+                [ariaLabel]="i18n.t('filterByFather')"
+                (valueChange)="setFather($event)"
+              />
+            </div>
+
+            <div class="toolbar__field">
+              <span class="toolbar__field-label">{{ i18n.t('filterByGender') }}</span>
+              <app-select
+                [options]="genderOptions()"
+                [value]="selectedGender()"
+                [ariaLabel]="i18n.t('filterByGender')"
+                (valueChange)="setGender($event)"
+              />
+            </div>
+          }
+
+          <div class="toolbar__field">
+            <span class="toolbar__field-label">{{ i18n.t('filterByBreed') }}</span>
+            <app-select
+              [options]="breedOptions()"
+              [value]="selectedBreed()"
+              [ariaLabel]="i18n.t('filterByBreed')"
+              (valueChange)="setBreed($event)"
+            />
           </div>
-        } @else if (loadError()) {
-          <div class="kittens-page__empty" role="alert">
-            <h2>{{ i18n.t('error') }}</h2>
-            <p>{{ loadError() }}</p>
+
+          <div class="toolbar__field">
+            <span class="toolbar__field-label">{{ i18n.t('filterByColor') }}</span>
+            <app-select
+              [options]="colorOptions()"
+              [value]="selectedColor()"
+              [ariaLabel]="i18n.t('filterByColor')"
+              (valueChange)="setColor($event)"
+            />
           </div>
-        } @else if (viewMode() === 'all') {
-          <h2 class="kittens-page__section-title">
-            {{ i18n.t('allKittens') }} ({{ filteredKittens().length }})
-          </h2>
+        </div>
+      }
+    </section>
+
+    <div
+      id="kittens-tab-panel"
+      role="tabpanel"
+      [attr.aria-labelledby]="activeTab() === 'kittens' ? 'tab-kittens' : 'tab-parents'"
+    >
+      @if (isLoading()) {
+        <p class="visually-hidden" role="status">{{ i18n.t('loadingKittens') }}</p>
+        <div class="card-grid" aria-hidden="true">
+          @for (slot of skeletons; track slot) {
+            <div class="skeleton-card">
+              <div class="skeleton-card__media"></div>
+              <div class="skeleton-card__body">
+                <span class="skeleton-card__line skeleton-card__line--title"></span>
+                <span class="skeleton-card__line"></span>
+                <span class="skeleton-card__line skeleton-card__line--short"></span>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (loadError()) {
+        <div class="state state--error" role="alert">
+          <span class="state__icon" aria-hidden="true">!</span>
+          <h2>{{ i18n.t('error') }}</h2>
+          <p>{{ loadError() }}</p>
+        </div>
+      } @else if (activeTab() === 'kittens') {
+        @if (viewMode() === 'all') {
+          <header class="section-head">
+            <h2>{{ i18n.t('allKittens') }}</h2>
+            <span class="section-head__count">{{ filteredKittens().length }}</span>
+          </header>
+
           @if (filteredKittens().length) {
-            <div class="kittens-page__grid">
+            <div class="card-grid">
               @for (kitten of filteredKittens(); track kitten.id) {
                 <a
                   class="kitten-card"
-                  [routerLink]="['/kittens', kitten.id]"
+                  [routerLink]="['/kittens', kitten.id] | locPath"
                   [attr.aria-label]="kitten.name + ', ' + kitten.breed"
                 >
                   <div class="kitten-card__media">
-                    <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                    <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
                     <span class="kitten-card__age-badge">{{ kitten.age }}</span>
                   </div>
                   <div class="kitten-card__body">
                     <h3 class="kitten-card__name">{{ kitten.name }}</h3>
                     <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
+
                     @if (kitten.gender !== 'unknown') {
-                      <p class="kitten-card__gender">
-                        <span
-                          class="kitten-card__gender-symbol"
-                          [class.kitten-card__gender-symbol--male]="kitten.gender === 'male'"
-                          [class.kitten-card__gender-symbol--female]="kitten.gender === 'female'"
-                          aria-hidden="true"
-                        >{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
+                      <span
+                        class="gender-pill"
+                        [class.gender-pill--male]="kitten.gender === 'male'"
+                        [class.gender-pill--female]="kitten.gender === 'female'"
+                      >
+                        <span aria-hidden="true">{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
                         {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
-                      </p>
+                      </span>
                     }
+
                     <div class="kitten-card__footer">
-                      <strong class="kitten-card__price">{{ kitten.priceLabel }}</strong>
-                      <span class="kitten-card__cta" aria-hidden="true">{{ i18n.t('viewDetails') }}</span>
+                      @if (kitten.prices.pet || kitten.prices.breeding) {
+                        <dl class="price">
+                          @if (kitten.prices.pet) {
+                            <div class="price__row">
+                              <dt>{{ i18n.t('petPrice') }}</dt>
+                              <dd>{{ kitten.prices.pet }}</dd>
+                            </div>
+                          }
+                          @if (kitten.prices.breeding) {
+                            <div class="price__row">
+                              <dt>{{ i18n.t('breedingPrice') }}</dt>
+                              <dd>{{ kitten.prices.breeding }}</dd>
+                            </div>
+                          }
+                        </dl>
+                      } @else {
+                        <p class="price price--ask">{{ kitten.priceLabel }}</p>
+                      }
+
+                      <span class="kitten-card__cta" aria-hidden="true">
+                        {{ i18n.t('viewDetails') }}
+                        <span class="kitten-card__cta-arrow">→</span>
+                      </span>
                     </div>
                   </div>
                 </a>
               }
             </div>
           } @else {
-            <div class="kittens-page__empty" role="status">
-              <h2>{{ i18n.t('noKittensMatchFilters') }}</h2>
+            <div class="state" role="status">
+              <span class="state__icon" aria-hidden="true">{{ hasActiveFilters() ? '🔍' : '🐱' }}</span>
+              <h2>
+                {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
+              </h2>
+              @if (hasActiveFilters()) {
+                <button type="button" class="state__action" (click)="resetFilters()">
+                  {{ i18n.t('resetAllFilters') }}
+                </button>
+              }
             </div>
           }
-        } @else {
-          @if (groupedByParents().length) {
-            @for (litter of groupedByParents(); track litter.key) {
-              <article class="kittens-page__litter">
-                <h3>
-                  {{ i18n.t('litterFrom') }} {{ litter.mother?.name }} &amp; {{ litter.father?.name }}
-                </h3>
-                <div class="kittens-page__litter-parents">
+        } @else if (groupedByParents().length) {
+          @for (litter of groupedByParents(); track litter.key) {
+            <article class="litter">
+              <header class="litter__head">
+                <div class="litter__pair">
                   @if (litter.mother; as mom) {
                     <a
-                      class="kittens-page__litter-parent kittens-page__litter-parent--mom"
-                      [routerLink]="['/parents', mom.id]"
+                      class="litter__parent litter__parent--mom"
+                      [routerLink]="['/parents', mom.id] | locPath"
                       [attr.aria-label]="i18n.t('mom') + ': ' + mom.name"
                     >
-                      <img [src]="mom.image" [alt]="mom.name" loading="lazy" />
-                      <div class="kittens-page__litter-parent-info">
+                      <img
+                        [appImageFallback]="parentPlaceholder"
+                        [src]="mom.image"
+                        [alt]="mom.name"
+                        loading="lazy"
+                      />
+                      <div class="litter__parent-info">
                         <strong>{{ i18n.t('mom') }}: {{ mom.name }}</strong>
                         <span>{{ mom.breed }}{{ mom.color ? ' · ' + mom.color : '' }}</span>
                       </div>
                     </a>
                   }
+
                   @if (litter.father; as dad) {
                     <a
-                      class="kittens-page__litter-parent kittens-page__litter-parent--dad"
-                      [routerLink]="['/parents', dad.id]"
+                      class="litter__parent litter__parent--dad"
+                      [routerLink]="['/parents', dad.id] | locPath"
                       [attr.aria-label]="i18n.t('dad') + ': ' + dad.name"
                     >
-                      <img [src]="dad.image" [alt]="dad.name" loading="lazy" />
-                      <div class="kittens-page__litter-parent-info">
+                      <img
+                        [appImageFallback]="parentPlaceholder"
+                        [src]="dad.image"
+                        [alt]="dad.name"
+                        loading="lazy"
+                      />
+                      <div class="litter__parent-info">
                         <strong>{{ i18n.t('dad') }}: {{ dad.name }}</strong>
                         <span>{{ dad.breed }}{{ dad.color ? ' · ' + dad.color : '' }}</span>
                       </div>
                     </a>
                   }
                 </div>
-                <h4 class="kittens-page__litter-count">
-                  {{ i18n.t('availableKittens') }} ({{ litter.kittens.length }})
-                </h4>
-                <div class="kittens-page__grid">
-                  @for (kitten of litter.kittens; track kitten.id) {
-                    <a
-                      class="kitten-card"
-                      [routerLink]="['/kittens', kitten.id]"
-                      [attr.aria-label]="kitten.name + ', ' + kitten.breed"
-                    >
-                      <div class="kitten-card__media">
-                        <img [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
-                        <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+
+                <h3 class="litter__title">
+                  {{ litter.name }}
+                  <span class="litter__count">{{ litter.kittens.length }}</span>
+                </h3>
+              </header>
+
+              <div class="card-grid card-grid--litter">
+                @for (kitten of litter.kittens; track kitten.id) {
+                  <a
+                    class="kitten-card"
+                    [routerLink]="['/kittens', kitten.id] | locPath"
+                    [attr.aria-label]="kitten.name + ', ' + kitten.breed"
+                  >
+                    <div class="kitten-card__media">
+                      <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                      <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                    </div>
+                    <div class="kitten-card__body">
+                      <h4 class="kitten-card__name">{{ kitten.name }}</h4>
+                      <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
+
+                      @if (kitten.gender !== 'unknown') {
+                        <span
+                          class="gender-pill"
+                          [class.gender-pill--male]="kitten.gender === 'male'"
+                          [class.gender-pill--female]="kitten.gender === 'female'"
+                        >
+                          <span aria-hidden="true">{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
+                          {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
+                        </span>
+                      }
+
+                      <div class="kitten-card__footer">
+                        <p class="price price--ask">{{ kitten.priceLabel }}</p>
+                        <span class="kitten-card__cta" aria-hidden="true">
+                          {{ i18n.t('viewDetails') }}
+                          <span class="kitten-card__cta-arrow">→</span>
+                        </span>
                       </div>
-                      <div class="kitten-card__body">
-                        <h5 class="kitten-card__name">{{ kitten.name }}</h5>
-                        <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
-                        @if (kitten.gender !== 'unknown') {
-                          <p class="kitten-card__gender">
-                            <span
-                              class="kitten-card__gender-symbol"
-                              [class.kitten-card__gender-symbol--male]="kitten.gender === 'male'"
-                              [class.kitten-card__gender-symbol--female]="kitten.gender === 'female'"
-                              aria-hidden="true"
-                            >{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
-                            {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
-                          </p>
-                        }
-                        <div class="kitten-card__footer">
-                          <strong class="kitten-card__price">{{ kitten.priceLabel }}</strong>
-                          <span class="kitten-card__cta" aria-hidden="true">{{ i18n.t('viewDetails') }}</span>
-                        </div>
-                      </div>
-                    </a>
-                  }
-                </div>
-              </article>
-            }
-          } @else {
-            <div class="kittens-page__empty" role="status">
-              <h2>{{ i18n.t('noKittensMatchFilters') }}</h2>
-            </div>
+                    </div>
+                  </a>
+                }
+              </div>
+            </article>
           }
+        } @else {
+          <div class="state" role="status">
+            <span class="state__icon" aria-hidden="true">{{ hasActiveFilters() ? '🔍' : '🐱' }}</span>
+            <h2>
+              {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
+            </h2>
+            @if (hasActiveFilters()) {
+              <button type="button" class="state__action" (click)="resetFilters()">
+                {{ i18n.t('resetAllFilters') }}
+              </button>
+            }
+          </div>
         }
       } @else {
-        @if (isLoading()) {
-          <div class="kittens-page__empty" role="status">
-            <h2>{{ i18n.t('loading') }}</h2>
-          </div>
-        } @else if (loadError()) {
-          <div class="kittens-page__empty" role="alert">
-            <h2>{{ i18n.t('error') }}</h2>
-          </div>
-        } @else {
-          <section class="kittens-page__parent-section">
-            <h2 class="kittens-page__section-title">{{ i18n.t('ourQueens') }}</h2>
-            @if (queens().length) {
-              <div class="kittens-page__parent-grid">
-                @for (parent of queens(); track parent.id) {
-                  <a class="parent-card" [routerLink]="['/parents', parent.id]" [attr.aria-label]="parent.name">
-                    <div class="parent-card__media">
-                      <img [src]="parent.image" [alt]="parent.name" loading="lazy" />
-                      <span class="parent-card__crown" aria-hidden="true">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#facc15" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zM5 21h14"/>
-                        </svg>
-                      </span>
-                    </div>
-                    <div class="parent-card__body">
-                      <h3>{{ parent.name }}</h3>
-                      @if (parent.breed) {
-                        <p class="parent-card__line">{{ parent.breed }}</p>
-                      }
-                      @if (parent.color) {
-                        <p class="parent-card__line">{{ parent.color }}</p>
-                      }
+        <section class="parent-section">
+          <header class="section-head">
+            <h2>{{ i18n.t('ourQueens') }}</h2>
+            <span class="section-head__count">{{ queens().length }}</span>
+          </header>
 
-                    </div>
-                  </a>
-                }
-              </div>
-            } @else {
-              <div class="kittens-page__empty" role="status">
-                <h2>{{ i18n.t('noParentsMatchFilter') }}</h2>
-              </div>
-            }
-          </section>
+          @if (queens().length) {
+            <div class="card-grid">
+              @for (parent of queens(); track parent.id) {
+                <a
+                  class="parent-card"
+                  [routerLink]="['/parents', parent.id] | locPath"
+                  [attr.aria-label]="parent.name"
+                >
+                  <div class="parent-card__media">
+                    <img
+                      [appImageFallback]="parentPlaceholder"
+                      [src]="parent.image"
+                      [alt]="parent.name"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="parent-card__body">
+                    <h3>{{ parent.name }}</h3>
+                    @if (parent.color) {
+                      <p class="parent-card__line">{{ parent.color }}</p>
+                    }
+                    @if (parent.breed) {
+                      <span class="parent-card__breed-badge">{{ parent.breed }}</span>
+                    }
+                  </div>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="state" role="status">
+              <h2>
+                {{ hasActiveFilters() ? i18n.t('noParentsMatchFilter') : i18n.t('noParentsYet') }}
+              </h2>
+            </div>
+          }
+        </section>
 
-          <section class="kittens-page__parent-section">
-            <h2 class="kittens-page__section-title">{{ i18n.t('ourStuds') }}</h2>
-            @if (studs().length) {
-              <div class="kittens-page__parent-grid">
-                @for (parent of studs(); track parent.id) {
-                  <a class="parent-card" [routerLink]="['/parents', parent.id]" [attr.aria-label]="parent.name">
-                    <div class="parent-card__media">
-                      <img [src]="parent.image" [alt]="parent.name" loading="lazy" />
-                      <span class="parent-card__crown" aria-hidden="true">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#facc15" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zM5 21h14"/>
-                        </svg>
-                      </span>
-                    </div>
-                    <div class="parent-card__body">
-                      <h3>{{ parent.name }}</h3>
-                      @if (parent.breed) {
-                        <p class="parent-card__line">{{ parent.breed }}</p>
-                      }
-                      @if (parent.color) {
-                        <p class="parent-card__line">{{ parent.color }}</p>
-                      }
-                      @if (parent.breed) {
-                        <span class="parent-card__breed-badge">{{ parent.breed }}</span>
-                      }
-                    </div>
-                  </a>
-                }
-              </div>
-            } @else {
-              <div class="kittens-page__empty" role="status">
-                <h2>{{ i18n.t('noParentsMatchFilter') }}</h2>
-              </div>
-            }
-          </section>
-        }
+        <section class="parent-section">
+          <header class="section-head">
+            <h2>{{ i18n.t('ourStuds') }}</h2>
+            <span class="section-head__count">{{ studs().length }}</span>
+          </header>
+
+          @if (studs().length) {
+            <div class="card-grid">
+              @for (parent of studs(); track parent.id) {
+                <a
+                  class="parent-card"
+                  [routerLink]="['/parents', parent.id] | locPath"
+                  [attr.aria-label]="parent.name"
+                >
+                  <div class="parent-card__media">
+                    <img
+                      [appImageFallback]="parentPlaceholder"
+                      [src]="parent.image"
+                      [alt]="parent.name"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="parent-card__body">
+                    <h3>{{ parent.name }}</h3>
+                    @if (parent.color) {
+                      <p class="parent-card__line">{{ parent.color }}</p>
+                    }
+                    @if (parent.breed) {
+                      <span class="parent-card__breed-badge">{{ parent.breed }}</span>
+                    }
+                  </div>
+                </a>
+              }
+            </div>
+          } @else {
+            <div class="state" role="status">
+              <h2>
+                {{ hasActiveFilters() ? i18n.t('noParentsMatchFilter') : i18n.t('noParentsYet') }}
+              </h2>
+            </div>
+          }
+        </section>
       }
     </div>
-
   </div>
 </div>
