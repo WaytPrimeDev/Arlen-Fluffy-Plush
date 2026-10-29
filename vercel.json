@@ -1,9 +1,17 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "angular",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/Arlen-Fluffy-Plush/browser",
+  "functions": {
+    "api/ssr.mjs": {
+      "includeFiles": "dist/Arlen-Fluffy-Plush/server/**"
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://arlenback-production.up.railway.app/api/:path*"
+      "source": "/(.*)",
+      "destination": "/api/ssr?__ssrPath=/$1"
     }
   ],
   "headers": [

@@ -11,8 +11,12 @@ export const SITE = {
    * The one host search engines should index. Canonical URLs, the sitemap and
    * robots.txt are pinned to it, so preview deployments on *.vercel.app point
    * at production instead of competing with it for the same content.
+   *
+   * It carries the `www`, because that is the host the site is served from:
+   * the apex answers a request with a 308 to it. The two have to agree, since
+   * a page served from any host but this one is marked `noindex`.
    */
-  canonicalOrigin: 'https://koshenya.com',
+  canonicalOrigin: 'https://www.koshenya.com',
   /** Shown as the site name in the Google snippet and in social cards. */
   shortName: 'Arlen Fluffy Plush',
   /**
