@@ -36,6 +36,8 @@ export class AnalyticsService {
   private started = false;
 
   private currentPath = '';
+  /** The full URL of the open page, captured when it opens. */
+  private currentLocation = '';
   private currentTitle = '';
   private openedAt = 0;
   private maxScroll = 0;
@@ -93,6 +95,10 @@ export class AnalyticsService {
       // Not `language`: GA4 already has a built-in Language dimension taken
       // from the browser, which is a different thing from the site's language.
       site_language: this.i18n.getLanguage(),
+      // Sent explicitly on every event: GA4 otherwise takes the address from
+      // the browser at send time, which attributes `page_leave` to the page
+      // being opened rather than to the one being left.
+      page_location: this.currentLocation,
       ...params,
     });
   }
@@ -135,6 +141,7 @@ export class AnalyticsService {
     this.reportLeave('navigation');
 
     this.currentPath = pathname;
+    this.currentLocation = this.document.defaultView?.location.href ?? pathname;
     this.openedAt = Date.now();
     this.maxScroll = 0;
     this.reportedMilestones.clear();
@@ -147,7 +154,6 @@ export class AnalyticsService {
     setTimeout(() => {
       this.currentTitle = this.document.title;
       this.track('virtual_page_view', {
-        page_location: this.document.defaultView?.location.href ?? pathname,
         page_title: this.currentTitle,
         // Lets one report cover both languages: /uk/kittens and /en/kittens
         // share this value, while `page_path` keeps them apart.

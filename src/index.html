@@ -19,23 +19,69 @@
     <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png" />
     <!-- iOS paints transparency black, so this icon carries a solid background. -->
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <!-- Only gstatic is preconnected: the build inlines this stylesheet into the
+         document, so googleapis is never actually requested in production and a
+         hint for it would just hold an unused connection open. -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
       rel="stylesheet"
     />
     <!-- Google Tag Manager -->
+    <!-- The container is half a megabyte of script and around 450 ms of main
+         thread work, so it is kept off the critical path: loaded with the page
+         it lands in the middle of the hero image's download and pushes LCP out.
+
+         `dataLayer` is created immediately, which is all AnalyticsService needs
+         — it queues events into the array and GTM replays them once it arrives.
+
+         Whichever comes first wins: the visitor touching the page, since they
+         are about to produce events worth sending; the main thread falling
+         idle; or a timeout after load, for browsers without idle callbacks. -->
     <script>
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
+
+        var triggers = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
+        var loaded = false;
+
+        function load() {
+          if (loaded) {
+            return;
+          }
+          loaded = true;
+
+          triggers.forEach(function (name) {
+            w.removeEventListener(name, load, true);
+          });
+
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        }
+
+        triggers.forEach(function (name) {
+          w.addEventListener(name, load, { capture: true, once: true, passive: true });
+        });
+
+        function schedule() {
+          if (w.requestIdleCallback) {
+            w.requestIdleCallback(load, { timeout: 3000 });
+          } else {
+            w.setTimeout(load, 2500);
+          }
+        }
+
+        if (d.readyState === 'complete') {
+          schedule();
+        } else {
+          w.addEventListener('load', schedule);
+        }
       })(window, document, 'script', 'dataLayer', 'GTM-KMX2RSN4');
     </script>
     <!-- End Google Tag Manager -->

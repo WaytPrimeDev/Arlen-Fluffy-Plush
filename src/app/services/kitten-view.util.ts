@@ -32,8 +32,8 @@ interface PickableImage {
  * fetched from a stock service, so a card never waits on a third party, and
  * they are split by animal so a kitten card never shows a grown cat.
  */
-export const KITTEN_PLACEHOLDER = '/assets/img/kitten.jpg';
-export const PARENT_PLACEHOLDER = '/assets/img/parent.jpg';
+export const KITTEN_PLACEHOLDER = '/assets/img/kitten.webp';
+export const PARENT_PLACEHOLDER = '/assets/img/parent.webp';
 
 export function pickImage(
   images: readonly PickableImage[] | undefined,
