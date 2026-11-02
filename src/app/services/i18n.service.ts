@@ -463,7 +463,7 @@ export class I18nService {
       status: 'Статус',
       price: 'Ціна',
       petPrice: 'У домашні улюбленці',
-      breedingPrice: 'У Розведення',
+      breedingPrice: 'У розведення',
       available: 'Доступне',
       reserved: 'Зарезервоване',
       sold: 'Продано',
