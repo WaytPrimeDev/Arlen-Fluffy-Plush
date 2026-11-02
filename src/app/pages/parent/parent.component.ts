@@ -41,6 +41,8 @@ interface KittenCard {
   age: string;
   image: string;
   priceLabel: string;
+  /** The two prices on their own, so the card can label each of them. */
+  prices: { pet: string | null; breeding: string | null };
 }
 
 interface LoadState {
@@ -219,6 +221,10 @@ function mapKittenApiToCard(kitten: KittenApiItem, i18n: I18nService): KittenCar
       kitten.images?.[0]?.full ??
       KITTEN_PLACEHOLDER,
     priceLabel: formatPrice(kitten, i18n),
+    prices: {
+      pet: kitten.price?.pet?.trim() || null,
+      breeding: kitten.price?.breeding?.trim() || null,
+    },
   };
 }
 

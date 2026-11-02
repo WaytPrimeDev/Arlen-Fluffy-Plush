@@ -163,42 +163,35 @@ select {
   font-size: 1.3rem;
   line-height: 1.15;
   color: var(--text-primary);
+  transition: color 0.25s ease;
+}
+
+.kitten-card:hover .kitten-card__name,
+.kitten-card:focus-visible .kitten-card__name {
+  color: var(--brand-purple);
+}
+
+.kitten-card__meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.15rem;
 }
 
 .kitten-card__meta {
   margin: 0;
+  min-width: 0;
   font-size: 0.86rem;
   color: var(--text-muted);
 }
 
 .kitten-card__footer {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.75rem;
   width: 100%;
   margin-top: auto;
-  padding-top: 0.9rem;
+  padding-top: 0.85rem;
   border-top: 1px solid rgb(28 24 39 / 7%);
-}
-
-.kitten-card__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--brand-purple);
-  white-space: nowrap;
-}
-
-.kitten-card__cta-arrow {
-  transition: transform 0.25s ease;
-}
-
-.kitten-card:hover .kitten-card__cta-arrow {
-  transform: translateX(3px);
 }
 
 /* Kept for the older markup that still renders the gender as a text row. */
@@ -249,21 +242,29 @@ select {
   color: #9d174d;
 }
 
+/* A price list reads best full width: label on the left, amount on the right,
+   joined by a dotted leader so the eye lands on the number. */
 .price {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.3rem;
+  width: 100%;
   min-width: 0;
 }
 
 .price__row {
   display: flex;
   align-items: baseline;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
 .price__row dt {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -271,15 +272,32 @@ select {
   color: var(--text-muted);
 }
 
+.price__row dt::after {
+  content: '';
+  flex: 1;
+  min-width: 0.75rem;
+  border-bottom: 1px dotted rgb(28 24 39 / 20%);
+  transform: translateY(-0.15em);
+}
+
 .price__row dd {
   margin: 0;
+  flex-shrink: 0;
   font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.2;
   color: var(--brand-purple);
+  white-space: nowrap;
 }
 
 .price--ask {
-  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(115 86 168 / 9%);
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--brand-purple);
 }

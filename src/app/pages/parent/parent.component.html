@@ -164,7 +164,6 @@
               <a
                 class="kitten-card"
                 [routerLink]="['/kittens', kitten.id] | locPath"
-                [attr.aria-label]="kitten.name + ', ' + kitten.breed"
               >
                 <div class="kitten-card__media">
                   <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
@@ -172,21 +171,39 @@
                 </div>
                 <div class="kitten-card__body">
                   <h3 class="kitten-card__name">{{ kitten.name }}</h3>
-                  <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
-                  @if (kitten.gender !== 'unknown') {
-                    <p class="kitten-card__gender">
+
+                  <div class="kitten-card__meta-row">
+                    <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
+                    @if (kitten.gender !== 'unknown') {
                       <span
-                        class="kitten-card__gender-symbol"
-                        [class.kitten-card__gender-symbol--male]="kitten.gender === 'male'"
-                        [class.kitten-card__gender-symbol--female]="kitten.gender === 'female'"
-                        aria-hidden="true"
-                      >{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
-                      {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
-                    </p>
-                  }
+                        class="gender-pill"
+                        [class.gender-pill--male]="kitten.gender === 'male'"
+                        [class.gender-pill--female]="kitten.gender === 'female'"
+                      >
+                        <span aria-hidden="true">{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
+                        {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
+                      </span>
+                    }
+                  </div>
                   <div class="kitten-card__footer">
-                    <strong class="kitten-card__price">{{ kitten.priceLabel }}</strong>
-                    <span class="kitten-card__cta" aria-hidden="true">{{ i18n.t('viewDetails') }}</span>
+                    @if (kitten.prices.pet || kitten.prices.breeding) {
+                      <dl class="price">
+                        @if (kitten.prices.pet) {
+                          <div class="price__row">
+                            <dt>{{ i18n.t('petPrice') }}</dt>
+                            <dd>{{ kitten.prices.pet }}</dd>
+                          </div>
+                        }
+                        @if (kitten.prices.breeding) {
+                          <div class="price__row">
+                            <dt>{{ i18n.t('breedingPrice') }}</dt>
+                            <dd>{{ kitten.prices.breeding }}</dd>
+                          </div>
+                        }
+                      </dl>
+                    } @else {
+                      <p class="price price--ask">{{ kitten.priceLabel }}</p>
+                    }
                   </div>
                 </div>
               </a>
