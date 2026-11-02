@@ -1,7 +1,7 @@
 import { DOCUMENT, Injectable, REQUEST, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { I18nService, LANGUAGES, localizedPath, type Language } from './i18n.service';
-import { SEO_LOCALES, SITE } from './site-config';
+import { DELIVERY_COUNTRIES, SEO_LOCALES, SITE } from './site-config';
 import {
   BREEDS,
   DETAIL_COPY,
@@ -54,7 +54,9 @@ const CURRENCIES: [RegExp, string][] = [
  * unambiguously, together with a currency. Anything else is published as an
  * offer without a price rather than as a wrong one.
  */
-function parsePrice(prices: readonly (string | null)[]): { price: number; currency: string } | null {
+function parsePrice(
+  prices: readonly (string | null)[],
+): { price: number; currency: string } | null {
   for (const raw of prices) {
     if (!raw) {
       continue;
@@ -76,6 +78,29 @@ function parsePrice(prices: readonly (string | null)[]): { price: number; curren
 }
 
 const JSON_LD_ID = 'app-structured-data';
+
+/**
+ * The cattery sells to anyone, anywhere. `Place: Worldwide` is the claim;
+ * the individual countries follow it because shopping and local surfaces match
+ * on a concrete region rather than on the word "worldwide".
+ */
+const AREA_SERVED: readonly Record<string, unknown>[] = [
+  { '@type': 'Place', name: 'Worldwide' },
+  ...DELIVERY_COUNTRIES.map((code) => ({ '@type': 'Country', name: code })),
+];
+
+/**
+ * Attached to a kitten's `Offer` so a shopping query that filters by delivery
+ * destination can still match it. No rate or transit time is declared: both are
+ * agreed per kitten and per country, and a wrong number is worse than none.
+ */
+const SHIPPING_DETAILS: Record<string, unknown> = {
+  '@type': 'OfferShippingDetails',
+  shippingDestination: DELIVERY_COUNTRIES.map((code) => ({
+    '@type': 'DefinedRegion',
+    addressCountry: code,
+  })),
+};
 
 /**
  * Owns everything a crawler reads: title, snippet description, canonical URL,
@@ -240,7 +265,7 @@ export class SeoService {
         // included, so a search for any of those names resolves to this one.
         sameAs: [...SITE.profiles],
         knowsAbout: [...BREEDS[language]],
-        areaServed: { '@type': 'Country', name: SITE.countryCode },
+        areaServed: [...AREA_SERVED],
         ...(SITE.email ? { email: SITE.email } : {}),
         ...(SITE.telephone ? { telephone: SITE.telephone } : {}),
         address: {
@@ -292,6 +317,8 @@ export class SeoService {
           url: canonical || undefined,
           availability: AVAILABILITY[input.offer.status],
           seller: { '@id': `${origin}/#organization` },
+          areaServed: [...AREA_SERVED],
+          shippingDetails: SHIPPING_DETAILS,
           ...(parsed ? { price: parsed.price, priceCurrency: parsed.currency } : {}),
         },
       });

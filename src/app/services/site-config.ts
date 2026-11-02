@@ -22,17 +22,32 @@ export const SITE = {
   /**
    * The names people actually search for. The cattery has gone by "Arlen Cat"
    * since 2010 and by the WCF prefix "Arlen Fluffy Plush" since 2016, and the
-   * site itself is known by its domain, so all three are declared as names of
+   * site itself is known by its domain, so all of them are declared as names of
    * the same organization instead of letting Google guess.
+   *
+   * The Cyrillic spellings are here because that is how a Ukrainian visitor
+   * types a Latin name from memory — "арлен кет", "арлен флафі кет", "кошеня
+   * ком". Each is a separate string: Google matches a query against the whole
+   * `alternateName` value, so a spelling that is not listed is not matched.
    */
   alternateNames: [
     'Arlen Cat',
     'Arlen Plush',
     'Arlen Fluffy Plush Cattery',
+    'Arlen Cat Cattery',
     'Розплідник Arlen Fluffy Plush',
     'Розплідник Arlen Cat',
+    'Арлен Кет',
+    'Арлен Кэт',
+    'Арлен Флафі Плаш',
+    'Арлен Флаффі Плаш',
+    'Арлен Флафі Кет',
+    'Арлен Флаффі Кэт',
+    'Розплідник Арлен',
+    'Розплідник Арлен Кет',
     'koshenya.com',
     'Кошеня ком',
+    'Кошеня.com',
   ] as readonly string[],
   logoPath: '/assets/img/navigation/photo_2024-08-31_20-45-32.png',
   /**
@@ -71,6 +86,46 @@ export const SITE = {
    */
   legacySite: 'https://arlen-cat.jimdofree.com/',
 } as const;
+
+/**
+ * Where a kitten can actually be sent. The cattery delivers worldwide, which
+ * `areaServed` says in one line, but shopping and local surfaces match on
+ * concrete regions — so the countries buyers ask for most often are named too,
+ * as ISO 3166-1 alpha-2 codes. Ukraine comes first; it is where the cattery is.
+ *
+ * This is not a closed list of what is possible, only of what is declared.
+ * Adding a country here is safe; the delivery itself is agreed per kitten.
+ */
+export const DELIVERY_COUNTRIES = [
+  'UA',
+  'DE',
+  'PL',
+  'AT',
+  'CH',
+  'CZ',
+  'SK',
+  'HU',
+  'RO',
+  'NL',
+  'BE',
+  'FR',
+  'IT',
+  'ES',
+  'PT',
+  'SE',
+  'NO',
+  'DK',
+  'FI',
+  'IE',
+  'GB',
+  'LT',
+  'LV',
+  'EE',
+  'US',
+  'CA',
+  'AE',
+  'IL',
+] as const;
 
 /** Languages the site publishes content in. */
 export const SEO_LOCALES = {
