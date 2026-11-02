@@ -51,11 +51,14 @@
   gap: 0.75rem;
 }
 
+/* The photos themselves are square, so a 4:3 stage cut the kitten's paws and
+   tail off. A slightly taller stage keeps more of the frame without letting
+   the photo dictate the height of the column. */
 .kitten-page__stage {
   position: relative;
   border-radius: 24px;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 7 / 6;
   background: var(--brand-light);
 }
 
