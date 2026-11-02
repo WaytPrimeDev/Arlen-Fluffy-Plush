@@ -256,28 +256,6 @@
             </section>
           }
 
-          <!-- 6. Price block -->
-          <div class="kitten-page__price-block">
-            <h2>{{ i18n.t('price') }}</h2>
-            <div class="kitten-page__price-rows">
-              @if (kitten()!.price?.pet) {
-                <div class="kitten-page__price-row">
-                  <span>{{ i18n.t('petPrice') }}</span>
-                  <strong>{{ kitten()!.price!.pet }}</strong>
-                </div>
-              }
-              @if (kitten()!.price?.breeding) {
-                <div class="kitten-page__price-row">
-                  <span>{{ i18n.t('breedingPrice') }}</span>
-                  <strong>{{ kitten()!.price!.breeding }}</strong>
-                </div>
-              }
-              @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
-                <p class="kitten-page__price-inquiry">{{ i18n.t('priceOnRequest') }}</p>
-              }
-            </div>
-          </div>
-
           <!-- 7. Telegram CTA -->
 
 
