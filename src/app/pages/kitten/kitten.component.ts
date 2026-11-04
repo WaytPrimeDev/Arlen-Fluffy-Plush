@@ -15,6 +15,7 @@ import { I18nService } from '../../services/i18n.service';
 import {
   formatAgeShort,
   mapStatus,
+  withCurrency,
   KITTEN_PLACEHOLDER,
   PARENT_PLACEHOLDER,
 } from '../../services/kitten-view.util';
@@ -148,6 +149,10 @@ export class KittenComponent {
   protected readonly ageLabel = computed(() =>
     formatAgeShort(this.kitten()?.birthDay, this.i18n),
   );
+
+  /** Shown with a currency sign, since the admin side stores bare numbers too. */
+  protected readonly petPrice = computed(() => withCurrency(this.kitten()?.price?.pet));
+  protected readonly breedingPrice = computed(() => withCurrency(this.kitten()?.price?.breeding));
 
   private readonly sortedImages = computed(() => {
     const kitten = this.kitten();

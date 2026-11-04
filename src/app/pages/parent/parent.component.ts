@@ -20,6 +20,7 @@ import {
   formatAgeShort,
   KITTEN_PLACEHOLDER,
   PARENT_PLACEHOLDER,
+  withCurrency,
 } from '../../services/kitten-view.util';
 import { STAGE_WIDTH, VIEWER_WIDTH, scaledImage } from '../../services/image-url.util';
 
@@ -222,15 +223,15 @@ function mapKittenApiToCard(kitten: KittenApiItem, i18n: I18nService): KittenCar
       KITTEN_PLACEHOLDER,
     priceLabel: formatPrice(kitten, i18n),
     prices: {
-      pet: kitten.price?.pet?.trim() || null,
-      breeding: kitten.price?.breeding?.trim() || null,
+      pet: withCurrency(kitten.price?.pet),
+      breeding: withCurrency(kitten.price?.breeding),
     },
   };
 }
 
 function formatPrice(kitten: KittenApiItem, i18n: I18nService): string {
-  const pet = kitten.price?.pet;
-  const breeding = kitten.price?.breeding;
+  const pet = withCurrency(kitten.price?.pet);
+  const breeding = withCurrency(kitten.price?.breeding);
   if (pet || breeding) {
     return [
       pet && `${i18n.t('petPrice')}: ${pet}`,

@@ -151,19 +151,19 @@
           <div class="kitten-page__price-block">
             <h2>{{ i18n.t('price') }}</h2>
             <div class="kitten-page__price-rows">
-              @if (kitten()!.price?.pet) {
+              @if (petPrice()) {
                 <div class="kitten-page__price-row">
                   <span>{{ i18n.t('petPrice') }}</span>
-                  <strong>{{ kitten()!.price!.pet }}</strong>
+                  <strong>{{ petPrice() }}</strong>
                 </div>
               }
-              @if (kitten()!.price?.breeding) {
+              @if (breedingPrice()) {
                 <div class="kitten-page__price-row">
                   <span>{{ i18n.t('breedingPrice') }}</span>
-                  <strong>{{ kitten()!.price!.breeding }}</strong>
+                  <strong>{{ breedingPrice() }}</strong>
                 </div>
               }
-              @if (!kitten()!.price?.pet && !kitten()!.price?.breeding) {
+              @if (!petPrice() && !breedingPrice()) {
                 <p class="kitten-page__price-inquiry">{{ i18n.t('priceOnRequest') }}</p>
               }
             </div>

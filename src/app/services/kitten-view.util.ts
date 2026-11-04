@@ -57,8 +57,8 @@ export function mapKittenToListItem(kitten: KittenApiItem, i18n: I18nService): K
     status: mapStatus(kitten.status),
     priceLabel: formatPrice(kitten, i18n),
     prices: {
-      pet: kitten.price?.pet?.trim() || null,
-      breeding: kitten.price?.breeding?.trim() || null,
+      pet: withCurrency(kitten.price?.pet),
+      breeding: withCurrency(kitten.price?.breeding),
     },
     image: pickImage(kitten.images),
     gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
@@ -118,8 +118,8 @@ export function formatAgeShort(birthDay: string | undefined, i18n: I18nService):
 }
 
 export function formatPrice(kitten: KittenApiItem, i18n: I18nService): string {
-  const pet = kitten.price?.pet;
-  const breeding = kitten.price?.breeding;
+  const pet = withCurrency(kitten.price?.pet);
+  const breeding = withCurrency(kitten.price?.breeding);
   if (pet || breeding) {
     const parts: string[] = [];
     if (pet) parts.push(`${i18n.t('petPrice')}: ${pet}`);
@@ -127,4 +127,17 @@ export function formatPrice(kitten: KittenApiItem, i18n: I18nService): string {
     return parts.join(' | ');
   }
   return i18n.t('priceOnRequest');
+}
+
+/**
+ * Prices are free text on the admin side, so some already carry a currency
+ * ("1200 $", "15000 грн") and some are a bare number. A dollar sign is added
+ * only to the bare ones, which keeps a hryvnia or euro price intact instead of
+ * relabelling it.
+ */
+export function withCurrency(value: string | null | undefined): string | null {
+  const price = value?.trim();
+  if (!price) return null;
+  if (/грн|₴|uah|\$|usd|дол|€|eur|євро/i.test(price)) return price;
+  return `${price} $`;
 }
