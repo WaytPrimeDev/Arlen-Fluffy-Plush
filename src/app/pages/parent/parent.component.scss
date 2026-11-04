@@ -254,17 +254,10 @@
 }
 
 .parent-page__kittens-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2rem;
-  height: 2rem;
-  padding: 0 0.6rem;
-  border-radius: 999px;
-  background: var(--brand-purple);
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 700;
+  --paw-count-size: 40px;
+  --paw-count-ink: #fff;
+
+  color: var(--brand-purple);
 }
 
 .parent-page__no-kittens {

@@ -237,8 +237,9 @@ export class I18nService {
         'Veterinary certificates, vaccinations, microchipping, and genetic tests of the parents.',
       homeWhy3Title: 'Lifelong support',
       homeWhy3Text: 'We stay in touch — advising on nutrition, health, and upbringing.',
-      homeWhy4Title: 'WCF documents',
-      homeWhy4Text: 'International-standard pedigrees and metrics for every kitten.',
+      homeWhy4Title: 'Delivery worldwide',
+      homeWhy4Text:
+        'We bring kittens to any country — full documents, safe transport and warm hands all the way to your door.',
       homeReviewsEyebrow: 'Reviews',
       homeReviewsTitleLead: 'Families that have already',
       homeReviewsTitleHighlight: 'found their love',
@@ -355,6 +356,9 @@ export class I18nService {
       valueIntegrityTitle: 'Breed standard',
       valueIntegrityDesc:
         'Our kittens are not only beautiful — they match the high standard and come with an official pedigree.',
+      valueDeliveryTitle: 'A world without borders',
+      valueDeliveryDesc:
+        'We send our kittens to any country in the world — with full documents, safe transport and care at every kilometre.',
       ourJourney: 'Our Journey',
       milestone2010Title: 'The first cat in our home',
       milestone2010Desc:
@@ -608,8 +612,9 @@ export class I18nService {
       homeWhy3Title: 'Підтримка назавжди',
       homeWhy3Text:
         'Ми залишаємося на зв’язку — консультуємо щодо харчування, здоров’я і виховання.',
-      homeWhy4Title: 'Документи WCF',
-      homeWhy4Text: 'Метрики та родоводи міжнародного стандарту для кожного кошеняти.',
+      homeWhy4Title: 'Доставка у будь-яку країну',
+      homeWhy4Text:
+        'Привеземо кошеня в будь-який куточок світу — повний пакет документів, надійний супровід і турбота до ваших дверей.',
       homeReviewsEyebrow: 'Відгуки',
       homeReviewsTitleLead: 'Родини, які вже',
       homeReviewsTitleHighlight: 'знайшли свою любов',
@@ -726,6 +731,9 @@ export class I18nService {
       valueIntegrityTitle: 'Стандарт породи',
       valueIntegrityDesc:
         'Наші кошенята — це не лише краса, а й відповідність високим стандартам породи та офіційний родовід.',
+      valueDeliveryTitle: 'Світ без кордонів',
+      valueDeliveryDesc:
+        'Ми відправляємо кошенят у будь-яку країну світу — з усіма документами, безпечним супроводом і турботою на кожному кілометрі шляху.',
       ourJourney: 'Наш шлях',
       milestone2010Title: 'Перша кішка в нашому домі',
       milestone2010Desc:

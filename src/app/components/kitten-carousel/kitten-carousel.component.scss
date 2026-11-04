@@ -8,6 +8,8 @@
 
 .kitten-carousel__track {
   display: flex;
+  /* Stretch keeps every slot as tall as the tallest card in the row. */
+  align-items: stretch;
   gap: 1.25rem;
   margin: 0;
   padding: 0.5rem 0.25rem 1.25rem;
@@ -34,10 +36,17 @@
 }
 
 .kitten-carousel__item {
+  display: flex;
   flex: 0 0 280px;
   scroll-snap-align: start;
   /* Keeps the lifted card and its focus ring from being clipped by the scroller. */
   padding: 0 2px;
+}
+
+/* The card fills the stretched slot, so all cards in the carousel are the
+   same height whatever their text and price rows add up to. */
+.kitten-carousel__item .kitten-card {
+  width: 100%;
 }
 
 .kitten-carousel__arrow {

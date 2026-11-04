@@ -16,6 +16,7 @@ import { PhotoViewerDirective } from '../../components/photo-viewer/photo-viewer
 import { SeoService } from '../../services/seo.service';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
+import { PawCountComponent } from '../../components/paw-count/paw-count.component';
 import {
   formatAgeShort,
   KITTEN_PLACEHOLDER,
@@ -55,7 +56,7 @@ interface LoadState {
 
 @Component({
   selector: 'app-parent',
-  imports: [RouterLink, PhotoViewerDirective, LocalizedPathPipe, ImageFallbackDirective],
+  imports: [RouterLink, PhotoViewerDirective, LocalizedPathPipe, ImageFallbackDirective, PawCountComponent],
   templateUrl: './parent.component.html',
   styleUrl: './parent.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

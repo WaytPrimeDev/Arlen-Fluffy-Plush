@@ -9,7 +9,7 @@ interface Milestone {
 }
 
 interface Value {
-  iconName: 'heart' | 'target' | 'trophy';
+  iconName: 'heart' | 'target' | 'trophy' | 'globe';
   titleKey: string;
   descriptionKey: string;
 }
@@ -43,6 +43,7 @@ export class AboutComponent {
     { iconName: 'heart',  titleKey: 'valueLoveTitle',        descriptionKey: 'valueLoveDesc' },
     { iconName: 'target', titleKey: 'valueExcellenceTitle',  descriptionKey: 'valueExcellenceDesc' },
     { iconName: 'trophy', titleKey: 'valueIntegrityTitle',   descriptionKey: 'valueIntegrityDesc' },
+    { iconName: 'globe',  titleKey: 'valueDeliveryTitle',    descriptionKey: 'valueDeliveryDesc' },
   ];
 
   protected readonly readiness: readonly ReadinessItem[] = [

@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { localizedName, PARENT_PLACEHOLDER } from '../../services/kitten-view.util';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
+import { PawCountComponent } from '../../components/paw-count/paw-count.component';
 
 type SexFilter = 'all' | 'male' | 'female';
 
@@ -39,7 +40,7 @@ const PER_PAGE = 12;
 
 @Component({
   selector: 'app-parents',
-  imports: [RouterLink, CommonModule, LocalizedPathPipe, ImageFallbackDirective],
+  imports: [RouterLink, CommonModule, LocalizedPathPipe, ImageFallbackDirective, PawCountComponent],
   templateUrl: './parents.component.html',
   styleUrl: './parents.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

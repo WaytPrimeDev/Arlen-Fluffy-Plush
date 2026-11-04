@@ -152,7 +152,7 @@
         <header class="parent-page__kittens-header">
           <h2 id="kittens-heading">{{ kittensSectionTitle() }}</h2>
           @if (kittens().length) {
-            <span class="parent-page__kittens-count">{{ kittens().length }}</span>
+            <app-paw-count class="parent-page__kittens-count" variant="solid" [count]="kittens().length" />
           }
         </header>
 

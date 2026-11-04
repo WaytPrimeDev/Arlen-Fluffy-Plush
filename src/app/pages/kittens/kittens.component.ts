@@ -25,6 +25,7 @@ import { FiltersService } from '../../services/filters.service';
 import { SelectComponent, type SelectOption } from '../../components/select/select.component';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
+import { PawCountComponent } from '../../components/paw-count/paw-count.component';
 
 type ViewMode = 'all' | 'grouped';
 type GenderFilter = 'all' | 'male' | 'female';
@@ -64,7 +65,7 @@ const LOOKUP_PER_PAGE = 1000;
 
 @Component({
   selector: 'app-kittens',
-  imports: [RouterLink, SelectComponent, LocalizedPathPipe, ImageFallbackDirective],
+  imports: [RouterLink, SelectComponent, LocalizedPathPipe, ImageFallbackDirective, PawCountComponent],
   templateUrl: './kittens.component.html',
   styleUrl: './kittens.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

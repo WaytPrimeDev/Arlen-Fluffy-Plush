@@ -348,20 +348,15 @@
 
 /* Kittens count — top right */
 .parent-card__kittens-count {
+  --paw-count-size: 38px;
+  --paw-count-ink: #fff;
+
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: rgb(28 24 39 / 55%);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0.6rem;
+  right: 0.6rem;
+  /* Opaque enough to keep the white number readable over any photo. */
+  color: rgb(28 24 39 / 72%);
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 28%));
 }
 
 /* Body */

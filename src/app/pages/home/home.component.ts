@@ -54,7 +54,7 @@ export class HomeComponent {
     { icon: '🏠', title: this.i18n.t('homeWhy1Title'), text: this.i18n.t('homeWhy1Text') },
     { icon: '🩺', title: this.i18n.t('homeWhy2Title'), text: this.i18n.t('homeWhy2Text') },
     { icon: '💜', title: this.i18n.t('homeWhy3Title'), text: this.i18n.t('homeWhy3Text') },
-    { icon: '📋', title: this.i18n.t('homeWhy4Title'), text: this.i18n.t('homeWhy4Text') },
+    { icon: '✈️', title: this.i18n.t('homeWhy4Title'), text: this.i18n.t('homeWhy4Text') },
   ]);
 
   protected readonly reviews = computed<Review[]>(() =>

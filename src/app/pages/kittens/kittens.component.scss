@@ -389,16 +389,9 @@
 }
 
 .section-head__count {
-  display: grid;
-  place-items: center;
-  min-width: 28px;
-  height: 28px;
-  padding: 0 0.5rem;
-  border-radius: 999px;
-  background: rgb(115 86 168 / 12%);
+  --paw-count-size: 38px;
+
   color: var(--brand-purple);
-  font-size: 0.82rem;
-  font-weight: 700;
 }
 
 /* ─── Grids ─────────────────────────────────────────────────────────────── */
@@ -521,17 +514,10 @@
 }
 
 .litter__count {
-  display: grid;
-  place-items: center;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 0.45rem;
-  border-radius: 999px;
-  background: rgb(115 86 168 / 12%);
+  --paw-count-size: 32px;
+
   color: var(--brand-purple);
-  font-family: Inter, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 700;
+  vertical-align: -0.35em;
 }
 
 /* ─── Parent card ───────────────────────────────────────────────────────── */

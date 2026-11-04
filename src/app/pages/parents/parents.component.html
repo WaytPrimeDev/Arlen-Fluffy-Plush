@@ -155,12 +155,12 @@
                 {{ formatSex(parent.sex) }}
               </span>
               @if (parent.kittensCount > 0) {
-                <span
+                <app-paw-count
                   class="parent-card__kittens-count"
+                  variant="solid"
+                  [count]="parent.kittensCount"
                   attr.aria-label="{{ parent.kittensCount }} {{ i18n.t('kittensWord') }}"
-                >
-                  {{ parent.kittensCount }}
-                </span>
+                />
               }
             </div>
 

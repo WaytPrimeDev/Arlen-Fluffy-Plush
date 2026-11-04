@@ -266,7 +266,7 @@
         @if (viewMode() === 'all') {
           <header class="section-head">
             <h2>{{ i18n.t('allKittens') }}</h2>
-            <span class="section-head__count">{{ filteredKittens().length }}</span>
+            <app-paw-count class="section-head__count" [count]="filteredKittens().length" />
           </header>
 
           @if (filteredKittens().length) {
@@ -380,7 +380,7 @@
 
                 <h3 class="litter__title">
                   {{ litter.name }}
-                  <span class="litter__count">{{ litter.kittens.length }}</span>
+                  <app-paw-count class="litter__count" [count]="litter.kittens.length" />
                 </h3>
               </header>
 
@@ -454,7 +454,7 @@
         <section class="parent-section">
           <header class="section-head">
             <h2>{{ i18n.t('ourQueens') }}</h2>
-            <span class="section-head__count">{{ queens().length }}</span>
+            <app-paw-count class="section-head__count" [count]="queens().length" />
           </header>
 
           @if (queens().length) {
@@ -497,7 +497,7 @@
         <section class="parent-section">
           <header class="section-head">
             <h2>{{ i18n.t('ourStuds') }}</h2>
-            <span class="section-head__count">{{ studs().length }}</span>
+            <app-paw-count class="section-head__count" [count]="studs().length" />
           </header>
 
           @if (studs().length) {
