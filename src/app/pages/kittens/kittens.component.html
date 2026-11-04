@@ -272,12 +272,16 @@
           @if (filteredKittens().length) {
             <div class="card-grid">
               @for (kitten of filteredKittens(); track kitten.id) {
-                <a
-                  class="kitten-card"
-                  [routerLink]="['/kittens', kitten.id] | locPath"
-                >
+                <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
                   <div class="kitten-card__media">
-                    <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                    <img
+                      draggable="false"
+                      decoding="async"
+                      appImageFallback
+                      [src]="kitten.image"
+                      [alt]="kitten.name"
+                      loading="lazy"
+                    />
                     <span class="kitten-card__age-badge">{{ kitten.age }}</span>
                   </div>
                   <div class="kitten-card__body">
@@ -323,7 +327,9 @@
             </div>
           } @else {
             <div class="state" role="status">
-              <span class="state__icon" aria-hidden="true">{{ hasActiveFilters() ? '🔍' : '🐱' }}</span>
+              <span class="state__icon" aria-hidden="true">{{
+                hasActiveFilters() ? '🔍' : '🐱'
+              }}</span>
               <h2>
                 {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
               </h2>
@@ -346,6 +352,8 @@
                       [attr.aria-label]="i18n.t('mom') + ': ' + mom.name"
                     >
                       <img
+                        draggable="false"
+                        decoding="async"
                         [appImageFallback]="parentPlaceholder"
                         [src]="mom.image"
                         [alt]="mom.name"
@@ -365,6 +373,8 @@
                       [attr.aria-label]="i18n.t('dad') + ': ' + dad.name"
                     >
                       <img
+                        draggable="false"
+                        decoding="async"
                         [appImageFallback]="parentPlaceholder"
                         [src]="dad.image"
                         [alt]="dad.name"
@@ -386,12 +396,16 @@
 
               <div class="card-grid card-grid--litter">
                 @for (kitten of litter.kittens; track kitten.id) {
-                  <a
-                    class="kitten-card"
-                    [routerLink]="['/kittens', kitten.id] | locPath"
-                  >
+                  <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
                     <div class="kitten-card__media">
-                      <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                      <img
+                        draggable="false"
+                        decoding="async"
+                        appImageFallback
+                        [src]="kitten.image"
+                        [alt]="kitten.name"
+                        loading="lazy"
+                      />
                       <span class="kitten-card__age-badge">{{ kitten.age }}</span>
                     </div>
                     <div class="kitten-card__body">
@@ -405,7 +419,9 @@
                             [class.gender-pill--male]="kitten.gender === 'male'"
                             [class.gender-pill--female]="kitten.gender === 'female'"
                           >
-                            <span aria-hidden="true">{{ kitten.gender === 'male' ? '♂' : '♀' }}</span>
+                            <span aria-hidden="true">{{
+                              kitten.gender === 'male' ? '♂' : '♀'
+                            }}</span>
                             {{ kitten.gender === 'male' ? i18n.t('male') : i18n.t('female') }}
                           </span>
                         }
@@ -439,7 +455,9 @@
           }
         } @else {
           <div class="state" role="status">
-            <span class="state__icon" aria-hidden="true">{{ hasActiveFilters() ? '🔍' : '🐱' }}</span>
+            <span class="state__icon" aria-hidden="true">{{
+              hasActiveFilters() ? '🔍' : '🐱'
+            }}</span>
             <h2>
               {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
             </h2>
@@ -467,6 +485,8 @@
                 >
                   <div class="parent-card__media">
                     <img
+                      draggable="false"
+                      decoding="async"
                       [appImageFallback]="parentPlaceholder"
                       [src]="parent.image"
                       [alt]="parent.name"
@@ -510,6 +530,8 @@
                 >
                   <div class="parent-card__media">
                     <img
+                      draggable="false"
+                      decoding="async"
                       [appImageFallback]="parentPlaceholder"
                       [src]="parent.image"
                       [alt]="parent.name"

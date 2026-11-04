@@ -35,15 +35,20 @@
     <ul #track class="kitten-carousel__track" (scroll)="updateScrollState()">
       @for (kitten of kittens(); track kitten.id) {
         <li class="kitten-carousel__item">
-          <!-- The home page sends every card to the catalogue rather than to the
-               kitten itself, so the label has to name that destination too. -->
           <a
             class="kitten-card"
-            [routerLink]="'/kittens' | locPath"
-            [attr.aria-label]="kitten.name + ', ' + kitten.breed + ' — ' + i18n.t('viewAllKittens')"
+            [routerLink]="['/kittens', kitten.id] | locPath"
+            [attr.aria-label]="kitten.name + ', ' + kitten.breed"
           >
             <div class="kitten-card__media">
-              <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+              <img
+                draggable="false"
+                decoding="async"
+                appImageFallback
+                [src]="kitten.image"
+                [alt]="kitten.name"
+                loading="lazy"
+              />
               <span class="kitten-card__age-badge">{{ kitten.age }}</span>
             </div>
             <div class="kitten-card__body">

@@ -17,6 +17,8 @@
     </div>
     <div class="about-page__intro-image">
       <img
+        draggable="false"
+        decoding="async"
         ngSrc="/assets/img/about_us.webp"
         fill
         sizes="(max-width: 900px) 100vw, 55vw"
@@ -35,31 +37,73 @@
           <article class="about-page__value-card">
             <div class="about-page__value-icon">
               @if (value.iconName === 'heart') {
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
                 </svg>
               }
               @if (value.iconName === 'target') {
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="6" />
+                  <circle cx="12" cy="12" r="2" />
                 </svg>
               }
               @if (value.iconName === 'trophy') {
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="8 11 12 15 16 11"/>
-                  <line x1="12" y1="15" x2="12" y2="3"/>
-                  <path d="M20 13c0 5-3.58 8.88-8 10-4.42-1.12-8-4.95-8-10V5l8-3 8 3z"/>
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="8 11 12 15 16 11" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                  <path d="M20 13c0 5-3.58 8.88-8 10-4.42-1.12-8-4.95-8-10V5l8-3 8 3z" />
                 </svg>
               }
               @if (value.iconName === 'globe') {
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M2 12h20"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20" />
+                  <path
+                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                  />
                 </svg>
               }
             </div>
@@ -75,9 +119,11 @@
       <h2 class="about-page__section-title">{{ 'ourJourney' | translate }}</h2>
       <div class="about-page__timeline">
         @for (milestone of milestones; track milestone.year; let i = $index) {
-          <div class="about-page__milestone"
-               [class.about-page__milestone--even]="i % 2 === 0"
-               [class.about-page__milestone--odd]="i % 2 !== 0">
+          <div
+            class="about-page__milestone"
+            [class.about-page__milestone--even]="i % 2 === 0"
+            [class.about-page__milestone--odd]="i % 2 !== 0"
+          >
             <div class="about-page__milestone-spacer"></div>
             <div class="about-page__milestone-dot" aria-hidden="true"></div>
             <div class="about-page__milestone-card">
@@ -99,34 +145,76 @@
             <div class="about-page__value-icon">
               @switch (item.iconName) {
                 @case ('paw') {
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="6.5" cy="9" r="2.2"/><circle cx="10.5" cy="5.5" r="2.2"/>
-                    <circle cx="15.5" cy="5.5" r="2.2"/><circle cx="19" cy="9.5" r="2.2"/>
-                    <path d="M8.5 15.5c1-2 2.1-3 4.1-3s3.1 1 4.1 3c.8 1.6.4 3.4-1.3 4-1 .4-1.9.2-2.8.2s-1.8.2-2.8-.2c-1.7-.6-2.1-2.4-1.3-4z"/>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="6.5" cy="9" r="2.2" />
+                    <circle cx="10.5" cy="5.5" r="2.2" />
+                    <circle cx="15.5" cy="5.5" r="2.2" />
+                    <circle cx="19" cy="9.5" r="2.2" />
+                    <path
+                      d="M8.5 15.5c1-2 2.1-3 4.1-3s3.1 1 4.1 3c.8 1.6.4 3.4-1.3 4-1 .4-1.9.2-2.8.2s-1.8.2-2.8-.2c-1.7-.6-2.1-2.4-1.3-4z"
+                    />
                   </svg>
                 }
                 @case ('shield') {
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 22c4.42-1.12 8-5 8-10V5l-8-3-8 3v7c0 5 3.58 8.88 8 10z"/>
-                    <path d="M9 11.5l2 2 4-4"/>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 22c4.42-1.12 8-5 8-10V5l-8-3-8 3v7c0 5 3.58 8.88 8 10z" />
+                    <path d="M9 11.5l2 2 4-4" />
                   </svg>
                 }
                 @case ('document') {
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="8" y1="13" x2="14" y2="13"/>
-                    <line x1="8" y1="17" x2="16" y2="17"/>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="8" y1="13" x2="14" y2="13" />
+                    <line x1="8" y1="17" x2="16" y2="17" />
                   </svg>
                 }
                 @case ('home') {
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 10.5 12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <path d="M12 17.5c-1.8-1.2-3-2.2-3-3.6a1.7 1.7 0 0 1 3-1 1.7 1.7 0 0 1 3 1c0 1.4-1.2 2.4-3 3.6z"/>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 10.5 12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path
+                      d="M12 17.5c-1.8-1.2-3-2.2-3-3.6a1.7 1.7 0 0 1 3-1 1.7 1.7 0 0 1 3 1c0 1.4-1.2 2.4-3 3.6z"
+                    />
                   </svg>
                 }
               }

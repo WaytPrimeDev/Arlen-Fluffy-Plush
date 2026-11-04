@@ -44,6 +44,20 @@ svg {
   max-width: 100%;
 }
 
+/* The photos are the cattery's own work, so they are not handed out as a drag
+   payload or a long-press "Save image" sheet. The `draggable="false"` on each
+   `<img>` does the same job; this covers what no attribute can reach — the
+   photos the lightbox builds at runtime — and stops the long-press callout on
+   iOS, which no `dragstart` handler can.
+
+   Deterrence only: the files are still served over HTTP. The reason to keep it
+   is the feel — a dragged card no longer trails a ghost image. */
+img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
 input,
 button,
 textarea,

@@ -76,19 +76,17 @@ describe('KittenCarouselComponent', () => {
     expect(cards().length).toBe(3);
   });
 
-  it('sends every card to the catalogue under the language prefix', async () => {
+  it('sends every card to its own kitten page under the language prefix', async () => {
     await respondWith(2);
     expect(cards().map((card) => card.getAttribute('href'))).toEqual([
-      '/uk/kittens',
-      '/uk/kittens',
+      '/uk/kittens/id-0',
+      '/uk/kittens/id-1',
     ]);
   });
 
-  it('names the catalogue in each card label, since that is where it goes', async () => {
+  it('names the kitten in each card label', async () => {
     await respondWith(1);
-    expect(cards()[0].getAttribute('aria-label')).toBe(
-      'Кошеня 0, Британська — Дивитися всіх кошенят',
-    );
+    expect(cards()[0].getAttribute('aria-label')).toBe('Кошеня 0, Британська');
   });
 
   it('is a labelled list of links, with hidden decorative icons', async () => {

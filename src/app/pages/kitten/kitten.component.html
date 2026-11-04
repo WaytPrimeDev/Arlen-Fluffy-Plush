@@ -1,8 +1,24 @@
 <section class="kitten-page">
   <div class="kitten-page__container">
-    <a class="kitten-page__back" [routerLink]="'/kittens' | locPath" [attr.aria-label]="i18n.t('backToKittens')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    <a
+      class="kitten-page__back"
+      [routerLink]="'/kittens' | locPath"
+      [attr.aria-label]="i18n.t('backToKittens')"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="12 19 5 12 12 5" />
       </svg>
       {{ i18n.t('backToKittens') }}
     </a>
@@ -22,11 +38,12 @@
         <p class="kitten-page__eyebrow">{{ i18n.t('error') }}</p>
         <h1>{{ i18n.t('error') }}</h1>
         <p>{{ loadError() }}</p>
-        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{ i18n.t('backToKittens') }}</a>
+        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{
+          i18n.t('backToKittens')
+        }}</a>
       </div>
     } @else if (kitten()) {
       <div class="kitten-page__layout">
-
         <!-- Gallery -->
         <div class="kitten-page__gallery">
           @if (images().length) {
@@ -56,6 +73,8 @@
                   "
                 >
                   <img
+                    draggable="false"
+                    decoding="async"
                     [src]="img.display"
                     [alt]="i18n.t('viewerImageAlt', { label: name(), index: i + 1 })"
                     [attr.loading]="i === 0 ? 'eager' : 'lazy'"
@@ -67,6 +86,8 @@
           } @else {
             <div class="kitten-page__stage kitten-page__stage--static">
               <img
+                draggable="false"
+                decoding="async"
                 class="kitten-page__slide kitten-page__slide--active"
                 appImageFallback
                 [src]="selectedImage()"
@@ -76,7 +97,11 @@
           }
 
           @if (images().length > 1) {
-            <div class="kitten-page__thumbs" role="list" [attr.aria-label]="i18n.t('galleryThumbnails')">
+            <div
+              class="kitten-page__thumbs"
+              role="list"
+              [attr.aria-label]="i18n.t('galleryThumbnails')"
+            >
               @for (img of images(); track img.zoom; let i = $index) {
                 <div role="listitem">
                   <button
@@ -87,7 +112,13 @@
                     [attr.aria-label]="i18n.t('viewerGoToImage', { index: i + 1 })"
                     (click)="selectImage(i)"
                   >
-                    <img [src]="img.thumb" alt="" loading="lazy" />
+                    <img
+                      draggable="false"
+                      decoding="async"
+                      [src]="img.thumb"
+                      alt=""
+                      loading="lazy"
+                    />
                   </button>
                 </div>
               }
@@ -97,13 +128,14 @@
 
         <!-- Details -->
         <div class="kitten-page__details">
-
           <!-- 1. Title row -->
           <header class="kitten-page__title-row">
             <h1>{{ name() }}</h1>
             <div class="kitten-page__title-badges">
               @if (ageLabel()) {
-                <span class="kitten-page__badge-pill kitten-page__badge-pill--age">{{ ageLabel() }}</span>
+                <span class="kitten-page__badge-pill kitten-page__badge-pill--age">{{
+                  ageLabel()
+                }}</span>
               }
               @if (genderLabel(); as label) {
                 <span
@@ -120,8 +152,26 @@
           <!-- 2. Specifications card -->
           <section class="kitten-page__spec-card" [attr.aria-label]="i18n.t('specifications')">
             <div class="kitten-page__spec-row">
-              <svg class="kitten-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m17 6-2.5-2.5"/><path d="m14 8-1-1"/><path d="m7 18 2.5 2.5"/><path d="m10 16 1 1"/>
+              <svg
+                class="kitten-page__spec-icon"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M2 15c6.667-6 13.333 0 20-6" />
+                <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993" />
+                <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993" />
+                <path d="m17 6-2.5-2.5" />
+                <path d="m14 8-1-1" />
+                <path d="m7 18 2.5 2.5" />
+                <path d="m10 16 1 1" />
               </svg>
               <div>
                 <p class="kitten-page__spec-label">{{ i18n.t('breed') }}</p>
@@ -129,8 +179,26 @@
               </div>
             </div>
             <div class="kitten-page__spec-row">
-              <svg class="kitten-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+              <svg
+                class="kitten-page__spec-icon"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+                <path
+                  d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"
+                />
               </svg>
               <div>
                 <p class="kitten-page__spec-label">{{ i18n.t('colorAndPattern') }}</p>
@@ -138,8 +206,23 @@
               </div>
             </div>
             <div class="kitten-page__spec-row">
-              <svg class="kitten-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              <svg
+                class="kitten-page__spec-icon"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
               <div>
                 <p class="kitten-page__spec-label">{{ i18n.t('birthdate') }}</p>
@@ -178,8 +261,20 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg class="kitten-page__cta-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
+              <svg
+                class="kitten-page__cta-icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
               </svg>
               {{ i18n.t('contactOnTelegram') }}
             </a>
@@ -196,14 +291,40 @@
             <h2>{{ i18n.t('healthInformation') }}</h2>
             <div class="kitten-page__health-card">
               <div class="kitten-page__health-item">
-                <svg class="kitten-page__check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                <svg
+                  class="kitten-page__check"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
                 <span>{{ i18n.t('fullyVaccinated') }}</span>
               </div>
               <div class="kitten-page__health-item">
-                <svg class="kitten-page__check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                <svg
+                  class="kitten-page__check"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
                 <span>{{ i18n.t('healthCertified') }}</span>
               </div>
@@ -223,6 +344,8 @@
                   >
                     <p class="kitten-page__parent-role">{{ i18n.t('mother') }}</p>
                     <img
+                      draggable="false"
+                      decoding="async"
                       [appImageFallback]="parentPlaceholder"
                       [src]="pickParentImage(mom)"
                       [alt]="parentName(mom)"
@@ -241,6 +364,8 @@
                   >
                     <p class="kitten-page__parent-role">{{ i18n.t('father') }}</p>
                     <img
+                      draggable="false"
+                      decoding="async"
                       [appImageFallback]="parentPlaceholder"
                       [src]="pickParentImage(dad)"
                       [alt]="parentName(dad)"
@@ -257,8 +382,6 @@
           }
 
           <!-- 7. Telegram CTA -->
-
-
         </div>
       </div>
     } @else {
@@ -266,7 +389,9 @@
         <p class="kitten-page__eyebrow">404</p>
         <h1>{{ i18n.t('priceOnRequest') }}</h1>
         <p>{{ i18n.t('priceOnRequest') }}</p>
-        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{ i18n.t('backToKittens') }}</a>
+        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{
+          i18n.t('backToKittens')
+        }}</a>
       </div>
     }
   </div>

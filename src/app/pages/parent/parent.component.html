@@ -1,9 +1,24 @@
 <article class="parent-page">
   <div class="parent-page__container">
-
-    <a class="parent-page__back" [routerLink]="'/parents' | locPath" [attr.aria-label]="i18n.t('backToParents')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-        <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    <a
+      class="parent-page__back"
+      [routerLink]="'/parents' | locPath"
+      [attr.aria-label]="i18n.t('backToParents')"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="12 19 5 12 12 5" />
       </svg>
       {{ i18n.t('backToParents') }}
     </a>
@@ -23,12 +38,12 @@
         <p class="parent-page__eyebrow">{{ i18n.t('error') }}</p>
         <h1>{{ i18n.t('error') }}</h1>
         <p>{{ loadError() }}</p>
-        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{ i18n.t('backToParents') }}</a>
+        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{
+          i18n.t('backToParents')
+        }}</a>
       </div>
     } @else if (parent()) {
-
       <div class="parent-page__layout">
-
         <!-- Gallery -->
         <div class="parent-page__gallery">
           @if (images().length) {
@@ -58,6 +73,8 @@
                   "
                 >
                   <img
+                    draggable="false"
+                    decoding="async"
                     [src]="img.display"
                     [alt]="i18n.t('viewerImageAlt', { label: name(), index: i + 1 })"
                     [attr.loading]="i === 0 ? 'eager' : 'lazy'"
@@ -69,6 +86,8 @@
           } @else {
             <div class="parent-page__stage parent-page__stage--static">
               <img
+                draggable="false"
+                decoding="async"
                 class="parent-page__slide parent-page__slide--active"
                 [appImageFallback]="parentPlaceholder"
                 [src]="selectedImage()"
@@ -78,7 +97,11 @@
           }
 
           @if (images().length > 1) {
-            <div class="parent-page__thumbs" role="list" [attr.aria-label]="i18n.t('galleryThumbnails')">
+            <div
+              class="parent-page__thumbs"
+              role="list"
+              [attr.aria-label]="i18n.t('galleryThumbnails')"
+            >
               @for (img of images(); track img.zoom; let i = $index) {
                 <div role="listitem">
                   <button
@@ -89,7 +112,13 @@
                     [attr.aria-label]="i18n.t('viewerGoToImage', { index: i + 1 })"
                     (click)="selectImage(i)"
                   >
-                    <img [src]="img.thumb" alt="" loading="lazy" />
+                    <img
+                      draggable="false"
+                      decoding="async"
+                      [src]="img.thumb"
+                      alt=""
+                      loading="lazy"
+                    />
                   </button>
                 </div>
               }
@@ -99,7 +128,6 @@
 
         <!-- Details -->
         <div class="parent-page__details">
-
           <header class="parent-page__title-row">
             <h1>{{ name() }}</h1>
             @if (sexLabel(); as label) {
@@ -117,8 +145,26 @@
 
           <section class="parent-page__spec-card" [attr.aria-label]="i18n.t('specifications')">
             <div class="parent-page__spec-row">
-              <svg class="parent-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="m17 6-2.5-2.5"/><path d="m14 8-1-1"/><path d="m7 18 2.5 2.5"/><path d="m10 16 1 1"/>
+              <svg
+                class="parent-page__spec-icon"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M2 15c6.667-6 13.333 0 20-6" />
+                <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993" />
+                <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993" />
+                <path d="m17 6-2.5-2.5" />
+                <path d="m14 8-1-1" />
+                <path d="m7 18 2.5 2.5" />
+                <path d="m10 16 1 1" />
               </svg>
               <div>
                 <p class="parent-page__spec-label">{{ i18n.t('breed') }}</p>
@@ -126,8 +172,26 @@
               </div>
             </div>
             <div class="parent-page__spec-row">
-              <svg class="parent-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+              <svg
+                class="parent-page__spec-icon"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+                <path
+                  d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"
+                />
               </svg>
               <div>
                 <p class="parent-page__spec-label">{{ i18n.t('color') }}</p>
@@ -135,8 +199,22 @@
               </div>
             </div>
             <div class="parent-page__spec-row">
-              <svg class="parent-page__spec-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                <path d="M12 5c1.5-2 4-2.5 5.5-1 1.5 1.5 1.5 4 0 5.5L12 15 6.5 9.5c-1.5-1.5-1.5-4 0-5.5C8 2.5 10.5 3 12 5z"/>
+              <svg
+                class="parent-page__spec-icon"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12 5c1.5-2 4-2.5 5.5-1 1.5 1.5 1.5 4 0 5.5L12 15 6.5 9.5c-1.5-1.5-1.5-4 0-5.5C8 2.5 10.5 3 12 5z"
+                />
               </svg>
               <div>
                 <p class="parent-page__spec-label">{{ i18n.t('sex') }}</p>
@@ -144,7 +222,6 @@
               </div>
             </div>
           </section>
-
         </div>
       </div>
 
@@ -152,7 +229,11 @@
         <header class="parent-page__kittens-header">
           <h2 id="kittens-heading">{{ kittensSectionTitle() }}</h2>
           @if (kittens().length) {
-            <app-paw-count class="parent-page__kittens-count" variant="solid" [count]="kittens().length" />
+            <app-paw-count
+              class="parent-page__kittens-count"
+              variant="solid"
+              [count]="kittens().length"
+            />
           }
         </header>
 
@@ -161,12 +242,16 @@
         } @else {
           <div class="parent-page__kittens-grid">
             @for (kitten of kittens(); track kitten.id) {
-              <a
-                class="kitten-card"
-                [routerLink]="['/kittens', kitten.id] | locPath"
-              >
+              <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
                 <div class="kitten-card__media">
-                  <img appImageFallback [src]="kitten.image" [alt]="kitten.name" loading="lazy" />
+                  <img
+                    draggable="false"
+                    decoding="async"
+                    appImageFallback
+                    [src]="kitten.image"
+                    [alt]="kitten.name"
+                    loading="lazy"
+                  />
                   <span class="kitten-card__age-badge">{{ kitten.age }}</span>
                 </div>
                 <div class="kitten-card__body">
@@ -211,14 +296,14 @@
           </div>
         }
       </section>
-
     } @else {
       <div class="parent-page__empty" role="status">
         <p class="parent-page__eyebrow">404</p>
         <h1>{{ i18n.t('noData') }}</h1>
-        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{ i18n.t('backToParents') }}</a>
+        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{
+          i18n.t('backToParents')
+        }}</a>
       </div>
     }
-
   </div>
 </article>

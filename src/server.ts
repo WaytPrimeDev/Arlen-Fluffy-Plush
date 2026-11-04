@@ -200,12 +200,33 @@ app.use(`${API_PATH}/{*splat}`, (req, res) => {
 
   const target = `${API_BACKEND_ORIGIN}${req.originalUrl}`;
 
-  fetch(target, { headers: { accept: req.headers.accept ?? 'application/json' } })
+  // `redirect: 'manual'` matters for `/api/photos/download`, which answers
+  // with a 302 to the watermarked photo on Cloudinary. Following it here would
+  // pull every megabyte through this function and drop the
+  // `Content-Disposition` that makes the browser save the file, so the
+  // redirect is handed to the browser to follow itself.
+  fetch(target, {
+    headers: { accept: req.headers.accept ?? 'application/json' },
+    redirect: 'manual',
+  })
     .then(async (response) => {
+      const location = response.headers.get('location');
+      if (location && response.status >= 300 && response.status < 400) {
+        res.redirect(response.status, location);
+        return;
+      }
+
       res.status(response.status);
       const type = response.headers.get('content-type');
       if (type) {
         res.type(type);
+      }
+
+      // Set by the download endpoint when it streams a file itself; harmless
+      // on the JSON responses, which do not carry it.
+      const disposition = response.headers.get('content-disposition');
+      if (disposition) {
+        res.setHeader('content-disposition', disposition);
       }
 
       res.send(Buffer.from(await response.arrayBuffer()));

@@ -10,8 +10,8 @@ import { I18nService } from '../../services/i18n.service';
 const KITTEN_ID = '6a2983fe8232ff7b53b2be16';
 
 /**
- * The home page is a shop window: every kitten on it opens the catalogue, so
- * visitors browse the full list rather than landing on one kitten.
+ * The home page is a shop window: every kitten on it opens that kitten's own
+ * page, while the buttons around them lead to the full catalogue.
  */
 describe('home page navigation', () => {
   let fixture: ComponentFixture<App>;
@@ -79,10 +79,10 @@ describe('home page navigation', () => {
     await settle();
   });
 
-  it('points every kitten link at the catalogue', async () => {
+  it('points every kitten link at that kitten', async () => {
     expect(kittenCards().length).toBeGreaterThan(0);
     for (const card of kittenCards()) {
-      expect(card.getAttribute('href')).toBe('/uk/kittens');
+      expect(card.getAttribute('href')).toBe(`/uk/kittens/${KITTEN_ID}`);
     }
   });
 
@@ -99,10 +99,10 @@ describe('home page navigation', () => {
     expect(targets).toContain('/uk/about');
   });
 
-  it('opens the catalogue when a card is clicked', async () => {
+  it('opens the kitten page when a card is clicked', async () => {
     kittenCards()[0].click();
     await settle();
 
-    expect(router.url).toBe('/uk/kittens');
+    expect(router.url).toBe(`/uk/kittens/${KITTEN_ID}`);
   });
 });

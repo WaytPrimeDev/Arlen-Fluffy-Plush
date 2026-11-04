@@ -42,6 +42,11 @@ interface SeoTarget {
   host: {
     '(keydown.escape)': 'closeMobileMenu()',
     '(keydown)': 'onDrawerKeydown($event)',
+    // Bound on the document rather than on the shell so the photos the
+    // lightbox renders are covered too: PhotoSwipe appends its overlay to
+    // `body`, outside this component's own subtree.
+    '(document:contextmenu)': 'guardPhoto($event)',
+    '(document:dragstart)': 'guardPhoto($event)',
   },
 })
 export class App {
@@ -122,6 +127,35 @@ export class App {
         this.seo.applyPage(target.key, target.path);
       }
     });
+  }
+
+  /**
+   * Keeps the cattery's photos out of a drag or a save-image menu. Every
+   * `<img>` also carries `draggable="false"`, which this backs up for the
+   * photos the lightbox creates at runtime, where no template attribute can
+   * reach.
+   *
+   * It is a deterrent, not protection: the files are still served over HTTP
+   * and anyone who wants one can take it from the network tab. What it does
+   * buy is the UX it was asked for — no ghost image trailing the cursor when
+   * a card is dragged, and no "Save image" offered on a watermark-free photo.
+   * Only photos are guarded, so right-click still works on text and links.
+   */
+  protected guardPhoto(event: Event): void {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const isPhoto =
+      target instanceof HTMLImageElement ||
+      // A card or gallery link wraps its photo, and that link is what a drag
+      // picks up; a text link has no photo in it and is left alone.
+      (target instanceof HTMLAnchorElement && target.querySelector('img') !== null);
+
+    if (isPhoto) {
+      event.preventDefault();
+    }
   }
 
   protected toggleMobileMenu(): void {

@@ -10,7 +10,13 @@
       @for (post of posts(); track post.id) {
         <article class="post-card">
           <div class="post-card__image">
-            <img [src]="post.image" [alt]="post.title" loading="lazy" />
+            <img
+              draggable="false"
+              decoding="async"
+              [src]="post.image"
+              [alt]="post.title"
+              loading="lazy"
+            />
             <span class="post-card__category">{{ post.category }}</span>
           </div>
 
@@ -19,9 +25,7 @@
             <h3 class="post-card__title">{{ post.title }}</h3>
             <p class="post-card__excerpt">{{ post.excerpt }}</p>
 
-            <button type="button" class="post-card__cta">
-              {{ i18n.t('blogReadMore') }} →
-            </button>
+            <button type="button" class="post-card__cta">{{ i18n.t('blogReadMore') }} →</button>
           </div>
         </article>
       }
