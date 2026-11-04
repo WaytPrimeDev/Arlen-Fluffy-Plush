@@ -225,16 +225,23 @@ export class KittensComponent {
 
     return sorted
       .map((family) => {
-        const momId = family.parents?.mom ?? null;
-        const dadId = family.parents?.dad ?? null;
+        /**
+         * Membership is read off the kitten's own `familyId`, with the family's
+         * `kittens` array as the fallback: those are the two links the API
+         * actually fills in. Matching on the parent pair instead left every
+         * litter empty, because `family.parents` comes back null.
+         */
+        const memberIds = new Set(family.kittens ?? []);
         const litterKittens = filtered.filter(
-          (k) =>
-            k.motherId !== null &&
-            k.fatherId !== null &&
-            k.motherId === momId &&
-            k.fatherId === dadId,
+          (k) => k.familyId === family._id || memberIds.has(k.id),
         );
         if (litterKittens.length === 0) return null;
+
+        /** A family without its own parents borrows them from its kittens. */
+        const momId =
+          family.parents?.mom ?? litterKittens.find((k) => k.motherId)?.motherId ?? null;
+        const dadId =
+          family.parents?.dad ?? litterKittens.find((k) => k.fatherId)?.fatherId ?? null;
 
         const mother = momId ? toLitterParentView(this.parentMap.get(momId)) : null;
         const father = dadId ? toLitterParentView(this.parentMap.get(dadId)) : null;

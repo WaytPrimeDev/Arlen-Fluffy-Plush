@@ -35,6 +35,8 @@ export interface KittenApiItem {
   images?: KittenImage[];
   price?: KittenPrice;
   parentId?: KittenParentRef;
+  /** The litter the kitten belongs to; how the API ties a kitten to a family. */
+  familyId?: string | null;
 }
 
 export interface KittenDisplayItem extends KittenApiItem {

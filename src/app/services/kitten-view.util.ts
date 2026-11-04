@@ -18,6 +18,8 @@ export interface KittenListItem {
   gender: 'male' | 'female' | 'unknown';
   motherId: string | null;
   fatherId: string | null;
+  /** Which litter the kitten belongs to, used to group the cards by family. */
+  familyId: string | null;
 }
 
 /** Shape shared by `KittenImage` and `ParentImage`. */
@@ -64,6 +66,7 @@ export function mapKittenToListItem(kitten: KittenApiItem, i18n: I18nService): K
     gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
     motherId: kitten.parentId?.mom ?? null,
     fatherId: kitten.parentId?.dad ?? null,
+    familyId: kitten.familyId ?? null,
   };
 }
 
