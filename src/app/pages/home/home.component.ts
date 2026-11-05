@@ -75,7 +75,7 @@ export class HomeComponent {
     {
       icon: '💬',
       label: 'Telegram',
-      link: 'https://t.me/kittensarlenfluffyplush',
+      link: 'https://t.me/arlenfluffyplush',
       value: '@arlenfluffyplush',
     },
     {
