@@ -261,8 +261,8 @@ export class SeoService {
         url: origin || undefined,
         logo: this.absoluteUrl(SITE.logoPath) || undefined,
         image: this.absoluteUrl(SITE.logoPath) || undefined,
-        // Every other place the same cattery publishes, the former Jimdo site
-        // included, so a search for any of those names resolves to this one.
+        // Only the channels this cattery owns, so a search for any of our own
+        // handles resolves here. No third-party or predecessor site is claimed.
         sameAs: [...SITE.profiles],
         knowsAbout: [...BREEDS[language]],
         areaServed: [...AREA_SERVED],

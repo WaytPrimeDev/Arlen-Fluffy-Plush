@@ -143,10 +143,15 @@ describe('SeoService', () => {
     const organization = graph[0];
     expect(organization['name']).toBe(SITE.name);
     expect(organization['url']).toBe(SITE.canonicalOrigin);
-    // The names the cattery is searched by, including the former Jimdo site,
-    // are what tie those queries to this domain.
-    expect(organization['alternateName']).toContain('Arlen Cat');
-    expect(organization['sameAs']).toContain(SITE.legacySite);
+    // The cattery's own names are what tie those queries to this domain.
+    expect(organization['alternateName']).toContain('Arlen Fluffy Plush Cattery');
+    // Arlen Fluffy Plush is independent: no predecessor or third-party site may
+    // be claimed as the same entity, so nothing outside our own properties is
+    // listed in `sameAs` and no foreign name appears in the structured data.
+    expect(organization['sameAs']).toEqual([...SITE.profiles]);
+    expect(JSON.stringify(structuredData()).toLowerCase()).not.toMatch(
+      /arlen[ _-]?cat|jimdo/,
+    );
     // Contact details are published only while the site itself shows them.
     expect(organization['telephone']).toBe(SITE.telephone);
     expect(organization['email']).toBe(SITE.email);

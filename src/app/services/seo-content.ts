@@ -20,72 +20,74 @@ export interface SeoPageCopy {
  * than a number: the catalogue changes constantly, and a number in a snippet
  * goes stale the week after it is written.
  *
- * The names a searcher might type — "Arlen Cat", "Arlen Plush", koshenya.com
- * and their Cyrillic spellings — belong to the same cattery, so they appear in
- * the copy alongside the WCF prefix rather than only in structured data.
+ * The names a searcher might type — "Arlen Fluffy Plush", "Arlen Plush",
+ * koshenya.com and their Cyrillic spellings — are all names of this cattery
+ * itself, so they appear in the copy alongside the WCF prefix rather than only
+ * in structured data. Only this cattery's own names are used anywhere in the
+ * SEO copy; no other cattery or former site is named.
  */
 const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
   uk: {
     home: {
-      title: 'Кошенята — розплідник Arlen Cat, доставка по світу',
+      title: 'Кошенята — розплідник Arlen Fluffy Plush, доставка по світу',
       description:
-        'Купити кошеня з документами WCF у розпліднику Arlen Cat: регдол та десятки інших порід. Доставка кошенят по Україні, у Німеччину, ЄС, США — по всьому світу.',
+        'Купити кошеня з документами WCF у розпліднику Arlen Fluffy Plush: регдол та десятки інших порід. Доставка кошенят по Україні, у Німеччину, ЄС, США — по всьому світу.',
       breadcrumb: 'Головна',
     },
     kittens: {
       title: 'Кошенята у продажу — ціна, фото, доставка',
       description:
-        'Кошенята у продажу від розплідника Arlen Cat: фото, вік, стать, окрас і ціна. Регдол, британські, шотландські та інші породи. Доставка у Німеччину, ЄС, США.',
+        'Кошенята у продажу від розплідника Arlen Fluffy Plush: фото, вік, стать, окрас і ціна. Регдол, британські, шотландські та інші породи. Доставка у Німеччину, ЄС, США.',
       breadcrumb: 'Кошенята',
     },
     parents: {
-      title: 'Коти та кішки розплідника Arlen Cat',
+      title: 'Коти та кішки розплідника Arlen Fluffy Plush',
       description:
         'Батьки наших кошенят у розпліднику Arlen Fluffy Plush: порода, окрас, титули та фотогалерея кожного дорослого кота й кішки з документами WCF.',
       breadcrumb: 'Батьки',
     },
     about: {
-      title: 'Про розплідник Arlen Fluffy Plush (Arlen Cat)',
+      title: 'Про розплідник Arlen Fluffy Plush',
       description:
-        'Історія розплідника Arlen Cat: перша кішка у 2010, WCF із 2016, регдол із 2021. Кошенята зростають удома, доставка у Німеччину, ЄС, США та інші країни.',
+        'Історія розплідника Arlen Fluffy Plush: перша кішка у 2010, WCF із 2016, регдол із 2021. Кошенята зростають удома, доставка у Німеччину, ЄС, США та інші країни.',
       breadcrumb: 'Про нас',
     },
     contacts: {
-      title: 'Контакти розплідника кошенят Arlen Cat',
+      title: 'Контакти розплідника кошенят Arlen Fluffy Plush',
       description:
-        'Контакти розплідника Arlen Cat: Telegram, телефон, e-mail, Тернопіль. Запитайте про вільних кошенят, ціну, бронювання та доставку у вашу країну.',
+        'Контакти розплідника Arlen Fluffy Plush: Telegram, телефон, e-mail, Тернопіль. Запитайте про вільних кошенят, ціну, бронювання та доставку у вашу країну.',
       breadcrumb: 'Контакти',
     },
   },
   en: {
     home: {
-      title: 'Kittens for sale — Arlen Cat cattery, worldwide delivery',
+      title: 'Kittens for sale — Arlen Fluffy Plush cattery, worldwide delivery',
       description:
-        'Buy a kitten with WCF papers from the Arlen Cat cattery: Ragdoll and dozens of other breeds. Worldwide delivery — Germany, the EU, the USA and beyond.',
+        'Buy a kitten with WCF papers from the Arlen Fluffy Plush cattery: Ragdoll and dozens of other breeds. Worldwide delivery — Germany, the EU, the USA and beyond.',
       breadcrumb: 'Home',
     },
     kittens: {
       title: 'Kittens for sale — price, photos, delivery',
       description:
-        'Kittens for sale from the Arlen Cat cattery: photos, age, sex, colour and price. Ragdoll, British, Scottish and dozens of other breeds, delivered worldwide.',
+        'Kittens for sale from the Arlen Fluffy Plush cattery: photos, age, sex, colour and price. Ragdoll, British, Scottish and dozens of other breeds, delivered worldwide.',
       breadcrumb: 'Kittens',
     },
     parents: {
-      title: 'Queens and studs of the Arlen Cat cattery',
+      title: 'Queens and studs of the Arlen Fluffy Plush cattery',
       description:
         'The parents behind our kittens at Arlen Fluffy Plush: breed, colour, titles and a photo gallery of every adult cat, all WCF-registered.',
       breadcrumb: 'Parents',
     },
     about: {
-      title: 'About the Arlen Fluffy Plush (Arlen Cat) cattery',
+      title: 'About the Arlen Fluffy Plush cattery',
       description:
-        'The story of the Arlen Cat cattery: our first cat in 2010, WCF since 2016, Ragdolls since 2021. Kittens raised at home and delivered to any country.',
+        'The story of the Arlen Fluffy Plush cattery: our first cat in 2010, WCF since 2016, Ragdolls since 2021. Kittens raised at home and delivered to any country.',
       breadcrumb: 'About',
     },
     contacts: {
-      title: 'Contact the Arlen Cat kitten cattery',
+      title: 'Contact the Arlen Fluffy Plush kitten cattery',
       description:
-        'Contact the Arlen Cat cattery: Telegram, phone, e-mail, Ternopil, Ukraine. Ask about available kittens, pricing, reservation and delivery to your country.',
+        'Contact the Arlen Fluffy Plush cattery: Telegram, phone, e-mail, Ternopil, Ukraine. Ask about available kittens, pricing, reservation and delivery to your country.',
       breadcrumb: 'Contacts',
     },
   },
@@ -97,12 +99,12 @@ const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
  */
 export const ORGANIZATION_DESCRIPTION: Record<Language, string> = {
   uk:
-    'Розплідник кошенят Arlen Fluffy Plush (Arlen Cat) із Тернополя, зареєстрований у World Cat Federation із 2016 року. ' +
+    'Розплідник кошенят Arlen Fluffy Plush із Тернополя, зареєстрований у World Cat Federation із 2016 року. ' +
     'Головна порода — регдол, поряд із нею в розпліднику є десятки інших порід, зокрема британські та шотландські. ' +
     'Кошенята зростають удома, їдуть до нових родин вакцинованими, чипованими та з документами WCF. ' +
     'Доставляємо кошенят по Україні та в будь-яку країну світу — Німеччину, країни ЄС, США, Канаду та інші.',
   en:
-    'Arlen Fluffy Plush (Arlen Cat) is a kitten cattery in Ternopil, Ukraine, registered with the World Cat Federation since 2016. ' +
+    'Arlen Fluffy Plush is a kitten cattery in Ternopil, Ukraine, registered with the World Cat Federation since 2016. ' +
     'Ragdoll is our main breed, alongside dozens of others including British and Scottish cats. ' +
     'Our kittens grow up at home and move to their new families vaccinated, microchipped and with WCF papers. ' +
     'We deliver kittens across Ukraine and to any country in the world — Germany, the EU, the USA, Canada and beyond.',
@@ -173,10 +175,8 @@ export const KEYWORDS: Record<Language, readonly string[]> = {
     'кошеня в Європу',
     'кошеня у США',
     'кошеня в Канаду',
-    'Arlen Cat',
     'Arlen Fluffy Plush',
     'Arlen Plush',
-    'арлен кет',
     'арлен флафі плаш',
     'арлен флафі кет',
     'розплідник арлен',
@@ -209,10 +209,8 @@ export const KEYWORDS: Record<Language, readonly string[]> = {
     'kitten to Europe',
     'kitten to the USA',
     'kitten to Canada',
-    'Arlen Cat',
     'Arlen Fluffy Plush',
     'Arlen Plush',
-    'Arlen Cat cattery',
     'koshenya.com',
   ],
 };
@@ -233,25 +231,25 @@ export const DETAIL_COPY = {
       breed ? `Кошеня ${name} — ${breed}, у продажу` : `Кошеня ${name} — у продажу`,
     kittenDescription: (name: string, breed: string, color: string, age: string) =>
       `${name} — кошеня${breed ? ` породи ${breed}` : ''}${color ? `, окрас ${color}` : ''} ` +
-      'з розплідника Arlen Fluffy Plush (Arlen Cat). ' +
+      'з розплідника Arlen Fluffy Plush. ' +
       `${age ? `Дата народження: ${sentencePart(age)}. ` : ''}` +
       'Документи WCF, вакцинація, чипування. Ціна, фото, батьки та доставка в будь-яку країну світу.',
     parentTitle: (name: string, breed: string) => (breed ? `${name} — ${breed}` : name),
     parentDescription: (name: string, breed: string, color: string) =>
       `${name}${breed ? ` — ${breed}` : ''}${color ? `, окрас ${color}` : ''}. ` +
-      'Дивіться фотогалерею, характеристики та кошенят цього кота в розпліднику Arlen Fluffy Plush (Arlen Cat).',
+      'Дивіться фотогалерею, характеристики та кошенят цього кота в розпліднику Arlen Fluffy Plush.',
   },
   en: {
     kittenTitle: (name: string, breed: string) =>
       breed ? `${name} the ${breed} kitten — for sale` : `${name} the kitten — for sale`,
     kittenDescription: (name: string, breed: string, color: string, age: string) =>
       `${name} is a${breed ? ` ${breed}` : ''} kitten${color ? ` with ${color} colouring` : ''} ` +
-      'from the Arlen Fluffy Plush (Arlen Cat) cattery. ' +
+      'from the Arlen Fluffy Plush cattery. ' +
       `${age ? `Born ${sentencePart(age)}. ` : ''}` +
       'WCF papers, vaccinations and microchipping. Price, photos, parents and worldwide delivery.',
     parentTitle: (name: string, breed: string) => (breed ? `${name} — ${breed}` : name),
     parentDescription: (name: string, breed: string, color: string) =>
       `${name}${breed ? ` — ${breed}` : ''}${color ? `, ${color} colouring` : ''}. ` +
-      'See the photo gallery, traits and kittens of this cat at the Arlen Fluffy Plush (Arlen Cat) cattery.',
+      'See the photo gallery, traits and kittens of this cat at the Arlen Fluffy Plush cattery.',
   },
 } as const;
