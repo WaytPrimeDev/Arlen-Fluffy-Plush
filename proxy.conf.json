@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://arlenback-b39e4.containers.snapdeploy.app",
+    "target": "arlenback-production.up.railway.app",
     "secure": true,
     "changeOrigin": true
   }
