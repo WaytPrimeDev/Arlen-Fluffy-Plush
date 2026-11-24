@@ -5,6 +5,7 @@ import { I18nService } from '../../services/i18n.service';
 import type { ListParams, PaginatedResponse } from '../../services/filters.service';
 import { buildListParams } from '../../services/http-params.util';
 import { API_PATH } from '../../services/api';
+import type { BreedRef, ColorRef, MaybeRef } from '../../services/taxonomy';
 
 export interface KittenImage {
   full: string;
@@ -25,10 +26,16 @@ export interface KittenParentRef {
 
 export interface KittenApiItem {
   _id: string;
+  /**
+   * The kitten's own URL segment, minted by the backend from `nameEn`. The
+   * public pages address a kitten by id; this is here because the API sends it.
+   */
+  slug?: string | null;
   nameUa?: string;
   nameEn?: string;
-  breed?: string;
-  color?: string;
+  /** Dictionary reference with the name already joined in; may be null. */
+  breed?: MaybeRef<BreedRef>;
+  color?: MaybeRef<ColorRef>;
   sex?: string;
   status?: string;
   birthDay?: string;

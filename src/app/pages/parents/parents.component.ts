@@ -16,6 +16,7 @@ import { FiltersService, type Pagination } from '../../services/filters.service'
 import { CommonModule } from '@angular/common';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { localizedName, PARENT_PLACEHOLDER } from '../../services/kitten-view.util';
+import { taxonomyName } from '../../services/taxonomy';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
 import { PawCountComponent } from '../../components/paw-count/paw-count.component';
 
@@ -68,8 +69,23 @@ export class ParentsComponent {
   protected readonly activeBreed = signal<string>('all');
   protected readonly activeColor = signal<string>('all');
 
-  protected readonly breeds = this.filtersService.breeds;
-  protected readonly colors = this.filtersService.colors;
+  /**
+   * The dictionaries are sent to the API as ids — a name is answered with a
+   * 400 — so each option pairs the entry's `_id` with its localized name.
+   */
+  protected readonly breedOptions = computed(() =>
+    this.filtersService.breeds().map((breed) => ({
+      value: breed._id,
+      label: taxonomyName(breed, this.i18n, this.i18n.t('fallbackNoBreed')),
+    })),
+  );
+
+  protected readonly colorOptions = computed(() =>
+    this.filtersService.colors().map((color) => ({
+      value: color._id,
+      label: taxonomyName(color, this.i18n, this.i18n.t('fallbackNoColor')),
+    })),
+  );
 
   private readonly rawParents = signal<readonly ParentApiItem[]>([]);
 
@@ -194,8 +210,8 @@ function mapParentToListItem(parent: ParentApiItem, i18n: I18nService): ParentLi
   return {
     id: parent._id,
     name: localizedName(parent.nameUa, parent.nameEn, i18n),
-    breed: parent.breed || i18n.t('fallbackNoBreed'),
-    color: parent.color || i18n.t('fallbackNoColor'),
+    breed: taxonomyName(parent.breed, i18n, i18n.t('fallbackNoBreed')),
+    color: taxonomyName(parent.color, i18n, i18n.t('fallbackNoColor')),
     sex: parent.sex === 'male' ? 'male' : parent.sex === 'female' ? 'female' : 'unknown',
     kittensCount: parent.Kittens?.length ?? 0,
     image:

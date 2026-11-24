@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import type { ListParams, PaginatedResponse } from './filters.service';
 import { buildListParams } from './http-params.util';
 import { API_PATH } from './api';
+import type { BreedRef, MaybeRef } from './taxonomy';
 
 export interface FamilyParentsRef {
   mom: string | null;
@@ -15,7 +16,8 @@ export interface FamilyApiItem {
   name: string;
   parents: FamilyParentsRef;
   kittens: string[];
-  breed: string;
+  /** Dictionary reference with the name already joined in; may be null. */
+  breed?: MaybeRef<BreedRef>;
   displayOrder: number;
   createdAt: string;
   updatedAt: string;

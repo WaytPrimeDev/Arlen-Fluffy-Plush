@@ -19,6 +19,7 @@ import {
   KITTEN_PLACEHOLDER,
   PARENT_PLACEHOLDER,
 } from '../../services/kitten-view.util';
+import { taxonomyName } from '../../services/taxonomy';
 import { PhotoViewerDirective } from '../../components/photo-viewer/photo-viewer.directive';
 import { SeoService } from '../../services/seo.service';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -146,9 +147,7 @@ export class KittenComponent {
     return null;
   });
 
-  protected readonly ageLabel = computed(() =>
-    formatAgeShort(this.kitten()?.birthDay, this.i18n),
-  );
+  protected readonly ageLabel = computed(() => formatAgeShort(this.kitten()?.birthDay, this.i18n));
 
   /** Shown with a currency sign, since the admin side stores bare numbers too. */
   protected readonly petPrice = computed(() => withCurrency(this.kitten()?.price?.pet));
@@ -207,8 +206,8 @@ export class KittenComponent {
       this.seo.applyKitten({
         path: `/kittens/${kitten._id}`,
         name: this.name(),
-        breed: kitten.breed ?? '',
-        color: kitten.color ?? '',
+        breed: taxonomyName(kitten.breed, this.i18n),
+        color: taxonomyName(kitten.color, this.i18n),
         age: this.formatBirthDay(kitten.birthDay),
         image: this.selectedImage(),
         // Status and price turn the page into an offer in the structured data,
@@ -233,7 +232,7 @@ export class KittenComponent {
       this.analytics.trackKittenView({
         id: kitten._id,
         name: this.name(),
-        breed: kitten.breed,
+        breed: taxonomyName(kitten.breed, this.i18n),
         sex: kitten.sex,
         status: kitten.status,
       });
@@ -265,4 +264,3 @@ export class KittenComponent {
     return images.find((i) => i.isMain)?.full ?? images[0].full ?? PARENT_PLACEHOLDER;
   }
 }
-

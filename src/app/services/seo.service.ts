@@ -4,6 +4,7 @@ import { I18nService, LANGUAGES, localizedPath, type Language } from './i18n.ser
 import { DELIVERY_COUNTRIES, SEO_LOCALES, SITE } from './site-config';
 import {
   BREEDS,
+  BREED_COPY,
   DETAIL_COPY,
   KEYWORDS,
   ORGANIZATION_DESCRIPTION,
@@ -158,6 +159,33 @@ export class SeoService {
       ],
       about: { name: details.name, description, image: details.image },
       offer: { status: details.status, prices: details.prices },
+    });
+  }
+
+  /**
+   * A breed's own listing page. Indexable on its own terms: it is the page a
+   * search for "<breed> kittens" should land on, with the breed's cover photo
+   * as the social image and the catalogue as its parent in the breadcrumbs.
+   */
+  applyBreed(details: {
+    path: string;
+    name: string;
+    image: string | null;
+    kittenCount: number;
+  }): void {
+    const language = this.i18n.getLanguage();
+    const copy = BREED_COPY[language];
+    const description = copy.description(details.name, details.kittenCount);
+
+    this.apply(details.path, {
+      title: copy.title(details.name),
+      description,
+      image: details.image,
+      type: 'website',
+      breadcrumbs: [
+        { label: seoCopy(language, 'kittens').breadcrumb, path: '/kittens' },
+        { label: details.name, path: details.path },
+      ],
     });
   }
 

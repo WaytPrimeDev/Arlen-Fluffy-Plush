@@ -2,9 +2,18 @@
   <section class="kittens-hero">
     <div class="kittens-hero__glow" aria-hidden="true"></div>
     <div class="kittens-hero__inner">
-      <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
-      <h1 class="kittens-hero__title">{{ i18n.t('exploreOurKittens') }}</h1>
-      <p class="kittens-hero__subtitle">{{ i18n.t('exploreOurKittensSubtitle') }}</p>
+      @if (breedSlugParam() && activeBreed()) {
+        <a class="kittens-hero__back" [routerLink]="'/kittens' | locPath">
+          <span aria-hidden="true">←</span> {{ i18n.t('backToAllKittens') }}
+        </a>
+        <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
+        <h1 class="kittens-hero__title">{{ activeBreedName() }}</h1>
+        <p class="kittens-hero__subtitle">{{ i18n.t('breedPageSubtitle') }}</p>
+      } @else {
+        <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
+        <h1 class="kittens-hero__title">{{ i18n.t('exploreOurKittens') }}</h1>
+        <p class="kittens-hero__subtitle">{{ i18n.t('exploreOurKittensSubtitle') }}</p>
+      }
 
       <!-- @if (!isLoading() && !loadError()) {
         <dl class="kittens-hero__stats">
@@ -26,6 +35,10 @@
   </section>
 
   <div class="kittens-page">
+    <!-- The breed picker: a link per breed rather than a filter, so every breed
+         is a page of its own that a visitor can land on and share. -->
+    <app-breed-tiles [breeds]="breeds()" [activeSlug]="breedSlugParam()" />
+
     <div class="kittens-page__tabs" role="tablist" [attr.aria-label]="i18n.t('viewMode')">
       <button
         type="button"
@@ -214,15 +227,17 @@
             </div>
           }
 
-          <div class="toolbar__field">
-            <span class="toolbar__field-label">{{ i18n.t('filterByBreed') }}</span>
-            <app-select
-              [options]="breedOptions()"
-              [value]="selectedBreed()"
-              [ariaLabel]="i18n.t('filterByBreed')"
-              (valueChange)="setBreed($event)"
-            />
-          </div>
+          @if (showBreedFilter()) {
+            <div class="toolbar__field">
+              <span class="toolbar__field-label">{{ i18n.t('filterByBreed') }}</span>
+              <app-select
+                [options]="breedOptions()"
+                [value]="selectedBreed()"
+                [ariaLabel]="i18n.t('filterByBreed')"
+                (valueChange)="setBreed($event)"
+              />
+            </div>
+          }
 
           <div class="toolbar__field">
             <span class="toolbar__field-label">{{ i18n.t('filterByColor') }}</span>
@@ -242,7 +257,16 @@
       role="tabpanel"
       [attr.aria-labelledby]="activeTab() === 'kittens' ? 'tab-kittens' : 'tab-parents'"
     >
-      @if (isLoading()) {
+      @if (breedMissing()) {
+        <div class="state" role="status">
+          <span class="state__icon" aria-hidden="true">🐾</span>
+          <h2>{{ i18n.t('breedNotFoundTitle') }}</h2>
+          <p>{{ i18n.t('breedNotFoundText') }}</p>
+          <a class="state__action" [routerLink]="'/kittens' | locPath">
+            {{ i18n.t('backToAllKittens') }}
+          </a>
+        </div>
+      } @else if (isLoading()) {
         <p class="visually-hidden" role="status">{{ i18n.t('loadingKittens') }}</p>
         <div class="card-grid" aria-hidden="true">
           @for (slot of skeletons; track slot) {
@@ -331,7 +355,13 @@
                 hasActiveFilters() ? '🔍' : '🐱'
               }}</span>
               <h2>
-                {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
+                @if (hasActiveFilters()) {
+                  {{ i18n.t('noKittensMatchFilters') }}
+                } @else if (breedSlugParam()) {
+                  {{ i18n.t('noKittensOfBreed') }}
+                } @else {
+                  {{ i18n.t('noKittensYet') }}
+                }
               </h2>
               @if (hasActiveFilters()) {
                 <button type="button" class="state__action" (click)="resetFilters()">
@@ -459,7 +489,13 @@
               hasActiveFilters() ? '🔍' : '🐱'
             }}</span>
             <h2>
-              {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
+              @if (hasActiveFilters()) {
+                {{ i18n.t('noKittensMatchFilters') }}
+              } @else if (breedSlugParam()) {
+                {{ i18n.t('noKittensOfBreed') }}
+              } @else {
+                {{ i18n.t('noKittensYet') }}
+              }
             </h2>
             @if (hasActiveFilters()) {
               <button type="button" class="state__action" (click)="resetFilters()">

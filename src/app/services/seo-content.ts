@@ -225,6 +225,30 @@ export function seoCopy(language: Language, key: SeoPageKey): SeoPageCopy {
 }
 
 /** Wording reused by the dynamic detail pages. */
+/**
+ * Copy for a breed page. It is a listing rather than one animal, so the title
+ * leads with the breed and the description says what the page holds — which is
+ * what a "<breed> kittens for sale" query is looking for.
+ */
+export const BREED_COPY = {
+  uk: {
+    title: (breed: string) => `Кошенята ${breed} — купити в розпліднику Arlen Fluffy Plush`,
+    description: (breed: string, count: number) =>
+      `Кошенята породи ${breed} з розплідника Arlen Fluffy Plush. ` +
+      `${count ? `Зараз доступно: ${count}. ` : ''}` +
+      'Документи WCF, вакцинація, чипування. Фото, ціни, батьки та доставка в будь-яку країну світу.',
+    heading: (breed: string) => `Кошенята ${breed}`,
+  },
+  en: {
+    title: (breed: string) => `${breed} kittens for sale — Arlen Fluffy Plush cattery`,
+    description: (breed: string, count: number) =>
+      `${breed} kittens from the Arlen Fluffy Plush cattery. ` +
+      `${count ? `${count} available right now. ` : ''}` +
+      'WCF papers, vaccinations and microchipping. Photos, prices, parents and worldwide delivery.',
+    heading: (breed: string) => `${breed} kittens`,
+  },
+} as const;
+
 export const DETAIL_COPY = {
   uk: {
     kittenTitle: (name: string, breed: string) =>

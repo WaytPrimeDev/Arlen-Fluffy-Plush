@@ -23,6 +23,7 @@ import {
   PARENT_PLACEHOLDER,
   withCurrency,
 } from '../../services/kitten-view.util';
+import { taxonomyName } from '../../services/taxonomy';
 import { STAGE_WIDTH, VIEWER_WIDTH, scaledImage } from '../../services/image-url.util';
 
 interface GalleryImage {
@@ -56,7 +57,13 @@ interface LoadState {
 
 @Component({
   selector: 'app-parent',
-  imports: [RouterLink, PhotoViewerDirective, LocalizedPathPipe, ImageFallbackDirective, PawCountComponent],
+  imports: [
+    RouterLink,
+    PhotoViewerDirective,
+    LocalizedPathPipe,
+    ImageFallbackDirective,
+    PawCountComponent,
+  ],
   templateUrl: './parent.component.html',
   styleUrl: './parent.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -196,8 +203,8 @@ export class ParentComponent {
       this.seo.applyParent({
         path: `/parents/${parent._id}`,
         name: this.name(),
-        breed: parent.breed ?? '',
-        color: parent.color ?? '',
+        breed: taxonomyName(parent.breed, this.i18n),
+        color: taxonomyName(parent.color, this.i18n),
         image: this.selectedImage(),
       });
     });
@@ -214,8 +221,8 @@ function mapKittenApiToCard(kitten: KittenApiItem, i18n: I18nService): KittenCar
     id: kitten._id,
     name:
       lang === 'uk' ? kitten.nameUa || kitten.nameEn || '—' : kitten.nameEn || kitten.nameUa || '—',
-    breed: kitten.breed || '—',
-    color: kitten.color || '—',
+    breed: taxonomyName(kitten.breed, i18n, '—'),
+    color: taxonomyName(kitten.color, i18n, '—'),
     gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
     age: formatAgeShort(kitten.birthDay, i18n) ?? '—',
     image:

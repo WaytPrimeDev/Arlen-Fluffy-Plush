@@ -54,6 +54,27 @@
   letter-spacing: 0.12em;
 }
 
+/* The way back out of a breed page, above its own title. */
+.kittens-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--brand-purple);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
 .kittens-hero__title {
   margin: 0;
   font-family: 'Playfair Display', serif;
@@ -651,7 +672,9 @@
 }
 
 .state__action {
+  display: inline-block;
   margin-top: 0.5rem;
+  text-decoration: none;
   padding: 0.6rem 1.3rem;
   border: none;
   border-radius: 999px;

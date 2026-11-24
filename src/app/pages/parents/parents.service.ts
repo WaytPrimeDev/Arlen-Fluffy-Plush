@@ -5,6 +5,7 @@ import { I18nService } from '../../services/i18n.service';
 import type { ListParams, PaginatedResponse } from '../../services/filters.service';
 import { buildListParams } from '../../services/http-params.util';
 import { API_PATH } from '../../services/api';
+import type { BreedRef, ColorRef, MaybeRef } from '../../services/taxonomy';
 
 export interface ParentImage {
   full: string;
@@ -15,10 +16,13 @@ export interface ParentImage {
 
 export interface ParentApiItem {
   _id: string;
+  /** Public URL segment. The pages address a parent by id; sent by the API. */
+  slug?: string | null;
   nameUa?: string;
   nameEn?: string;
-  breed?: string;
-  color?: string;
+  /** Dictionary reference with the name already joined in; may be null. */
+  breed?: MaybeRef<BreedRef>;
+  color?: MaybeRef<ColorRef>;
   sex?: string;
   familyId?: string[];
   Kittens?: string[];

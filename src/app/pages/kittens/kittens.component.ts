@@ -2,14 +2,18 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
+  untracked,
   viewChild,
   type ElementRef,
 } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { KittensService, type KittenApiItem } from './kittens.service';
 import {
   formatAgeShort,
@@ -22,7 +26,11 @@ import { FamiliesService, type FamilyApiItem } from '../../services/families.ser
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
 import { I18nService } from '../../services/i18n.service';
 import { FiltersService } from '../../services/filters.service';
+import { BreedsService } from '../../services/breeds.service';
+import { SeoService } from '../../services/seo.service';
+import { breedCover, taxonomyId, taxonomyName, type BreedRef } from '../../services/taxonomy';
 import { SelectComponent, type SelectOption } from '../../components/select/select.component';
+import { BreedTilesComponent } from '../../components/breed-tiles/breed-tiles.component';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
 import { PawCountComponent } from '../../components/paw-count/paw-count.component';
@@ -65,7 +73,14 @@ const LOOKUP_PER_PAGE = 1000;
 
 @Component({
   selector: 'app-kittens',
-  imports: [RouterLink, SelectComponent, LocalizedPathPipe, ImageFallbackDirective, PawCountComponent],
+  imports: [
+    RouterLink,
+    SelectComponent,
+    BreedTilesComponent,
+    LocalizedPathPipe,
+    ImageFallbackDirective,
+    PawCountComponent,
+  ],
   templateUrl: './kittens.component.html',
   styleUrl: './kittens.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -76,6 +91,8 @@ export class KittensComponent {
   private readonly parentsService = inject(ParentsService);
   private readonly familiesService = inject(FamiliesService);
   private readonly filtersService = inject(FiltersService);
+  private readonly breedsService = inject(BreedsService);
+  private readonly seo = inject(SeoService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
@@ -86,6 +103,26 @@ export class KittensComponent {
   private readonly parentMap = new Map<string, ParentApiItem>();
 
   private readonly queryParams = toSignal(this.route.queryParamMap, { initialValue: null });
+  private readonly pathParams = toSignal(this.route.paramMap, { initialValue: null });
+
+  /**
+   * The breed this page is scoped to, taken from `/breeds/:slug`. Null on
+   * `/kittens`, which is the same page showing every breed at once.
+   */
+  protected readonly breedSlugParam = computed<string | null>(
+    () => this.pathParams()?.get('slug')?.trim() || null,
+  );
+
+  /** Every breed with a page of its own, for the tiles above the listing. */
+  protected readonly allBreeds = signal<readonly BreedRef[]>([]);
+  /** The breed record behind `breedSlugParam`, once the API has answered. */
+  protected readonly activeBreed = signal<BreedRef | null>(null);
+  /** True when the slug in the URL names no breed, which is a 404. */
+  protected readonly breedMissing = signal(false);
+
+  protected readonly activeBreedName = computed(() =>
+    taxonomyName(this.activeBreed(), this.i18n, this.i18n.t('fallbackNoBreed')),
+  );
 
   protected readonly activeTab = computed<Tab>(() => {
     const params = this.queryParams();
@@ -125,7 +162,14 @@ export class KittensComponent {
   protected readonly isLoading = signal(true);
   protected readonly loadError = signal('');
 
-  protected readonly breeds = this.filtersService.breeds;
+  /**
+   * `/breeds` is the list the tiles are built from; `/filters/breeds` is the
+   * fallback, because the filter dictionary carries the same records and the
+   * page must not lose its breed picker when one endpoint is unavailable.
+   */
+  protected readonly breeds = computed<readonly BreedRef[]>(() =>
+    this.allBreeds().length ? this.allBreeds() : this.filtersService.breeds(),
+  );
   protected readonly colors = this.filtersService.colors;
 
   protected readonly mothers = computed<ParentOption[]>(() =>
@@ -156,17 +200,27 @@ export class KittensComponent {
     { value: 'female', label: this.i18n.t('female') },
   ]);
 
+  /** Options carry the dictionary `_id`: the API rejects a name with a 400. */
   protected readonly breedOptions = computed<SelectOption[]>(() => [
     { value: 'all', label: this.i18n.t('allBreeds') },
-    ...this.breeds().map((b) => ({ value: b, label: b })),
+    ...this.breeds().map((breed) => ({
+      value: breed._id,
+      label: taxonomyName(breed, this.i18n, this.i18n.t('fallbackNoBreed')),
+    })),
   ]);
 
   protected readonly colorOptions = computed<SelectOption[]>(() => [
     { value: 'all', label: this.i18n.t('allColors') },
-    ...this.colors().map((c) => ({ value: c, label: c })),
+    ...this.colors().map((color) => ({
+      value: color._id,
+      label: taxonomyName(color, this.i18n, this.i18n.t('fallbackNoColor')),
+    })),
   ]);
 
   protected readonly showKittenOnlyFilters = computed(() => this.activeTab() === 'kittens');
+
+  /** A breed page is already scoped, so the breed select has nothing to add. */
+  protected readonly showBreedFilter = computed(() => this.breedSlugParam() === null);
 
   /** Numbers for the hero strip, derived from what is already loaded. */
   protected readonly availableCount = computed(
@@ -212,8 +266,10 @@ export class KittensComponent {
       if (mother !== 'all' && k.motherId !== mother) return false;
       if (father !== 'all' && k.fatherId !== father) return false;
       if (gender !== 'all' && k.gender !== gender) return false;
-      if (breed !== 'all' && k.breed !== breed) return false;
-      if (color !== 'all' && k.color !== color) return false;
+      // Matched on the dictionary id, not on the name: the same breed can be
+      // spelled differently in each language, and the id is what the API uses.
+      if (breed !== 'all' && k.breedId !== breed) return false;
+      if (color !== 'all' && k.colorId !== color) return false;
       return true;
     });
   });
@@ -244,8 +300,8 @@ export class KittensComponent {
         const dadId =
           family.parents?.dad ?? litterKittens.find((k) => k.fatherId)?.fatherId ?? null;
 
-        const mother = momId ? toLitterParentView(this.parentMap.get(momId)) : null;
-        const father = dadId ? toLitterParentView(this.parentMap.get(dadId)) : null;
+        const mother = momId ? toLitterParentView(this.parentMap.get(momId), this.i18n) : null;
+        const father = dadId ? toLitterParentView(this.parentMap.get(dadId), this.i18n) : null;
 
         return {
           key: family._id,
@@ -265,24 +321,67 @@ export class KittensComponent {
     const breed = this.selectedBreed();
     const color = this.selectedColor();
     return this.parents().filter(
-      (p) => (breed === 'all' || p.breed === breed) && (color === 'all' || p.color === color),
+      (p) =>
+        (breed === 'all' || taxonomyId(p.breed) === breed) &&
+        (color === 'all' || taxonomyId(p.color) === color),
     );
   });
 
   protected readonly queens = computed<ParentDisplayCard[]>(() =>
     this.parentsBreedFiltered()
       .filter((p) => p.sex === 'female')
-      .map(toParentCard),
+      .map((parent) => toParentCard(parent, this.i18n)),
   );
 
   protected readonly studs = computed<ParentDisplayCard[]>(() =>
     this.parentsBreedFiltered()
       .filter((p) => p.sex === 'male')
-      .map(toParentCard),
+      .map((parent) => toParentCard(parent, this.i18n)),
   );
 
   constructor() {
-    this.loadAll();
+    // The tiles show every breed whatever the URL, so the list is fetched once
+    // and survives a move from one breed to the next.
+    this.breedsService
+      .getBreeds()
+      .pipe(catchError(() => of<BreedRef[]>([])))
+      .subscribe((breeds) => this.allBreeds.set(breeds));
+
+    // `/breeds/:slug` renders this same component, so moving between two
+    // breeds keeps it alive and changes nothing but the parameter.
+    effect(() => {
+      const slug = this.breedSlugParam();
+      untracked(() => this.loadAll(slug));
+    });
+
+    // A breed page carries no `seo` key in its route data, so it owns its own
+    // metadata; the plain catalogue is still described by the shell. Depending
+    // on the language signal re-applies the copy when the visitor switches.
+    effect(() => {
+      const slug = this.breedSlugParam();
+      this.i18n.language$();
+
+      if (!slug) {
+        return;
+      }
+
+      if (this.breedMissing()) {
+        this.seo.applyNotFound(`/breeds/${slug}`);
+        return;
+      }
+
+      const breed = this.activeBreed();
+      if (!breed) {
+        return;
+      }
+
+      this.seo.applyBreed({
+        path: `/breeds/${slug}`,
+        name: taxonomyName(breed, this.i18n, this.i18n.t('fallbackNoBreed')),
+        image: breedCover(breed),
+        kittenCount: untracked(() => this.filteredKittens().length),
+      });
+    });
   }
 
   protected setTab(tab: Tab): void {
@@ -365,50 +464,80 @@ export class KittensComponent {
       ?.focus();
   }
 
-  private loadAll(): void {
+  /**
+   * One load for both URLs this component serves. A breed page asks the breed
+   * endpoints, which apply the same "only kittens that belong to a litter" rule
+   * as the general catalogue, so the two listings cannot drift apart.
+   */
+  private loadAll(slug: string | null): void {
     this.isLoading.set(true);
     this.loadError.set('');
+    this.breedMissing.set(false);
+    this.activeBreed.set(null);
+    // The mothers and fathers of the previous breed are not in this one.
+    this.resetFilters();
 
-    forkJoin({
-      kittens: this.kittensService.getKittens({ perPage: LOOKUP_PER_PAGE }),
-      parents: this.parentsService.getParents({ perPage: LOOKUP_PER_PAGE }),
-      families: this.familiesService.getFamilies({ perPage: LOOKUP_PER_PAGE }),
-    }).subscribe({
-      next: ({ kittens, parents, families }) => {
+    const request = slug
+      ? forkJoin({
+          breed: this.breedsService.getBreed(slug).pipe(map((response) => response.breed)),
+          kittens: this.breedsService.getBreedKittens(slug, { perPage: LOOKUP_PER_PAGE }),
+          parents: this.breedsService.getBreedParents(slug, { perPage: LOOKUP_PER_PAGE }),
+          families: this.breedsService.getBreedFamilies(slug, { perPage: LOOKUP_PER_PAGE }),
+        })
+      : forkJoin({
+          breed: of<BreedRef | null>(null),
+          kittens: this.kittensService.getKittens({ perPage: LOOKUP_PER_PAGE }),
+          parents: this.parentsService.getParents({ perPage: LOOKUP_PER_PAGE }),
+          families: this.familiesService.getFamilies({ perPage: LOOKUP_PER_PAGE }),
+        });
+
+    request.subscribe({
+      next: ({ breed, kittens, parents, families }) => {
         this.parentMap.clear();
         for (const p of parents.data ?? []) {
           this.parentMap.set(p._id, p);
         }
+        this.activeBreed.set(breed ?? null);
         this.rawKittens.set(kittens.data ?? []);
         this.parents.set(parents.data ?? []);
         this.families.set(families.data ?? []);
         this.isLoading.set(false);
       },
-      error: () => {
-        this.loadError.set(this.i18n.t('error'));
+      error: (error: unknown) => {
+        // An unknown slug is a page that does not exist, not a broken API, and
+        // it has to read as one: its own copy and `noindex` rather than the
+        // generic "could not load" box.
+        if (slug && error instanceof HttpErrorResponse && error.status === 404) {
+          this.breedMissing.set(true);
+        } else {
+          this.loadError.set(this.i18n.t('error'));
+        }
         this.isLoading.set(false);
       },
     });
   }
 }
 
-function toLitterParentView(parent: ParentApiItem | undefined): LitterParentView | null {
+function toLitterParentView(
+  parent: ParentApiItem | undefined,
+  i18n: I18nService,
+): LitterParentView | null {
   if (!parent) return null;
   return {
     id: parent._id,
     name: parent.nameUa || parent.nameEn || '—',
-    breed: parent.breed ?? '',
-    color: parent.color ?? '',
+    breed: taxonomyName(parent.breed, i18n),
+    color: taxonomyName(parent.color, i18n),
     image: pickImage(parent.images, PARENT_PLACEHOLDER),
   };
 }
 
-function toParentCard(parent: ParentApiItem): ParentDisplayCard {
+function toParentCard(parent: ParentApiItem, i18n: I18nService): ParentDisplayCard {
   return {
     id: parent._id,
     name: parent.nameUa || parent.nameEn || '—',
-    breed: parent.breed ?? '',
-    color: parent.color ?? '',
+    breed: taxonomyName(parent.breed, i18n),
+    color: taxonomyName(parent.color, i18n),
     image: pickImage(parent.images, PARENT_PLACEHOLDER),
   };
 }

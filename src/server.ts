@@ -118,6 +118,27 @@ async function idsFrom(path: string): Promise<string[]> {
 }
 
 /**
+ * The slug of every breed, for the one page per breed under `/breeds/`. They
+ * are listed separately from the detail pages because a breed is addressed by
+ * slug rather than by id.
+ */
+async function breedSlugs(): Promise<string[]> {
+  try {
+    const response = await fetch(`${API_BASE}/breeds`);
+    if (!response.ok) {
+      return [];
+    }
+
+    const body = (await response.json()) as { breeds?: { slug?: string }[] };
+    return (body.breeds ?? [])
+      .map((breed) => breed.slug?.trim())
+      .filter((slug): slug is string => Boolean(slug));
+  } catch {
+    return [];
+  }
+}
+
+/**
  * One `<url>` per language, each listing both languages as alternates. Google
  * requires an hreflang set to be complete and self-referencing, so every entry
  * points at itself as well as at its counterpart, plus the prefix-less URL as
@@ -144,13 +165,17 @@ function urlEntries(origin: string, path: string, priority: string): string[] {
 }
 
 async function buildSitemap(origin: string): Promise<string> {
-  const [kittenIds, parentIds] = await Promise.all([
+  const [kittenIds, parentIds, breeds] = await Promise.all([
     idsFrom('cats/kittens'),
     idsFrom('cats/parents'),
+    breedSlugs(),
   ]);
 
   const entries = [
     ...STATIC_PATHS.flatMap((path) => urlEntries(origin, path, path === '/' ? '1.0' : '0.8')),
+    // A breed page ranks above a single kitten: it outlives the kitten it
+    // lists, and "<breed> kittens" is what the search actually says.
+    ...breeds.flatMap((slug) => urlEntries(origin, `/breeds/${slug}`, '0.75')),
     ...kittenIds.flatMap((id) => urlEntries(origin, `/kittens/${id}`, '0.7')),
     ...parentIds.flatMap((id) => urlEntries(origin, `/parents/${id}`, '0.6')),
   ];

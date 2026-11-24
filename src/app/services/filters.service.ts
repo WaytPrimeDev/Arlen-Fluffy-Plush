@@ -1,6 +1,7 @@
 import { Injectable, Signal, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_PATH } from './api';
+import { toRef, type BreedRef, type ColorRef, type MaybeRef } from './taxonomy';
 
 export interface Pagination {
   page: number;
@@ -20,7 +21,9 @@ export interface PaginatedResponse<T> {
 export interface ListParams {
   page?: number;
   perPage?: number;
+  /** The breed's `_id`. A name is rejected by the API with a 400. */
   breed?: string;
+  /** The colour's `_id`, likewise. */
   color?: string;
 }
 
@@ -29,16 +32,22 @@ export interface ListParams {
  * `/filters/colors` with `{ status, colors: [...] }`, so the list lives under a
  * key named after the endpoint. The other shapes are kept as fallbacks in case
  * the response ever switches to `data` or to a bare array.
+ *
+ * The entries are objects — `{ _id, nameUa, nameEn, ... }`, plus `image` for a
+ * breed — since the filters moved to ids. A deployment where the API still
+ * answers with plain names is survived by `toRef`, which wraps a string into a
+ * reference rather than letting it reach a template as `undefined`.
  */
-type FiltersApiResponse =
-  | string[]
-  | { breeds?: string[]; colors?: string[]; data?: string[]; message?: string };
+type FiltersApiResponse<T extends BreedRef | ColorRef> =
+  | MaybeRef<T>[]
+  | { breeds?: MaybeRef<T>[]; colors?: MaybeRef<T>[]; data?: MaybeRef<T>[]; message?: string };
 
-function extractList(response: FiltersApiResponse, key: 'breeds' | 'colors'): string[] {
-  if (Array.isArray(response)) {
-    return response;
-  }
-  return response?.[key] ?? response?.data ?? [];
+function extractList<T extends BreedRef | ColorRef>(
+  response: FiltersApiResponse<T>,
+  key: 'breeds' | 'colors',
+): T[] {
+  const raw = Array.isArray(response) ? response : (response?.[key] ?? response?.data ?? []);
+  return raw.map((entry) => toRef<T>(entry)).filter((entry): entry is T => entry !== null);
 }
 
 @Injectable({
@@ -48,13 +57,13 @@ export class FiltersService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = API_PATH;
 
-  private readonly breedsSignal = signal<string[]>([]);
-  private readonly colorsSignal = signal<string[]>([]);
+  private readonly breedsSignal = signal<BreedRef[]>([]);
+  private readonly colorsSignal = signal<ColorRef[]>([]);
   private breedsLoaded = false;
   private colorsLoaded = false;
 
-  readonly breeds: Signal<string[]> = this.breedsSignal.asReadonly();
-  readonly colors: Signal<string[]> = this.colorsSignal.asReadonly();
+  readonly breeds: Signal<BreedRef[]> = this.breedsSignal.asReadonly();
+  readonly colors: Signal<ColorRef[]> = this.colorsSignal.asReadonly();
 
   constructor() {
     this.loadBreeds();
@@ -66,7 +75,7 @@ export class FiltersService {
       return;
     }
     this.breedsLoaded = true;
-    this.http.get<FiltersApiResponse>(`${this.apiUrl}/filters/breeds`).subscribe({
+    this.http.get<FiltersApiResponse<BreedRef>>(`${this.apiUrl}/filters/breeds`).subscribe({
       next: (response) => this.breedsSignal.set(extractList(response, 'breeds')),
       error: () => {
         this.breedsLoaded = false;
@@ -79,7 +88,7 @@ export class FiltersService {
       return;
     }
     this.colorsLoaded = true;
-    this.http.get<FiltersApiResponse>(`${this.apiUrl}/filters/colors`).subscribe({
+    this.http.get<FiltersApiResponse<ColorRef>>(`${this.apiUrl}/filters/colors`).subscribe({
       next: (response) => this.colorsSignal.set(extractList(response, 'colors')),
       error: () => {
         this.colorsLoaded = false;

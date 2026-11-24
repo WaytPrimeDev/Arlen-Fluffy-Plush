@@ -1,5 +1,6 @@
 import type { KittenApiItem } from '../pages/kittens/kittens.service';
 import type { I18nService } from './i18n.service';
+import { breedSlug, taxonomyId, taxonomyName } from './taxonomy';
 
 export type KittenStatus = 'available' | 'reserved' | 'offline';
 
@@ -7,8 +8,12 @@ export interface KittenListItem {
   id: string;
   name: string;
   breed: string;
+  /** The breed's id and slug, for filtering by id and linking to its page. */
+  breedId: string | null;
+  breedSlug: string | null;
   age: string;
   color: string;
+  colorId: string | null;
   status: KittenStatus;
   /** Ready-made one-line label, used where there is no room for both prices. */
   priceLabel: string;
@@ -53,9 +58,12 @@ export function mapKittenToListItem(kitten: KittenApiItem, i18n: I18nService): K
   return {
     id: kitten._id,
     name: localizedName(kitten.nameUa, kitten.nameEn, i18n),
-    breed: kitten.breed || i18n.t('fallbackNoBreed'),
+    breed: taxonomyName(kitten.breed, i18n, i18n.t('fallbackNoBreed')),
+    breedId: taxonomyId(kitten.breed),
+    breedSlug: breedSlug(kitten.breed),
     age: formatBirthDay(kitten.birthDay, i18n),
-    color: kitten.color || i18n.t('fallbackNoColor'),
+    color: taxonomyName(kitten.color, i18n, i18n.t('fallbackNoColor')),
+    colorId: taxonomyId(kitten.color),
     status: mapStatus(kitten.status),
     priceLabel: formatPrice(kitten, i18n),
     prices: {

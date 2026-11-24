@@ -172,6 +172,18 @@ export class I18nService {
         'Find your perfect fluffy companion from our carefully bred kittens',
       availableKittensTab: 'Available Kittens',
       ourParentsTab: 'Our Parents',
+
+      // Breed tiles & breed pages
+      browseByBreed: 'Choose a breed',
+      allBreedsTile: 'All kittens',
+      allBreedsHint: 'Every breed at once',
+      breedKittens: 'kittens',
+      breedPageSubtitle: 'Kittens of this breed from our cattery, with photos, prices and parents',
+      backToAllKittens: 'All kittens',
+      breedNotFoundTitle: 'This breed does not exist',
+      breedNotFoundText:
+        'The link may be out of date. Pick a breed from the list, or look through every kitten.',
+      noKittensOfBreed: 'No kittens of this breed right now',
       ourQueens: 'Our Queens',
       ourStuds: 'Our Studs',
       noParentsMatchFilter: 'No parents match your filter.',
@@ -324,8 +336,7 @@ export class I18nService {
       contacts: 'Contacts',
 
       // Footer
-      footerAbout:
-        'Breeding exceptional fluffy kittens with love and dedication.',
+      footerAbout: 'Breeding exceptional fluffy kittens with love and dedication.',
       quickLinks: 'Quick Links',
       ourStory: 'Our Story',
       contactUs: 'Contact Us',
@@ -345,7 +356,8 @@ export class I18nService {
         'Since September 2016 we have been officially registered as a cattery with the World Cat Federation (WCF) under the name Arlen Fluffy Plush. In 2021 we discovered the wonderful Ragdoll breed, and since then working with these royal cats has been the main focus of our cattery. Today we work with several breeds, but the Ragdolls remain our heart.',
       aboutIntroP3:
         'For our family this is not just a favourite pursuit — it is part of our life. The birth of every new litter of kittens is a true celebration for us, one we await with great excitement and impatience.',
-      aboutIntroImageAlt: 'A bright cattery room with a cat tree, wall shelves and beds, where Ragdoll cats play on a rug',
+      aboutIntroImageAlt:
+        'A bright cattery room with a cat tree, wall shelves and beds, where Ragdoll cats play on a rug',
       coreValues: 'Our Core Values',
       valueLoveTitle: 'Love & Care',
       valueLoveDesc:
@@ -383,8 +395,7 @@ export class I18nService {
       readiness1Desc:
         'From birth the little ones get used to people, to the sounds of the house and to being petted, so they grow up very sociable, hand-raised and trusting.',
       readiness2Title: 'Health and protection',
-      readiness2Desc:
-        'Kittens move to their new families fully vaccinated and microchipped.',
+      readiness2Desc: 'Kittens move to their new families fully vaccinated and microchipped.',
       readiness3Title: 'Official set of documents',
       readiness3Desc:
         'Together with the kitten you receive a complete set: a pedigree, a club transfer and an veterinary passport.',
@@ -547,6 +558,18 @@ export class I18nService {
         'Знайдіть ідеального пухнастого друга з-поміж наших дбайливо вирощених кошенят',
       availableKittensTab: 'Доступні кошенята',
       ourParentsTab: 'Наші батьки',
+
+      // Breed tiles & breed pages
+      browseByBreed: 'Оберіть породу',
+      allBreedsTile: 'Усі кошенята',
+      allBreedsHint: 'Усі породи разом',
+      breedKittens: 'кошенят',
+      breedPageSubtitle: 'Кошенята цієї породи з нашого розплідника — фото, ціни та батьки кожного',
+      backToAllKittens: 'Усі кошенята',
+      breedNotFoundTitle: 'Такої породи не існує',
+      breedNotFoundText:
+        'Можливо, посилання застаріло. Оберіть породу зі списку або подивіться всіх кошенят.',
+      noKittensOfBreed: 'Зараз немає кошенят цієї породи',
       ourQueens: 'Наші мами',
       ourStuds: 'Наші тата',
       noParentsMatchFilter: 'Немає батьків, що відповідають фільтру.',
@@ -574,7 +597,8 @@ export class I18nService {
       homeHeroTitleTail: 'Це родина.',
       homeHeroDescription:
         'Ми вирощуємо кошенят, які стають повноправними членами родини — гріють холодні вечори, слухають ваші історії й перетворюють квартиру на справжній дім.',
-      homeHeroImageAlt: 'Пухнастий кіт рагдол відпочиває на сонячному підвіконні у затишній вітальні',
+      homeHeroImageAlt:
+        'Пухнастий кіт рагдол відпочиває на сонячному підвіконні у затишній вітальні',
       homeHeroPrimaryCta: 'Познайомитись із кошенятами',
       homeHeroSecondaryCta: 'Про розплідник',
       homeHeroPillTitle: 'Усі кошенята соціалізовані',
@@ -699,8 +723,7 @@ export class I18nService {
       contacts: 'Контакти',
 
       // Footer
-      footerAbout:
-        'Розводимо виняткових пухнастих кошенят із любов’ю та відданістю.',
+      footerAbout: 'Розводимо виняткових пухнастих кошенят із любов’ю та відданістю.',
       quickLinks: 'Швидкі посилання',
       ourStory: 'Наша історія',
       contactUs: 'Зв’язатися з нами',
@@ -711,8 +734,7 @@ export class I18nService {
 
       // About page
       aboutHeroTitle: 'Наша історія',
-      aboutHeroSubtitle:
-        'Подорож пристрасті, відданості та любові до виняткових пухнастих кошенят',
+      aboutHeroSubtitle: 'Подорож пристрасті, відданості та любові до виняткових пухнастих кошенят',
       aboutIntroTitle: 'Досконалість у розведенні з 2010 року',
       aboutIntroP1:
         'Наша історія розпочалася ще у 2010 році, коли в нашому домі з’явилася перша шотландська прямовуха кішка. Саме з неї зародилася наша велика любов, захоплення та професійний шлях у світі котів.',
@@ -720,7 +742,8 @@ export class I18nService {
         'З вересня 2016 року ми офіційно зареєстровані як розплідник у Всесвітній федерації котів (WCF) під назвою Arlen Fluffy Plush. У 2021 році ми відкрили для себе дивовижну породу регдол, і з того часу робота з цими королівськими котами стала основним напрямком нашого розплідника. Сьогодні ми працюємо з кількома породами, але регдоли залишаються головними.',
       aboutIntroP3:
         'Для нашої родини це не просто улюблена справа — це частина нашого життя. Народження кожного нового помету кошенят для нас — це справжнє свято, на яке ми чекаємо з великим трепетом і нетерпінням.',
-      aboutIntroImageAlt: 'Світла кімната розплідника з ігровим комплексом, полицями та лежанками, де на килимі граються коти рагдол',
+      aboutIntroImageAlt:
+        'Світла кімната розплідника з ігровим комплексом, полицями та лежанками, де на килимі граються коти рагдол',
       coreValues: 'Наші цінності',
       valueLoveTitle: 'Любов та турбота',
       valueLoveDesc:
