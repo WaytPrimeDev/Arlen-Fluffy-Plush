@@ -102,15 +102,28 @@ function acceptedLocales(header: string | string[] | undefined): string[] {
     .map((entry) => entry.tag);
 }
 
-async function idsFrom(path: string): Promise<string[]> {
+/**
+ * The URL segment of every record in a listing: its slug, falling back to its
+ * `_id`.
+ *
+ * The sitemap has to name the address a page is canonically served at, and
+ * that is the slug — a kitten reachable at both `/kittens/arlen-luna` and
+ * `/kittens/66f0...` would otherwise be submitted under the id while its own
+ * canonical tag pointed at the slug, which is the one contradiction a sitemap
+ * must not contain. The fallback keeps the sitemap populated on a backend that
+ * has not minted slugs yet.
+ */
+async function routeParamsFrom(path: string): Promise<string[]> {
   try {
     const response = await fetch(`${API_BASE}/${path}?perPage=1000`);
     if (!response.ok) {
       return [];
     }
 
-    const body = (await response.json()) as { data?: { _id?: string }[] };
-    return (body.data ?? []).map((item) => item._id).filter((id): id is string => Boolean(id));
+    const body = (await response.json()) as { data?: { _id?: string; slug?: string | null }[] };
+    return (body.data ?? [])
+      .map((item) => item.slug?.trim() || item._id)
+      .filter((param): param is string => Boolean(param));
   } catch {
     // A sitemap listing only the static pages beats returning a 500.
     return [];
@@ -165,9 +178,9 @@ function urlEntries(origin: string, path: string, priority: string): string[] {
 }
 
 async function buildSitemap(origin: string): Promise<string> {
-  const [kittenIds, parentIds, breeds] = await Promise.all([
-    idsFrom('cats/kittens'),
-    idsFrom('cats/parents'),
+  const [kittens, parents, breeds] = await Promise.all([
+    routeParamsFrom('cats/kittens'),
+    routeParamsFrom('cats/parents'),
     breedSlugs(),
   ]);
 
@@ -176,8 +189,8 @@ async function buildSitemap(origin: string): Promise<string> {
     // A breed page ranks above a single kitten: it outlives the kitten it
     // lists, and "<breed> kittens" is what the search actually says.
     ...breeds.flatMap((slug) => urlEntries(origin, `/breeds/${slug}`, '0.75')),
-    ...kittenIds.flatMap((id) => urlEntries(origin, `/kittens/${id}`, '0.7')),
-    ...parentIds.flatMap((id) => urlEntries(origin, `/parents/${id}`, '0.6')),
+    ...kittens.flatMap((param) => urlEntries(origin, `/kittens/${param}`, '0.7')),
+    ...parents.flatMap((param) => urlEntries(origin, `/parents/${param}`, '0.6')),
   ];
 
   return [

@@ -17,6 +17,7 @@ import { CommonModule } from '@angular/common';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { localizedName, PARENT_PLACEHOLDER } from '../../services/kitten-view.util';
 import { taxonomyName } from '../../services/taxonomy';
+import { catRouteParam } from '../../services/cat-route.util';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
 import { PawCountComponent } from '../../components/paw-count/paw-count.component';
 
@@ -24,6 +25,13 @@ type SexFilter = 'all' | 'male' | 'female';
 
 interface ParentListItem {
   id: string;
+  /**
+   * The segment this record's page lives at: its slug, or its `_id` while the
+   * backend has not minted one. Separate from `id`, which stays the `_id` the
+   * analytics events and `@for` keys are built on, so switching the public
+   * URLs over to slugs did not quietly change what gets reported.
+   */
+  routeParam: string;
   name: string;
   breed: string;
   color: string;
@@ -209,6 +217,7 @@ export class ParentsComponent {
 function mapParentToListItem(parent: ParentApiItem, i18n: I18nService): ParentListItem {
   return {
     id: parent._id,
+    routeParam: catRouteParam(parent),
     name: localizedName(parent.nameUa, parent.nameEn, i18n),
     breed: taxonomyName(parent.breed, i18n, i18n.t('fallbackNoBreed')),
     color: taxonomyName(parent.color, i18n, i18n.t('fallbackNoColor')),

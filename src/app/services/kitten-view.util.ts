@@ -1,4 +1,5 @@
 import type { KittenApiItem } from '../pages/kittens/kittens.service';
+import { catRouteParam } from './cat-route.util';
 import type { I18nService } from './i18n.service';
 import { breedSlug, taxonomyId, taxonomyName } from './taxonomy';
 
@@ -6,6 +7,13 @@ export type KittenStatus = 'available' | 'reserved' | 'offline';
 
 export interface KittenListItem {
   id: string;
+  /**
+   * The segment this record's page lives at: its slug, or its `_id` while the
+   * backend has not minted one. Separate from `id`, which stays the `_id` the
+   * analytics events and `@for` keys are built on, so switching the public
+   * URLs over to slugs did not quietly change what gets reported.
+   */
+  routeParam: string;
   name: string;
   breed: string;
   /** The breed's id and slug, for filtering by id and linking to its page. */
@@ -57,6 +65,7 @@ export function pickImage(
 export function mapKittenToListItem(kitten: KittenApiItem, i18n: I18nService): KittenListItem {
   return {
     id: kitten._id,
+    routeParam: catRouteParam(kitten),
     name: localizedName(kitten.nameUa, kitten.nameEn, i18n),
     breed: taxonomyName(kitten.breed, i18n, i18n.t('fallbackNoBreed')),
     breedId: taxonomyId(kitten.breed),

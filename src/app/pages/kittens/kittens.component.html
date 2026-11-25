@@ -296,7 +296,7 @@
           @if (filteredKittens().length) {
             <div class="card-grid">
               @for (kitten of filteredKittens(); track kitten.id) {
-                <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
+                <a class="kitten-card" [routerLink]="['/kittens', kitten.routeParam] | locPath">
                   <div class="kitten-card__media">
                     <img
                       draggable="false"
@@ -378,7 +378,7 @@
                   @if (litter.mother; as mom) {
                     <a
                       class="litter__parent litter__parent--mom"
-                      [routerLink]="['/parents', mom.id] | locPath"
+                      [routerLink]="['/parents', mom.routeParam] | locPath"
                       [attr.aria-label]="i18n.t('mom') + ': ' + mom.name"
                     >
                       <img
@@ -399,7 +399,7 @@
                   @if (litter.father; as dad) {
                     <a
                       class="litter__parent litter__parent--dad"
-                      [routerLink]="['/parents', dad.id] | locPath"
+                      [routerLink]="['/parents', dad.routeParam] | locPath"
                       [attr.aria-label]="i18n.t('dad') + ': ' + dad.name"
                     >
                       <img
@@ -426,7 +426,7 @@
 
               <div class="card-grid card-grid--litter">
                 @for (kitten of litter.kittens; track kitten.id) {
-                  <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
+                  <a class="kitten-card" [routerLink]="['/kittens', kitten.routeParam] | locPath">
                     <div class="kitten-card__media">
                       <img
                         draggable="false"
@@ -516,7 +516,7 @@
               @for (parent of queens(); track parent.id) {
                 <a
                   class="parent-card"
-                  [routerLink]="['/parents', parent.id] | locPath"
+                  [routerLink]="['/parents', parent.routeParam] | locPath"
                   [attr.aria-label]="parent.name"
                 >
                   <div class="parent-card__media">
@@ -561,7 +561,7 @@
               @for (parent of studs(); track parent.id) {
                 <a
                   class="parent-card"
-                  [routerLink]="['/parents', parent.id] | locPath"
+                  [routerLink]="['/parents', parent.routeParam] | locPath"
                   [attr.aria-label]="parent.name"
                 >
                   <div class="parent-card__media">

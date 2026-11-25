@@ -6,6 +6,7 @@ import type { ListParams, PaginatedResponse } from '../../services/filters.servi
 import { buildListParams } from '../../services/http-params.util';
 import { API_PATH } from '../../services/api';
 import type { BreedRef, ColorRef, MaybeRef } from '../../services/taxonomy';
+import { isObjectId } from '../../services/cat-route.util';
 
 export interface ParentImage {
   full: string;
@@ -52,10 +53,13 @@ export class ParentsService {
     });
   }
 
-  getParentById(id: string): Observable<ParentApiItem> {
-    return this.http
-      .get<ParentApiResponse>(`${this.apiUrl}/cats/parent/${id}`)
-      .pipe(map((response) => response.data));
+  /** One parent, by slug or by id — see `KittensService.getKitten`. */
+  getParent(param: string): Observable<ParentApiItem> {
+    const path = isObjectId(param)
+      ? `${this.apiUrl}/cats/parent/${encodeURIComponent(param)}`
+      : `${this.apiUrl}/cats/parent/slug/${encodeURIComponent(param)}`;
+
+    return this.http.get<ParentApiResponse>(path).pipe(map((response) => response.data));
   }
 
   /**

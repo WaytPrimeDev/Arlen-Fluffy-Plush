@@ -33,6 +33,18 @@
           <div class="skeleton-line"></div>
         </div>
       </div>
+    } @else if (notFound()) {
+      <!-- A dead link, not a failure: its own copy, and `noindex` applied by
+           the component so the URL leaves the index instead of lingering as a
+           soft 404. -->
+      <div class="kitten-page__empty">
+        <p class="kitten-page__eyebrow">{{ i18n.t('kittenNotFoundTitle') }}</p>
+        <h1>{{ i18n.t('kittenNotFoundTitle') }}</h1>
+        <p>{{ i18n.t('kittenNotFoundText') }}</p>
+        <a class="kitten-page__back-cta" [routerLink]="'/kittens' | locPath">{{
+          i18n.t('backToKittens')
+        }}</a>
+      </div>
     } @else if (loadError()) {
       <div class="kitten-page__empty" role="alert">
         <p class="kitten-page__eyebrow">{{ i18n.t('error') }}</p>
@@ -46,79 +58,139 @@
       <div class="kitten-page__layout">
         <!-- Gallery -->
         <div class="kitten-page__gallery">
-          @if (images().length) {
-            <!-- Buttons rather than links: a link to the photo file is a live
-                 destination before the page has hydrated, so an early click
-                 would leave the site for a bare image. Every photo is here so
-                 the viewer gets the whole set; only the selected one is
-                 visible and reachable. -->
-            <div
-              class="kitten-page__stage"
-              appPhotoViewer=".kitten-page__slide"
-              [pageImageWidth]="stageWidth"
-              [viewerImageWidth]="viewerWidth"
-            >
-              @for (img of images(); track img.zoom; let i = $index) {
-                <button
-                  type="button"
-                  class="kitten-page__slide"
-                  [class.kitten-page__slide--active]="selectedImageIndex() === i"
-                  [attr.data-pswp-src]="img.zoom"
-                  [attr.tabindex]="selectedImageIndex() === i ? null : -1"
-                  [attr.aria-hidden]="selectedImageIndex() === i ? null : 'true'"
-                  [attr.aria-label]="
-                    i18n.t('openPhotoFullscreen') +
-                    ': ' +
-                    i18n.t('viewerCounter', { current: i + 1, total: images().length })
-                  "
-                >
+          <!-- Buttons rather than links: a link to the photo file is a live
+               destination before the page has hydrated, so an early click
+               would leave the site for a bare image. Every slide is here so
+               the viewer gets the whole set; only the selected one is visible
+               and reachable. -->
+          <div
+            class="kitten-page__stage"
+            appPhotoViewer=".kitten-page__slide--viewable"
+            [pageImageWidth]="stageWidth"
+            [viewerImageWidth]="viewerWidth"
+          >
+            @for (slide of slides(); track slide.key; let i = $index) {
+              @switch (slide.kind) {
+                @case ('photo') {
+                  <button
+                    type="button"
+                    class="kitten-page__slide kitten-page__slide--viewable"
+                    [class.kitten-page__slide--active]="selectedIndex() === i"
+                    [attr.data-pswp-src]="slide.zoom"
+                    [attr.tabindex]="selectedIndex() === i ? null : -1"
+                    [attr.aria-hidden]="selectedIndex() === i ? null : 'true'"
+                    [attr.aria-label]="
+                      i18n.t('openPhotoFullscreen') +
+                      ': ' +
+                      i18n.t('viewerCounter', {
+                        current: slide.viewerIndex,
+                        total: viewerCount()
+                      })
+                    "
+                  >
+                    <img
+                      draggable="false"
+                      decoding="async"
+                      [src]="slide.display"
+                      [alt]="i18n.t('viewerImageAlt', { label: name(), index: slide.viewerIndex })"
+                      [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                      [attr.fetchpriority]="i === 0 ? 'high' : null"
+                    />
+                  </button>
+                }
+
+                @case ('video') {
+                  <!-- Only the poster is in the markup. The player is built by
+                       the viewer once this slide is actually opened, so a
+                       kitten page costs no YouTube request, and sets no YouTube
+                       identifiers, until someone asks for the video. The
+                       dimensions are declared because the viewer cannot
+                       measure an iframe the way it measures a photo. -->
+                  <button
+                    type="button"
+                    class="kitten-page__slide kitten-page__slide--viewable kitten-page__slide--video"
+                    [class.kitten-page__slide--active]="selectedIndex() === i"
+                    [attr.data-pswp-video-embed]="slide.embed"
+                    [attr.data-pswp-video-title]="i18n.t('videoTitle', { label: name() })"
+                    [attr.data-pswp-width]="videoSlideWidth"
+                    [attr.data-pswp-height]="videoSlideHeight"
+                    [attr.tabindex]="selectedIndex() === i ? null : -1"
+                    [attr.aria-hidden]="selectedIndex() === i ? null : 'true'"
+                    [attr.aria-label]="i18n.t('videoPlay', { label: name() })"
+                    (click)="trackVideoOpen(slide)"
+                  >
+                    <img
+                      draggable="false"
+                      decoding="async"
+                      loading="lazy"
+                      class="kitten-page__video-poster"
+                      [src]="slide.display"
+                      alt=""
+                    />
+                    <!-- Decorative: the button's own label already names the
+                         action, so a second announcement would just repeat it. -->
+                    <span class="kitten-page__play" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M8 5.5v13l11-6.5z" />
+                      </svg>
+                    </span>
+                  </button>
+                }
+
+                @case ('placeholder') {
                   <img
                     draggable="false"
                     decoding="async"
-                    [src]="img.display"
-                    [alt]="i18n.t('viewerImageAlt', { label: name(), index: i + 1 })"
-                    [attr.loading]="i === 0 ? 'eager' : 'lazy'"
-                    [attr.fetchpriority]="i === 0 ? 'high' : null"
+                    class="kitten-page__slide kitten-page__slide--active"
+                    appImageFallback
+                    [src]="slide.display"
+                    [alt]="name()"
                   />
-                </button>
+                }
               }
-            </div>
-          } @else {
-            <div class="kitten-page__stage kitten-page__stage--static">
-              <img
-                draggable="false"
-                decoding="async"
-                class="kitten-page__slide kitten-page__slide--active"
-                appImageFallback
-                [src]="selectedImage()"
-                [alt]="name()"
-              />
-            </div>
-          }
+            }
+          </div>
 
-          @if (images().length > 1) {
+          @if (slides().length > 1) {
             <div
               class="kitten-page__thumbs"
               role="list"
               [attr.aria-label]="i18n.t('galleryThumbnails')"
             >
-              @for (img of images(); track img.zoom; let i = $index) {
+              @for (slide of slides(); track slide.key; let i = $index) {
                 <div role="listitem">
                   <button
                     type="button"
                     class="kitten-page__thumb"
-                    [class.kitten-page__thumb--active]="selectedImageIndex() === i"
-                    [attr.aria-current]="selectedImageIndex() === i ? 'true' : null"
-                    [attr.aria-label]="i18n.t('viewerGoToImage', { index: i + 1 })"
-                    (click)="selectImage(i)"
+                    [class.kitten-page__thumb--active]="selectedIndex() === i"
+                    [class.kitten-page__thumb--video]="slide.kind === 'video'"
+                    [attr.aria-current]="selectedIndex() === i ? 'true' : null"
+                    [attr.aria-label]="
+                      slide.kind === 'video'
+                        ? i18n.t('viewerGoToVideo')
+                        : i18n.t('viewerGoToImage', { index: i + 1 })
+                    "
+                    (click)="selectSlide(i)"
                   >
-                    <img
-                      draggable="false"
-                      decoding="async"
-                      [src]="img.thumb"
-                      alt=""
-                      loading="lazy"
-                    />
+                    @if (slide.kind !== 'placeholder') {
+                      <img
+                        draggable="false"
+                        decoding="async"
+                        loading="lazy"
+                        [src]="slide.thumb"
+                        alt=""
+                      />
+                    }
+                    @if (slide.kind === 'video') {
+                      <!-- A shape, not just a tint: a thumbnail told apart from
+                           the photos by colour alone would not be told apart at
+                           all by anyone who cannot see the difference. -->
+                      <span class="kitten-page__thumb-badge" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                          <path d="M8 5.5v13l11-6.5z" />
+                        </svg>
+                      </span>
+                    }
                   </button>
                 </div>
               }
@@ -340,7 +412,7 @@
                 @if (mother(); as mom) {
                   <a
                     class="kitten-page__parent-card kitten-page__parent-card--mom"
-                    [routerLink]="['/parents', mom._id] | locPath"
+                    [routerLink]="['/parents', parentRouteParam(mom)] | locPath"
                   >
                     <p class="kitten-page__parent-role">{{ i18n.t('mother') }}</p>
                     <img
@@ -360,7 +432,7 @@
                 @if (father(); as dad) {
                   <a
                     class="kitten-page__parent-card kitten-page__parent-card--dad"
-                    [routerLink]="['/parents', dad._id] | locPath"
+                    [routerLink]="['/parents', parentRouteParam(dad)] | locPath"
                   >
                     <p class="kitten-page__parent-role">{{ i18n.t('father') }}</p>
                     <img

@@ -183,6 +183,12 @@ export class I18nService {
       breedNotFoundTitle: 'This breed does not exist',
       breedNotFoundText:
         'The link may be out of date. Pick a breed from the list, or look through every kitten.',
+      kittenNotFoundTitle: 'This kitten is no longer listed',
+      kittenNotFoundText:
+        'It may have found a home, or the link may be out of date. Have a look at the kittens we have now.',
+      parentNotFoundTitle: 'This cat is no longer listed',
+      parentNotFoundText:
+        'The link may be out of date. Have a look at the cats in our cattery now.',
       noKittensOfBreed: 'No kittens of this breed right now',
       ourQueens: 'Our Queens',
       ourStuds: 'Our Studs',
@@ -440,6 +446,13 @@ export class I18nService {
       openPhotoFullscreen: 'Open photo full screen',
       galleryThumbnails: 'Photo thumbnails',
 
+      // Kitten video
+      video: 'Video',
+      videoPlay: 'Play the video about {label}',
+      videoTitle: 'Video about {label}',
+      viewerGoToVideo: 'Go to the video',
+      videoWatchOnYoutube: 'Watch on YouTube',
+
       // Kitten fallbacks
       kittenFallbackName: 'Kitten',
       kittenLoadError: 'Failed to load kitten data.',
@@ -569,6 +582,12 @@ export class I18nService {
       breedNotFoundTitle: 'Такої породи не існує',
       breedNotFoundText:
         'Можливо, посилання застаріло. Оберіть породу зі списку або подивіться всіх кошенят.',
+      kittenNotFoundTitle: 'Це кошеня більше не в каталозі',
+      kittenNotFoundText:
+        'Можливо, воно вже знайшло дім або посилання застаріло. Подивіться кошенят, які є зараз.',
+      parentNotFoundTitle: 'Цього кота більше не в каталозі',
+      parentNotFoundText:
+        'Можливо, посилання застаріло. Подивіться котів нашого розплідника зараз.',
       noKittensOfBreed: 'Зараз немає кошенят цієї породи',
       ourQueens: 'Наші мами',
       ourStuds: 'Наші тата',
@@ -825,6 +844,13 @@ export class I18nService {
       photo: 'Фото',
       openPhotoFullscreen: 'Відкрити фото на весь екран',
       galleryThumbnails: 'Мініатюри фото',
+
+      // Kitten video
+      video: 'Відео',
+      videoPlay: 'Подивитися відео про {label}',
+      videoTitle: 'Відео про {label}',
+      viewerGoToVideo: 'Перейти до відео',
+      videoWatchOnYoutube: 'Дивитися на YouTube',
 
       // Kitten fallbacks
       kittenFallbackName: 'Кошеня',

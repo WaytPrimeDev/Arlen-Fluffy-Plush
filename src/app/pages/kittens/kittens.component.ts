@@ -22,8 +22,15 @@ import {
   type KittenListItem,
   PARENT_PLACEHOLDER,
 } from '../../services/kitten-view.util';
-import { FamiliesService, type FamilyApiItem } from '../../services/families.service';
+import {
+  FamiliesService,
+  familyMemberId,
+  familyMemberRecord,
+  type FamilyApiItem,
+  type FamilyMember,
+} from '../../services/families.service';
 import { ParentsService, type ParentApiItem } from '../parents/parents.service';
+import { catRouteParam } from '../../services/cat-route.util';
 import { I18nService } from '../../services/i18n.service';
 import { FiltersService } from '../../services/filters.service';
 import { BreedsService } from '../../services/breeds.service';
@@ -46,6 +53,13 @@ interface ParentOption {
 
 interface LitterParentView {
   id: string;
+  /**
+   * The segment this record's page lives at: its slug, or its `_id` while the
+   * backend has not minted one. Separate from `id`, which stays the `_id` the
+   * analytics events and `@for` keys are built on, so switching the public
+   * URLs over to slugs did not quietly change what gets reported.
+   */
+  routeParam: string;
   name: string;
   breed: string;
   color: string;
@@ -63,6 +77,13 @@ interface LitterView {
 
 interface ParentDisplayCard {
   id: string;
+  /**
+   * The segment this record's page lives at: its slug, or its `_id` while the
+   * backend has not minted one. Separate from `id`, which stays the `_id` the
+   * analytics events and `@for` keys are built on, so switching the public
+   * URLs over to slugs did not quietly change what gets reported.
+   */
+  routeParam: string;
   name: string;
   breed: string;
   color: string;
@@ -283,25 +304,40 @@ export class KittensComponent {
     return sorted
       .map((family) => {
         /**
-         * Membership is read off the kitten's own `familyId`, with the family's
-         * `kittens` array as the fallback: those are the two links the API
+         * Membership is read off the kitten's own `familyId`, with the
+         * family's `kittens` as the fallback: those are the two links the API
          * actually fills in. Matching on the parent pair instead left every
-         * litter empty, because `family.parents` comes back null.
+         * litter empty, because `family.parents` used to come back null.
+         *
+         * The entries are ids on an older backend and whole kittens on the
+         * current one, so only their ids are taken here — the litter still
+         * shows the kittens from `filteredKittens`, which are the ones the
+         * breed and colour filters have already been applied to.
          */
-        const memberIds = new Set(family.kittens ?? []);
+        const memberIds = new Set(
+          (family.kittens ?? [])
+            .map((member) => familyMemberId(member))
+            .filter((id): id is string => id !== null),
+        );
         const litterKittens = filtered.filter(
           (k) => k.familyId === family._id || memberIds.has(k.id),
         );
         if (litterKittens.length === 0) return null;
 
-        /** A family without its own parents borrows them from its kittens. */
-        const momId =
-          family.parents?.mom ?? litterKittens.find((k) => k.motherId)?.motherId ?? null;
-        const dadId =
-          family.parents?.dad ?? litterKittens.find((k) => k.fatherId)?.fatherId ?? null;
-
-        const mother = momId ? toLitterParentView(this.parentMap.get(momId), this.i18n) : null;
-        const father = dadId ? toLitterParentView(this.parentMap.get(dadId), this.i18n) : null;
+        /**
+         * The parents come embedded now, which is what spares the grouping a
+         * lookup; when only an id arrives it is resolved against the parents
+         * listing the page has loaded anyway. A family that names no parents
+         * at all still borrows them from its own kittens.
+         */
+        const mother = this.litterParent(
+          family.parents?.mom,
+          litterKittens.find((k) => k.motherId)?.motherId,
+        );
+        const father = this.litterParent(
+          family.parents?.dad,
+          litterKittens.find((k) => k.fatherId)?.fatherId,
+        );
 
         return {
           key: family._id,
@@ -465,6 +501,24 @@ export class KittensComponent {
   }
 
   /**
+   * A litter's mother or father, from whichever of the three sources has it:
+   * the record the family embeds, that record looked up by id in the parents
+   * listing, or the id a kitten of the litter points at.
+   */
+  private litterParent(
+    member: FamilyMember<ParentApiItem> | null | undefined,
+    fallbackId: string | null | undefined,
+  ): LitterParentView | null {
+    const embedded = familyMemberRecord(member);
+    if (embedded) {
+      return toLitterParentView(embedded, this.i18n);
+    }
+
+    const id = familyMemberId(member) ?? fallbackId ?? null;
+    return id ? toLitterParentView(this.parentMap.get(id), this.i18n) : null;
+  }
+
+  /**
    * One load for both URLs this component serves. A breed page asks the breed
    * endpoints, which apply the same "only kittens that belong to a litter" rule
    * as the general catalogue, so the two listings cannot drift apart.
@@ -525,6 +579,7 @@ function toLitterParentView(
   if (!parent) return null;
   return {
     id: parent._id,
+    routeParam: catRouteParam(parent),
     name: parent.nameUa || parent.nameEn || '—',
     breed: taxonomyName(parent.breed, i18n),
     color: taxonomyName(parent.color, i18n),
@@ -535,6 +590,7 @@ function toLitterParentView(
 function toParentCard(parent: ParentApiItem, i18n: I18nService): ParentDisplayCard {
   return {
     id: parent._id,
+    routeParam: catRouteParam(parent),
     name: parent.nameUa || parent.nameEn || '—',
     breed: taxonomyName(parent.breed, i18n),
     color: taxonomyName(parent.color, i18n),

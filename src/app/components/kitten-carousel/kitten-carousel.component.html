@@ -37,7 +37,7 @@
         <li class="kitten-carousel__item">
           <a
             class="kitten-card"
-            [routerLink]="['/kittens', kitten.id] | locPath"
+            [routerLink]="['/kittens', kitten.routeParam] | locPath"
             [attr.aria-label]="kitten.name + ', ' + kitten.breed"
           >
             <div class="kitten-card__media">

@@ -125,6 +125,23 @@ export class AnalyticsService {
     this.noteInteraction('view_kitten');
   }
 
+  /**
+   * A visitor starting the kitten's video. Reported separately from
+   * `gallery_photo` because it is the strongest signal the page produces:
+   * someone who plays the video has gone past skimming the photos.
+   *
+   * `video_id` is here so a video that gets played and never converts can be
+   * told apart from one that is never started at all.
+   */
+  trackKittenVideo(video: { kittenId: string; kittenName: string; videoId: string }): void {
+    this.track('play_kitten_video', {
+      kitten_id: video.kittenId,
+      kitten_name: video.kittenName,
+      video_id: video.videoId,
+    });
+    this.noteInteraction('gallery_video');
+  }
+
   /** Records an in-page action, so `page_leave` can name what came last. */
   noteInteraction(name: string): void {
     this.lastInteraction = name;

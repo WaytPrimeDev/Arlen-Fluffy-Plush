@@ -73,7 +73,7 @@
   background: none;
   text-align: inherit;
   text-decoration: none;
-  cursor: zoom-in;
+  cursor: default;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
@@ -89,14 +89,63 @@
     visibility: visible;
   }
 
+  /* Only the slides the viewer collects invite a click. */
+  &--viewable {
+    cursor: zoom-in;
+  }
+
+  /* The video opens a player rather than magnifying a photo. */
+  &--video {
+    cursor: pointer;
+  }
+
   &:focus-visible {
     outline: 3px solid var(--brand-purple);
     outline-offset: -3px;
   }
 }
 
-.kitten-page__stage--static .kitten-page__slide {
-  cursor: default;
+/* The poster is a 480x360 letterboxed still of a 16:9 video, so the black bars
+   are cropped out rather than shown inside the stage. */
+.kitten-page__video-poster {
+  transform: scale(1.34);
+}
+
+/* Centred over the poster. `pointer-events: none` keeps the hit target a single
+   button: without it the glyph would swallow clicks aimed at the slide. */
+.kitten-page__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  /* Opaque, not translucent: a glyph tinted over an unknown video frame has no
+     contrast ratio anyone can promise. */
+  background: rgb(28 24 39 / 82%);
+  pointer-events: none;
+  transition: background-color 0.2s ease, scale 0.2s ease;
+
+  svg {
+    width: 38px;
+    height: 38px;
+    fill: #fff;
+  }
+}
+
+.kitten-page__slide--video:hover .kitten-page__play,
+.kitten-page__slide--video:focus-visible .kitten-page__play {
+  background: var(--brand-purple);
+  scale: 1.06;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kitten-page__play {
+    transition: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -112,6 +161,7 @@
 }
 
 .kitten-page__thumb {
+  position: relative;
   display: block;
   padding: 0;
   width: 72px;
@@ -140,6 +190,12 @@
   &--active {
     border-color: var(--brand-purple);
     box-shadow: 0 0 0 2px rgb(115 86 168 / 20%);
+  }
+
+  /* Same crop as the stage, so the thumbnail is of the video and not of the
+     black bars around it. */
+  &--video img {
+    transform: scale(1.34);
   }
 
   &:focus-visible {
@@ -585,5 +641,27 @@
 
   .kitten-page__parents-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Marks the video among the thumbnails. A corner badge rather than a tint,
+   because a difference carried by colour alone is not a difference for
+   everyone. */
+.kitten-page__thumb-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgb(28 24 39 / 82%);
+  pointer-events: none;
+
+  svg {
+    width: 13px;
+    height: 13px;
+    fill: #fff;
   }
 }

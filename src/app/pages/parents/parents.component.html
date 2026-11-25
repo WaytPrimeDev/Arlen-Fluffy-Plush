@@ -137,7 +137,7 @@
         <li role="listitem">
           <a
             class="parent-card"
-            [routerLink]="['/parents', parent.id] | locPath"
+            [routerLink]="['/parents', parent.routeParam] | locPath"
             [attr.aria-label]="i18n.t('moreAbout') + ' ' + parent.name"
           >
             <div class="parent-card__media">
