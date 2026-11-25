@@ -7,5 +7,5 @@
  * then follow the same host as the rendered pages.
  */
 export const API_BACKEND_ORIGIN = (
-  process.env['API_ORIGIN'] ?? 'https://arlenback-production.up.railway.app/'
+  process.env['API_ORIGIN'] ?? 'https://arlenback.onrender.com/'
 ).replace(/\/+$/, '');

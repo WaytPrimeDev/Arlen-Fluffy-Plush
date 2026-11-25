@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://arlenback-production.up.railway.app",
+    "target": "https://arlenback.onrender.com",
     "secure": true,
     "changeOrigin": true
   }
