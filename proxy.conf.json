@@ -1,7 +1,8 @@
 {
   "/api": {
     "target": "https://arlenback.onrender.com",
-    "secure": false,
+
+    "secure": true,
     "changeOrigin": true
   }
 }

@@ -9,16 +9,11 @@
  * That is a silent failure worth one noisy line in the build log, which is
  * what the warning below is for.
  */
-const configuredOrigin = process.env['API_ORIGIN'];
-
-if (!configuredOrigin && process.env['NODE_ENV'] === 'production') {
-  console.warn(
-    '[api-backend] API_ORIGIN is not set; /api requests will be proxied to ' +
-      'http://localhost:3000 and will fail. Set API_ORIGIN in the deployment environment.',
-  );
-}
-
-export const API_BACKEND_ORIGIN = (configuredOrigin ?? 'https://arlenback.onrender.com').replace(
-  /\/+$/,
-  '',
-);
+ * `API_ORIGIN` names it, and the public backend is the default: a deployment
+ * that never sets the variable still serves the whole catalogue. Set it to
+ * point the site at another backend — `http://localhost:3000` to develop
+ * against a local one, a staging host to try a release against that.
+ */
+export const API_BACKEND_ORIGIN = (
+  process.env['API_ORIGIN'] ?? 'https://arlenback.onrender.com'
+).replace(/\/+$/, '');
