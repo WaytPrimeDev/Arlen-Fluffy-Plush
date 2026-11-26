@@ -91,6 +91,18 @@
   font-size: 1.02rem;
 }
 
+/* The cattery's own paragraph about a breed, on the breed's permanent page.
+   Narrower measure and a smaller size than the subtitle above it: it is a
+   paragraph to read rather than a line to glance at. */
+.kittens-hero__intro {
+  margin: 1rem 0 0;
+  max-width: 68ch;
+  color: var(--text-muted);
+  line-height: 1.75;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
 .kittens-hero__stats {
   display: flex;
   flex-wrap: wrap;

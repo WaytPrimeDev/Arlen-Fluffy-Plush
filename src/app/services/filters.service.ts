@@ -21,9 +21,18 @@ export interface PaginatedResponse<T> {
 export interface ListParams {
   page?: number;
   perPage?: number;
-  /** The breed's `_id`. A name is rejected by the API with a 400. */
+  /**
+   * The breed's slug — the same key its own page is addressed by, so one breed
+   * is named one way everywhere. The API takes an `_id` here too, but a slug
+   * in a URL says which breed is being filtered for, and a filter that
+   * survives being copied out of the address bar is worth more than the few
+   * characters an id would save. A name is rejected with a 400.
+   */
   breed?: string;
-  /** The colour's `_id`, likewise. */
+  /**
+   * The colour's `_id`. Colours have no slug — the dictionary carries nothing
+   * but names — so this one stays an id.
+   */
   color?: string;
 }
 

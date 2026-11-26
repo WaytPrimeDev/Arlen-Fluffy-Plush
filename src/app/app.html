@@ -9,10 +9,13 @@
       (click)="closeMobileMenu()"
     >
       <span class="app-header__brand-icon" aria-hidden="true">
+        <!-- The image has a class of its own: carrying the wrapper's class as
+             well applied the 60px tile, its gradient and its grid twice, once
+             to the box and once to the picture inside it. -->
         <img
           draggable="false"
           decoding="async"
-          class="app-header__brand-icon"
+          class="app-header__brand-logo"
           src="assets/img/navigation/photo_logo.svg"
           alt=""
         />
@@ -124,3 +127,5 @@
 </main>
 
 <app-footer></app-footer>
+
+<app-cookie-banner></app-cookie-banner>

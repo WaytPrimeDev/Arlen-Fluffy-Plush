@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { SITE } from './app/services/site-config';
 import { LANGUAGES, LANGUAGE_COOKIE, type Language } from './app/services/i18n.service';
 import { API_PATH } from './app/services/api';
+import { CANONICAL_BREED_SLUGS } from './app/services/canonical-breeds';
 import { API_BACKEND_ORIGIN } from './api-backend';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
@@ -22,6 +23,21 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const SITE_ORIGIN = (process.env['SITE_ORIGIN'] || SITE.canonicalOrigin).replace(/\/+$/, '');
 
 const canonicalHost = URL.canParse(SITE_ORIGIN) ? new URL(SITE_ORIGIN).host : '';
+
+/**
+ * The host that serves the same site but is not the canonical one, so it can
+ * be collapsed onto the canonical host instead of competing with it.
+ *
+ * `www` and the apex are one pair, and either one of them can be the canonical
+ * half: this site is canonically served from `www.koshenya.com`, so the host to
+ * redirect is the apex. Deriving it from `canonicalHost` is what keeps the two
+ * in step — an earlier revision hard-coded the `www.` prefix and so looked for
+ * `www.www.koshenya.com`, a host that does not exist, which left the redirect
+ * dead and both hosts indexable.
+ */
+const redirectedHost = canonicalHost.startsWith('www.')
+  ? canonicalHost.slice('www.'.length)
+  : canonicalHost && `www.${canonicalHost}`;
 
 const API_BASE = `${API_BACKEND_ORIGIN}${API_PATH}`;
 
@@ -178,17 +194,31 @@ function urlEntries(origin: string, path: string, priority: string): string[] {
 }
 
 async function buildSitemap(origin: string): Promise<string> {
-  const [kittens, parents, breeds] = await Promise.all([
+  const [kittens, parents, servedBreeds] = await Promise.all([
     routeParamsFrom('cats/kittens'),
     routeParamsFrom('cats/parents'),
     breedSlugs(),
   ]);
+
+  /**
+   * The breeds the cattery always has a page for, plus whatever the backend is
+   * serving today. The permanent ones come first and the set de-duplicates, so
+   * a breed the backend serves under one of these slugs is submitted once.
+   *
+   * Listing the permanent slugs unconditionally is the point: a breed page that
+   * appears in the sitemap only while a kitten of that breed is in stock is a
+   * URL Google indexes, then finds gone, then drops — and the next litter
+   * starts from nothing.
+   */
+  const breeds = [...new Set([...CANONICAL_BREED_SLUGS, ...servedBreeds])];
 
   const entries = [
     ...STATIC_PATHS.flatMap((path) => urlEntries(origin, path, path === '/' ? '1.0' : '0.8')),
     // A breed page ranks above a single kitten: it outlives the kitten it
     // lists, and "<breed> kittens" is what the search actually says.
     ...breeds.flatMap((slug) => urlEntries(origin, `/breeds/${slug}`, '0.75')),
+    // Reachable and indexable, but it should never outrank a kitten.
+    ...urlEntries(origin, '/cookies', '0.2'),
     ...kittens.flatMap((param) => urlEntries(origin, `/kittens/${param}`, '0.7')),
     ...parents.flatMap((param) => urlEntries(origin, `/parents/${param}`, '0.6')),
   ];
@@ -220,10 +250,12 @@ const angularApp = new AngularNodeAppEngine({
 });
 
 /**
- * The app asks its own origin for data, so `/api` has to lead somewhere. On
- * Vercel the `rewrites` entry answers these URLs at the edge and this handler
- * never runs; it is what makes the same paths work under `npm run
- * serve:ssr:Arlen-Fluffy-Plush` and on any other host.
+ * The app asks its own origin for data, so `/api` has to lead somewhere, and
+ * this handler is what it leads to — everywhere, production included. The only
+ * `rewrites` rule in `vercel.json` is the catch-all that sends every path to
+ * the SSR function, which means `/api` arrives here rather than being answered
+ * at the edge. `API_ORIGIN` therefore has to be set in the deployment
+ * environment; see `api-backend.ts`.
  *
  * Only GET and HEAD are forwarded: the site reads the catalogue and nothing
  * else, so an open proxy for writes would be a liability rather than a feature.
@@ -275,15 +307,16 @@ app.use(`${API_PATH}/{*splat}`, (req, res) => {
 });
 
 /**
- * Collapse `www.` onto the canonical host so the two never compete in the
- * index. Other hosts are left alone: preview deployments stay reachable and
- * are kept out of the index by a `noindex` tag instead.
+ * Collapse the other half of the `www`/apex pair onto the canonical host so the
+ * two never compete in the index. Other hosts are left alone: preview
+ * deployments stay reachable and are kept out of the index by a `noindex` tag
+ * instead.
  */
 app.use((req, res, next) => {
   const host =
     firstHeaderValue(req.headers['x-forwarded-host']) || firstHeaderValue(req.headers.host);
 
-  if (host && host === `www.${canonicalHost}`) {
+  if (host && redirectedHost && host === redirectedHost) {
     res.redirect(301, `${SITE_ORIGIN}${req.originalUrl}`);
     return;
   }

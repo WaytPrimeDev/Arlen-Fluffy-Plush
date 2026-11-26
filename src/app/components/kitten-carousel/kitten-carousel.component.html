@@ -35,24 +35,28 @@
     <ul #track class="kitten-carousel__track" (scroll)="updateScrollState()">
       @for (kitten of kittens(); track kitten.id) {
         <li class="kitten-carousel__item">
-          <a
-            class="kitten-card"
-            [routerLink]="['/kittens', kitten.routeParam] | locPath"
-            [attr.aria-label]="kitten.name + ', ' + kitten.breed"
-          >
+          <article class="kitten-card">
             <div class="kitten-card__media">
-              <img
-                draggable="false"
-                decoding="async"
-                appImageFallback
-                [src]="kitten.image"
+              <app-card-gallery
+                [images]="kitten.images"
                 [alt]="kitten.name"
-                loading="lazy"
+                [link]="['/kittens', kitten.routeParam] | locPath"
+                [swipe]="false"
               />
-              <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+              <div class="kitten-card__media-badges">
+                <app-status-pill [status]="kitten.status" variant="overlay" />
+                <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+              </div>
             </div>
             <div class="kitten-card__body">
-              <h3 class="kitten-card__name">{{ kitten.name }}</h3>
+              <h3 class="kitten-card__name">
+                <a
+                  class="kitten-card__link"
+                  [routerLink]="['/kittens', kitten.routeParam] | locPath"
+                  [attr.aria-label]="cardLabel(kitten)"
+                  >{{ kitten.name }}</a
+                >
+              </h3>
 
               <div class="kitten-card__meta-row">
                 <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
@@ -88,7 +92,7 @@
                 }
               </div>
             </div>
-          </a>
+          </article>
         </li>
       }
     </ul>

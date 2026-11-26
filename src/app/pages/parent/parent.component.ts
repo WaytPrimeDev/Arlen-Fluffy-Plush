@@ -223,6 +223,18 @@ export class ParentComponent {
       : p.nameEn || p.nameUa || '—';
   });
 
+  /**
+   * The breed and colour as words.
+   *
+   * They are read through `taxonomyName` rather than straight off the record
+   * because the API sends a dictionary reference — `{ _id, nameUa, nameEn }` —
+   * where it used to send a bare name. Interpolating that object printed
+   * "[object Object]" on the page. The helper also picks the language and
+   * survives the older string shape, so both deployments read the same.
+   */
+  protected readonly breedName = computed(() => taxonomyName(this.parent()?.breed, this.i18n, '—'));
+  protected readonly colorName = computed(() => taxonomyName(this.parent()?.color, this.i18n, '—'));
+
   protected readonly sexLabel = computed(() => {
     const sex = this.parent()?.sex;
     if (sex === 'female') return this.i18n.t('queen');

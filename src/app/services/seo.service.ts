@@ -1,4 +1,4 @@
-import { DOCUMENT, Injectable, REQUEST, inject } from '@angular/core';
+import { DOCUMENT, Injectable, REQUEST, RESPONSE_INIT, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { I18nService, LANGUAGES, localizedPath, type Language } from './i18n.service';
 import { DELIVERY_COUNTRIES, SEO_LOCALES, SITE } from './site-config';
@@ -27,6 +27,12 @@ interface SeoInput {
   breadcrumbs?: SeoBreadcrumb[];
   /** False for a URL that should stay out of the index, such as a 404. */
   indexable?: boolean;
+  /**
+   * Overrides the site-wide keyword list for a page the general terms do not
+   * describe. A legal page is not a shopping page, and advertising it with
+   * "buy a kitten" is the kind of mismatch Bing and Yandex read as spam.
+   */
+  keywords?: readonly string[];
   /** Structured data describing the subject of a detail page. */
   about?: { name: string; description: string; image: string | null };
   /**
@@ -40,6 +46,9 @@ interface SeoInput {
 const AVAILABILITY: Record<KittenStatus, string> = {
   available: 'https://schema.org/InStock',
   reserved: 'https://schema.org/PreOrder',
+  sold: 'https://schema.org/SoldOut',
+  // Not a kitten on offer at all, so the offer is marked closed rather than
+  // open: better to under-claim than to advertise one that is not for sale.
   offline: 'https://schema.org/SoldOut',
 };
 
@@ -115,6 +124,13 @@ export class SeoService {
   private readonly meta = inject(Meta);
   private readonly i18n = inject(I18nService);
   private readonly request = inject(REQUEST, { optional: true });
+  /**
+   * The object `@angular/ssr` builds the HTTP response from. It is read after
+   * rendering has finished, so a page that turns out to name nothing can still
+   * change the status code the visitor and the crawler receive. Absent in the
+   * browser, where a client-side navigation has no status to set.
+   */
+  private readonly responseInit = inject(RESPONSE_INIT, { optional: true });
 
   /** Applies the copy of a static page. */
   applyPage(key: SeoPageKey, path: string): void {
@@ -125,6 +141,7 @@ export class SeoService {
       title: copy.title,
       description: copy.description,
       type: 'website',
+      keywords: copy.keywords,
       breadcrumbs: key === 'home' ? [] : [{ label: copy.breadcrumb, path }],
     });
   }
@@ -213,9 +230,23 @@ export class SeoService {
     });
   }
 
-  /** Metadata for a URL that does not name a page. */
+  /**
+   * Metadata for a URL that does not name a page, and the 404 that goes with
+   * it.
+   *
+   * `noindex` on its own is not enough. A URL that names nothing and still
+   * answers 200 is a soft 404: Google reports it as an error, keeps the URL in
+   * its records and re-crawls it instead of dropping it. The status has to say
+   * what the page says, so it is set here rather than left to the route table
+   * — these URLs match a real route (`/kittens/:id`, `/breeds/:slug`) and only
+   * turn out to be nothing once the API has answered.
+   */
   applyNotFound(path: string): void {
     const language = this.i18n.getLanguage();
+
+    if (this.responseInit) {
+      this.responseInit.status = 404;
+    }
 
     this.apply(path, {
       title: this.i18n.t('notFoundTitle'),
@@ -238,7 +269,7 @@ export class SeoService {
     this.title.setTitle(fullTitle);
 
     this.setMetaByName('description', input.description);
-    this.setMetaByName('keywords', KEYWORDS[language].join(', '));
+    this.setMetaByName('keywords', (input.keywords ?? KEYWORDS[language]).join(', '));
     this.setMetaByName('robots', this.robotsDirective(input.indexable !== false));
 
     this.setMetaByProperty('og:type', input.type ?? 'website');

@@ -1,0 +1,185 @@
+/* The gallery fills whatever media box the card gives it. */
+.card-gallery {
+  position: absolute;
+  inset: 0;
+}
+
+/* The scroll container itself: one slide wide, snapping to each photo. The
+   swipe on a phone or a tablet is the browser's own scrolling of this box, so
+   there is no gesture handler to go wrong. */
+.card-gallery__track {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  /* Keeps a swipe that runs past the last photo from turning into the
+     browser's back gesture. */
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.card-gallery__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Nothing to flip through: no scrolling, no snap points, no controls. Same for
+   a gallery that has handed the swipe over to the strip around it — the arrows
+   still scroll the box, they just do it programmatically. */
+.card-gallery--single .card-gallery__track,
+.card-gallery--no-swipe .card-gallery__track {
+  overflow: hidden;
+}
+
+.card-gallery__slide {
+  display: block;
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.card-gallery__slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The card's hover zoom is dropped inside the gallery: a scaled slide shows
+     its neighbour's edge while the track is mid-swipe. */
+  transform: none;
+}
+
+/* ─── Arrows: the mouse half of the control ──────────────────────────────── */
+
+.card-gallery__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  opacity: 0.55;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid rgb(28 24 39 / 10%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--text-primary);
+  box-shadow: 0 2px 10px rgb(28 24 39 / 18%);
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card-gallery__arrow--prev {
+  left: 0.55rem;
+}
+
+.card-gallery__arrow--next {
+  right: 0.55rem;
+}
+
+.card-gallery:hover .card-gallery__arrow,
+.card-gallery:focus-within .card-gallery__arrow {
+  opacity: 1;
+}
+
+/* Where the photos are swiped, the arrows are the mouse half of the control
+   and nothing else: on a touch screen they would only cover the photo. Where
+   the swipe belongs to the strip around the card, they are the only way to
+   flip a photo, so they stay — and at full strength, as there is no hover to
+   bring them out. */
+@media (hover: none), (pointer: coarse) {
+  .card-gallery--swipe .card-gallery__arrow {
+    display: none;
+  }
+
+  .card-gallery__arrow {
+    opacity: 1;
+  }
+}
+
+.card-gallery__arrow:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.card-gallery__arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.card-gallery__arrow:focus-visible {
+  outline: 3px solid var(--brand-purple);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* ─── Dots: which photo of how many, on every device ─────────────────────── */
+
+.card-gallery__dots {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0 0.15rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  /* A pill behind the dots, so they keep their contrast over a pale photo. */
+  background: rgb(28 24 39 / 45%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.card-gallery__dot {
+  display: grid;
+  place-items: center;
+  /* Kept at the 24px minimum target size even though the dot itself is small. */
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+}
+
+.card-gallery__dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 70%);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card-gallery__dot--active::before {
+  background: #fff;
+  transform: scale(1.3);
+}
+
+.card-gallery__dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-gallery__arrow,
+  .card-gallery__dot::before {
+    transition: none;
+  }
+
+  .card-gallery__arrow:hover:not(:disabled) {
+    transform: translateY(-50%);
+  }
+}

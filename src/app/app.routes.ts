@@ -56,6 +56,12 @@ const localizedRoutes: Routes = [
       import('./pages/contacts/contacts.component').then((m) => m.ContactsComponent),
   },
   {
+    path: 'cookies',
+    data: { seo: 'cookies' },
+    loadComponent: () =>
+      import('./pages/cookies/cookies.component').then((m) => m.CookiesComponent),
+  },
+  {
     // Must stay inside the language subtree. Without it an unknown path such as
     // /uk/typo falls through to the top-level catch-all, which would redirect
     // it to /uk/typo again — a redirect loop that hangs the renderer.

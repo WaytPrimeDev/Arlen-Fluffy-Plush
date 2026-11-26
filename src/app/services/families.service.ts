@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, concatMap, first, forkJoin, from, map, of, switchMap } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import type { ListParams, PaginatedResponse } from './filters.service';
 import { buildListParams } from './http-params.util';
 import { API_PATH } from './api';
@@ -56,6 +57,27 @@ export function familyMemberRecord<T extends { _id: string }>(
   return member && typeof member !== 'string' ? member : null;
 }
 
+/** What one request asks for: a cattery's litters fit in a single page. */
+const WHOLE_LIST_PER_PAGE = 1000;
+
+/**
+ * How far the crawl below looks for a readable page before giving up on
+ * learning how many litters there are. The first page that answers carries
+ * `pagination.totalItems`, so this only has to outlast a run of unreadable
+ * records at the head of the listing.
+ */
+const PROBE_PAGES = [1, 2, 3, 4, 5, 6, 7, 8];
+
+/**
+ * Ceiling on the one-record-per-request crawl. It is the slow path for a
+ * backend that cannot serve the listing whole, not a way to page through a
+ * catalogue of any size, so it stops rather than firing hundreds of requests.
+ */
+const CRAWL_LIMIT = 120;
+
+/** A request for one record, used by both the probe and the crawl. */
+type SingleRecordParams = Omit<ListParams, 'page' | 'perPage'>;
+
 /**
  * Lives here rather than under a page, because the families page is gone and
  * the only reader left is the litter grouping on the kittens page.
@@ -71,5 +93,61 @@ export class FamiliesService {
     return this.http.get<PaginatedResponse<FamilyApiItem>>(`${this.apiUrl}/families`, {
       params: buildListParams(params),
     });
+  }
+
+  /**
+   * Every litter, as complete as the backend can make it.
+   *
+   * `/families` joins each litter's parents in, so a single parent record
+   * whose breed or colour was saved as text instead of as a dictionary
+   * reference fails the request — and with it every litter on the page, not
+   * just the one that cannot be read. That is what emptied the whole grouping
+   * and left the page apologising for a catalogue it had actually loaded.
+   *
+   * So the listing is asked for whole first, which is the normal path and one
+   * request; only when that fails is it read one record per request, and an
+   * unreadable litter then costs its own card instead of all of them.
+   */
+  getAllFamilies(params: SingleRecordParams = {}): Observable<FamilyApiItem[]> {
+    return this.getFamilies({ ...params, page: 1, perPage: WHOLE_LIST_PER_PAGE }).pipe(
+      map((response) => response.data ?? []),
+      catchError(() => this.crawlFamilies(params)),
+    );
+  }
+
+  /** The listing read one record at a time, skipping the records that fail. */
+  private crawlFamilies(params: SingleRecordParams): Observable<FamilyApiItem[]> {
+    return this.countFamilies(params).pipe(
+      switchMap((total) => {
+        const pages = Math.min(total, CRAWL_LIMIT);
+        if (pages <= 0) {
+          return of<FamilyApiItem[]>([]);
+        }
+
+        return forkJoin(
+          Array.from({ length: pages }, (_, index) =>
+            this.getFamilies({ ...params, page: index + 1, perPage: 1 }).pipe(
+              map((response) => response.data ?? []),
+              catchError(() => of<FamilyApiItem[]>([])),
+            ),
+          ),
+        ).pipe(map((records) => records.flat()));
+      }),
+    );
+  }
+
+  /** How many litters there are, read off the first page that answers. */
+  private countFamilies(params: SingleRecordParams): Observable<number> {
+    return from(PROBE_PAGES).pipe(
+      concatMap((page) =>
+        this.getFamilies({ ...params, page, perPage: 1 }).pipe(
+          map((response) => response.pagination.totalItems),
+          // -1 rather than 0, so a page that failed is told apart from a
+          // catalogue that genuinely has no litters and stops the probe.
+          catchError(() => of(-1)),
+        ),
+      ),
+      first((total) => total >= 0, 0),
+    );
   }
 }

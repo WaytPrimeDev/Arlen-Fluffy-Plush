@@ -120,6 +120,33 @@ select {
   outline-offset: 3px;
 }
 
+/* A card whose photo is a small gallery cannot be one big `<a>`: the gallery's
+   arrows and dots are buttons, and a button may not sit inside a link. The
+   name carries the link instead, stretched over the card so the whole card
+   stays clickable, and the gallery's controls sit above that overlay. */
+.kitten-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kitten-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.kitten-card:has(.kitten-card__link:focus-visible) {
+  outline: 3px solid var(--brand-purple);
+  outline-offset: 3px;
+}
+
+/* Lifts the photo above that overlay, so a swipe reaches the gallery's scroll
+   container and a click on a photo reaches the photo's own link. */
+.kitten-card:has(.card-gallery) .kitten-card__media {
+  z-index: 2;
+}
+
 .kitten-card__media {
   position: relative;
   aspect-ratio: 4 / 5;
@@ -138,6 +165,12 @@ select {
   transform: scale(1.06);
 }
 
+/* No hover zoom inside the gallery: a scaled slide shows the edge of its
+   neighbour while the track is mid-swipe. */
+.kitten-card:hover .kitten-card__media .card-gallery__slide img {
+  transform: none;
+}
+
 /* Keeps the badges legible over a light photo. */
 .kitten-card__media::after {
   content: '';
@@ -146,6 +179,25 @@ select {
   height: 38%;
   background: linear-gradient(to bottom, rgb(28 24 39 / 22%), transparent);
   pointer-events: none;
+}
+
+/* The badges laid over the photo, as one row in the corner. The age badge
+   places itself when it is used alone, as it still is on the parent page, so
+   inside this row it hands that over to the row. */
+.kitten-card__media-badges {
+  position: absolute;
+  inset: 0.8rem 0.8rem auto;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  pointer-events: none;
+}
+
+.kitten-card__media-badges .kitten-card__age-badge {
+  position: static;
 }
 
 .kitten-card__age-badge {

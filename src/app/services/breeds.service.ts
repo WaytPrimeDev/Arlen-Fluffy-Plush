@@ -7,7 +7,6 @@ import { toRef, type BreedRef } from './taxonomy';
 import type { ListParams, Pagination, PaginatedResponse } from './filters.service';
 import type { KittenApiItem } from '../pages/kittens/kittens.service';
 import type { ParentApiItem } from '../pages/parents/parents.service';
-import type { FamilyApiItem } from './families.service';
 
 interface BreedsApiResponse {
   status?: number;
@@ -65,16 +64,6 @@ export class BreedsService {
   ): Observable<PaginatedResponse<ParentApiItem>> {
     return this.http.get<PaginatedResponse<ParentApiItem>>(
       `${this.apiUrl}/breeds/${encodeURIComponent(slug)}/parents`,
-      { params: buildListParams(params) },
-    );
-  }
-
-  getBreedFamilies(
-    slug: string,
-    params: Pick<ListParams, 'page' | 'perPage'> = {},
-  ): Observable<PaginatedResponse<FamilyApiItem>> {
-    return this.http.get<PaginatedResponse<FamilyApiItem>>(
-      `${this.apiUrl}/breeds/${encodeURIComponent(slug)}/families`,
       { params: buildListParams(params) },
     );
   }

@@ -84,7 +84,7 @@
                       ': ' +
                       i18n.t('viewerCounter', {
                         current: slide.viewerIndex,
-                        total: viewerCount()
+                        total: viewerCount(),
                       })
                     "
                   >
@@ -204,6 +204,7 @@
           <header class="kitten-page__title-row">
             <h1>{{ name() }}</h1>
             <div class="kitten-page__title-badges">
+              <app-status-pill [status]="status()" />
               @if (ageLabel()) {
                 <span class="kitten-page__badge-pill kitten-page__badge-pill--age">{{
                   ageLabel()
@@ -247,7 +248,7 @@
               </svg>
               <div>
                 <p class="kitten-page__spec-label">{{ i18n.t('breed') }}</p>
-                <p class="kitten-page__spec-value">{{ kitten()!.breed || '—' }}</p>
+                <p class="kitten-page__spec-value">{{ breedName() }}</p>
               </div>
             </div>
             <div class="kitten-page__spec-row">
@@ -274,7 +275,7 @@
               </svg>
               <div>
                 <p class="kitten-page__spec-label">{{ i18n.t('colorAndPattern') }}</p>
-                <p class="kitten-page__spec-value">{{ kitten()!.color || '—' }}</p>
+                <p class="kitten-page__spec-value">{{ colorName() }}</p>
               </div>
             </div>
             <div class="kitten-page__spec-row">
@@ -424,8 +425,8 @@
                       loading="lazy"
                     />
                     <p class="kitten-page__parent-name">{{ parentName(mom) }}</p>
-                    @if (mom.breed) {
-                      <p class="kitten-page__parent-breed">{{ mom.breed }}</p>
+                    @if (parentBreed(mom); as breed) {
+                      <p class="kitten-page__parent-breed">{{ breed }}</p>
                     }
                   </a>
                 }
@@ -444,8 +445,8 @@
                       loading="lazy"
                     />
                     <p class="kitten-page__parent-name">{{ parentName(dad) }}</p>
-                    @if (dad.breed) {
-                      <p class="kitten-page__parent-breed">{{ dad.breed }}</p>
+                    @if (parentBreed(dad); as breed) {
+                      <p class="kitten-page__parent-breed">{{ breed }}</p>
                     }
                   </a>
                 }

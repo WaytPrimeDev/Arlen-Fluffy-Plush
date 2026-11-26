@@ -1,8 +1,9 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, effect, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { I18nService, stripLanguagePrefix } from './i18n.service';
+import { CookieConsentService } from './cookie-consent.service';
 
 /** Values GA4 accepts as event parameters. */
 export type AnalyticsParams = Record<string, string | number | boolean>;
@@ -30,6 +31,7 @@ export class AnalyticsService {
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly i18n = inject(I18nService);
+  private readonly consent = inject(CookieConsentService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   /** Set once `init()` has run, so a second call cannot double-bind listeners. */
@@ -47,6 +49,20 @@ export class AnalyticsService {
   /** Guards against `pagehide` and `visibilitychange` both closing a page. */
   private leaveReported = false;
   private scrollFrame = 0;
+
+  constructor() {
+    // Consent given mid-visit arrives after the page was opened, and the page
+    // view was dropped at the time. It is counted now, so the visit does not
+    // start with a session that has no landing page.
+    effect(() => {
+      if (!this.consent.analyticsAllowed() || !this.started) {
+        return;
+      }
+
+      this.currentPath = '';
+      this.openPage();
+    });
+  }
 
   /** Called once from the root component. */
   init(): void {
@@ -82,9 +98,16 @@ export class AnalyticsService {
     this.document.addEventListener('click', this.onDocumentClick, { capture: true });
   }
 
-  /** Sends one event, named and parameterised the way GA4 will show it. */
+  /**
+   * Sends one event, named and parameterised the way GA4 will show it.
+   *
+   * Dropped outright while analytics consent is missing. The tag manager is
+   * not loaded then either, so a push would only pile up in `dataLayer` — and
+   * would be replayed in full the moment the container did arrive, which is
+   * the one thing a refusal has to prevent.
+   */
   track(event: string, params: AnalyticsParams = {}): void {
-    if (!this.isBrowser) {
+    if (!this.isBrowser || !this.consent.analyticsAllowed()) {
       return;
     }
 

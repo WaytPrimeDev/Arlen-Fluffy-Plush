@@ -102,6 +102,23 @@
   }
 }
 
+/* Legal links sit in the bottom bar rather than in the quick links: they are
+   there to be found when looked for, not to compete with the catalogue. */
+.app-footer__legal a {
+  color: #cbd5e1;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  transition: color 0.2s ease;
+
+  &:hover { color: #c4b5fd; }
+
+  &:focus-visible {
+    outline: 3px solid #c4b5fd;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
 .app-footer__made {
   display: inline-flex;
   align-items: center;

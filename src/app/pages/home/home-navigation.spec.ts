@@ -19,8 +19,13 @@ describe('home page navigation', () => {
   let http: HttpTestingController;
 
   const host = () => fixture.nativeElement as HTMLElement;
+  /**
+   * A card's link is the name inside it rather than the card element: the
+   * photo is a small gallery, whose arrows and dots are buttons and so cannot
+   * sit inside a link.
+   */
   const kittenCards = () =>
-    Array.from(host().querySelectorAll('a.kitten-card')) as HTMLAnchorElement[];
+    Array.from(host().querySelectorAll('a.kitten-card__link')) as HTMLAnchorElement[];
   const buttons = () =>
     Array.from(host().querySelectorAll('.landing a.button')) as HTMLAnchorElement[];
 

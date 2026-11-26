@@ -1,0 +1,106 @@
+<div
+  class="card-gallery"
+  [class.card-gallery--single]="!hasMany()"
+  [class.card-gallery--swipe]="swipe()"
+  [class.card-gallery--no-swipe]="!swipe()"
+>
+  <div
+    #track
+    class="card-gallery__track"
+    [attr.aria-roledescription]="hasMany() ? i18n.t('photoGallery') : null"
+    (scroll)="onScroll()"
+  >
+    @for (image of images(); track image + $index; let first = $first) {
+      @if (link(); as target) {
+        <a
+          class="card-gallery__slide"
+          [routerLink]="target"
+          tabindex="-1"
+          aria-hidden="true"
+          draggable="false"
+        >
+          <img
+            draggable="false"
+            decoding="async"
+            [appImageFallback]="placeholder()"
+            [src]="image"
+            alt=""
+            [attr.loading]="first ? loading() : 'lazy'"
+          />
+        </a>
+      } @else {
+        <div class="card-gallery__slide">
+          <img
+            draggable="false"
+            decoding="async"
+            [appImageFallback]="placeholder()"
+            [src]="image"
+            [alt]="first ? alt() : ''"
+            [attr.loading]="first ? loading() : 'lazy'"
+          />
+        </div>
+      }
+    }
+  </div>
+
+  @if (hasMany()) {
+    <button
+      type="button"
+      class="card-gallery__arrow card-gallery__arrow--prev"
+      [attr.aria-label]="i18n.t('previousPhoto')"
+      [disabled]="!canPrev()"
+      (click)="prev($event)"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      class="card-gallery__arrow card-gallery__arrow--next"
+      [attr.aria-label]="i18n.t('nextPhoto')"
+      [disabled]="!canNext()"
+      (click)="next($event)"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M9 18l6-6-6-6" />
+      </svg>
+    </button>
+
+    <div class="card-gallery__dots">
+      @for (image of images(); track image + $index; let i = $index) {
+        <button
+          type="button"
+          class="card-gallery__dot"
+          [class.card-gallery__dot--active]="i === index()"
+          [attr.aria-label]="i18n.t('photoNumber') + ' ' + (i + 1)"
+          [attr.aria-current]="i === index() ? 'true' : null"
+          (click)="goTo($event, i)"
+        ></button>
+      }
+    </div>
+  }
+</div>

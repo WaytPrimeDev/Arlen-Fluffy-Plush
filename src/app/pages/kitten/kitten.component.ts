@@ -25,6 +25,7 @@ import { SeoService } from '../../services/seo.service';
 import { AnalyticsService } from '../../services/analytics.service';
 import { LocalizedPathPipe } from '../../pipes/localized-path.pipe';
 import { ImageFallbackDirective } from '../../components/image-fallback/image-fallback.directive';
+import { StatusPillComponent } from '../../components/status-pill/status-pill.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { STAGE_WIDTH, VIEWER_WIDTH, scaledImage } from '../../services/image-url.util';
 import { kittenVideo } from '../../services/video-url.util';
@@ -97,7 +98,13 @@ interface LoadState {
 
 @Component({
   selector: 'app-kitten',
-  imports: [RouterLink, PhotoViewerDirective, LocalizedPathPipe, ImageFallbackDirective],
+  imports: [
+    RouterLink,
+    PhotoViewerDirective,
+    LocalizedPathPipe,
+    ImageFallbackDirective,
+    StatusPillComponent,
+  ],
   templateUrl: './kitten.component.html',
   styleUrl: './kitten.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -225,9 +232,24 @@ export class KittenComponent {
 
   protected readonly ageLabel = computed(() => formatAgeShort(this.kitten()?.birthDay, this.i18n));
 
+  /**
+   * The same state the catalogue cards show, through the same mapper, so a
+   * kitten cannot read as reserved on one page and available on the other.
+   */
+  protected readonly status = computed(() => mapStatus(this.kitten()?.status));
+
   /** Shown with a currency sign, since the admin side stores bare numbers too. */
   protected readonly petPrice = computed(() => withCurrency(this.kitten()?.price?.pet));
   protected readonly breedingPrice = computed(() => withCurrency(this.kitten()?.price?.breeding));
+
+  /**
+   * Breed and colour arrive as dictionary references, so the name has to be
+   * read out of them in the active language: interpolating the reference
+   * itself would print the object. `taxonomyName` reads the language signal,
+   * which is what re-translates the spec rows on a language switch.
+   */
+  protected readonly breedName = computed(() => taxonomyName(this.kitten()?.breed, this.i18n, '—'));
+  protected readonly colorName = computed(() => taxonomyName(this.kitten()?.color, this.i18n, '—'));
 
   private readonly sortedImages = computed(() => {
     const kitten = this.kitten();
@@ -425,7 +447,16 @@ export class KittenComponent {
   }
 
   protected parentName(parent: ParentApiItem): string {
-    return parent.nameUa || parent.nameEn || '—';
+    // Same rule as `name` above and as ParentComponent: the active language
+    // first, the other one only as a fallback.
+    return this.i18n.getLanguage() === 'uk'
+      ? parent.nameUa || parent.nameEn || '—'
+      : parent.nameEn || parent.nameUa || '—';
+  }
+
+  /** The breed line on a parent card; empty for a parent without a breed. */
+  protected parentBreed(parent: ParentApiItem): string {
+    return taxonomyName(parent.breed, this.i18n);
   }
 
   /** The parent's own page address: its slug when it has one. */

@@ -1,6 +1,6 @@
 import type { Language } from './i18n.service';
 
-export type SeoPageKey = 'home' | 'kittens' | 'parents' | 'about' | 'contacts';
+export type SeoPageKey = 'home' | 'kittens' | 'parents' | 'about' | 'contacts' | 'cookies';
 
 export interface SeoPageCopy {
   /** Goes into <title>; the site name is appended by the service. */
@@ -9,6 +9,13 @@ export interface SeoPageCopy {
   description: string;
   /** Breadcrumb label for this page. */
   breadcrumb: string;
+  /**
+   * Keywords for this page alone, where the site-wide list would describe it
+   * wrongly. Only the legal pages need one: `KEYWORDS` is a shopping list, and
+   * a cookie policy advertised with "buy a kitten" is a mismatch Bing and
+   * Yandex treat as spam rather than as a signal.
+   */
+  keywords?: readonly string[];
 }
 
 /**
@@ -16,9 +23,14 @@ export interface SeoPageCopy {
  * does (WCF documents since 2016, the first cat in 2010, Ragdoll since 2021,
  * home-raised, vaccination, chipping, lifetime support, Ternopil, delivery to
  * any country, the Telegram and phone contacts) so the snippet never promises
- * more than the page delivers. The breed count is written as "dozens" rather
- * than a number: the catalogue changes constantly, and a number in a snippet
- * goes stale the week after it is written.
+ * more than the page delivers.
+ *
+ * The breeds are named rather than counted. The About page says the cattery
+ * works with "several breeds", Ragdoll chief among them, and the catalogue
+ * currently holds a handful — so "dozens of breeds", which an earlier revision
+ * of this copy promised, was an overclaim that the pages themselves did not
+ * back up. Ragdoll, British and Scottish are what the cattery actually breeds,
+ * and they are also what people search for, so they are what the snippets say.
  *
  * The names a searcher might type — "Arlen Fluffy Plush", "Arlen Plush",
  * koshenya.com and their Cyrillic spellings — are all names of this cattery
@@ -29,15 +41,15 @@ export interface SeoPageCopy {
 const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
   uk: {
     home: {
-      title: 'Кошенята — розплідник Arlen Fluffy Plush, доставка по світу',
+      title: 'Кошенята регдол, британські та шотландські — розплідник Arlen Fluffy Plush',
       description:
-        'Купити кошеня з документами WCF у розпліднику Arlen Fluffy Plush: регдол та десятки інших порід. Доставка кошенят по Україні, у Німеччину, ЄС, США — по всьому світу.',
+        'Купити кошеня з документами WCF у розпліднику Arlen Fluffy Plush: регдол, британські та шотландські кошенята. Доставка по Україні, у Німеччину, ЄС, США — по всьому світу.',
       breadcrumb: 'Головна',
     },
     kittens: {
       title: 'Кошенята у продажу — ціна, фото, доставка',
       description:
-        'Кошенята у продажу від розплідника Arlen Fluffy Plush: фото, вік, стать, окрас і ціна. Регдол, британські, шотландські та інші породи. Доставка у Німеччину, ЄС, США.',
+        'Кошенята у продажу від розплідника Arlen Fluffy Plush: фото, вік, стать, окрас і ціна. Регдол, британські та шотландські кошенята. Доставка у Німеччину, ЄС, США.',
       breadcrumb: 'Кошенята',
     },
     parents: {
@@ -49,7 +61,7 @@ const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
     about: {
       title: 'Про розплідник Arlen Fluffy Plush',
       description:
-        'Історія розплідника Arlen Fluffy Plush: перша кішка у 2010, WCF із 2016, регдол із 2021. Кошенята зростають удома, доставка у Німеччину, ЄС, США та інші країни.',
+        'Історія розплідника Arlen Fluffy Plush: перша шотландська кішка у 2010, WCF із 2016, регдол із 2021. Кошенята зростають удома, доставка у Німеччину, ЄС, США та інші країни.',
       breadcrumb: 'Про нас',
     },
     contacts: {
@@ -58,18 +70,35 @@ const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
         'Контакти розплідника Arlen Fluffy Plush: Telegram, телефон, e-mail, Тернопіль. Запитайте про вільних кошенят, ціну, бронювання та доставку у вашу країну.',
       breadcrumb: 'Контакти',
     },
+    cookies: {
+      title: 'Політика використання файлів cookie',
+      description:
+        'Які файли cookie використовує сайт розплідника Arlen Fluffy Plush, для чого саме, на який час вони зберігаються, як відкликати згоду та як видалити чи заблокувати їх у браузері.',
+      breadcrumb: 'Політика cookie',
+      keywords: [
+        'політика cookie',
+        'файли cookie',
+        'використання cookie',
+        'згода на cookie',
+        'відкликати згоду на cookie',
+        'налаштування cookie',
+        'захист персональних даних',
+        'GDPR',
+        'Arlen Fluffy Plush',
+      ],
+    },
   },
   en: {
     home: {
-      title: 'Kittens for sale — Arlen Fluffy Plush cattery, worldwide delivery',
+      title: 'Ragdoll, British and Scottish kittens — Arlen Fluffy Plush cattery',
       description:
-        'Buy a kitten with WCF papers from the Arlen Fluffy Plush cattery: Ragdoll and dozens of other breeds. Worldwide delivery — Germany, the EU, the USA and beyond.',
+        'Buy a kitten with WCF papers from the Arlen Fluffy Plush cattery: Ragdoll, British and Scottish kittens. Worldwide delivery — Germany, the EU, the USA and beyond.',
       breadcrumb: 'Home',
     },
     kittens: {
       title: 'Kittens for sale — price, photos, delivery',
       description:
-        'Kittens for sale from the Arlen Fluffy Plush cattery: photos, age, sex, colour and price. Ragdoll, British, Scottish and dozens of other breeds, delivered worldwide.',
+        'Kittens for sale from the Arlen Fluffy Plush cattery: photos, age, sex, colour and price. Ragdoll, British and Scottish kittens, delivered worldwide.',
       breadcrumb: 'Kittens',
     },
     parents: {
@@ -81,7 +110,7 @@ const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
     about: {
       title: 'About the Arlen Fluffy Plush cattery',
       description:
-        'The story of the Arlen Fluffy Plush cattery: our first cat in 2010, WCF since 2016, Ragdolls since 2021. Kittens raised at home and delivered to any country.',
+        'The story of the Arlen Fluffy Plush cattery: our first Scottish cat in 2010, WCF since 2016, Ragdolls since 2021. Kittens raised at home and delivered to any country.',
       breadcrumb: 'About',
     },
     contacts: {
@@ -89,6 +118,22 @@ const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
       description:
         'Contact the Arlen Fluffy Plush cattery: Telegram, phone, e-mail, Ternopil, Ukraine. Ask about available kittens, pricing, reservation and delivery to your country.',
       breadcrumb: 'Contacts',
+    },
+    cookies: {
+      title: 'Cookie Policy',
+      description:
+        'Which cookies the Arlen Fluffy Plush cattery website uses, what each one is for, how long it is kept, how to withdraw your consent, and how to remove or block them in your browser.',
+      breadcrumb: 'Cookie Policy',
+      keywords: [
+        'cookie policy',
+        'cookies',
+        'cookie consent',
+        'withdraw cookie consent',
+        'cookie settings',
+        'data protection',
+        'GDPR',
+        'Arlen Fluffy Plush',
+      ],
     },
   },
 };
@@ -100,12 +145,12 @@ const COPY: Record<Language, Record<SeoPageKey, SeoPageCopy>> = {
 export const ORGANIZATION_DESCRIPTION: Record<Language, string> = {
   uk:
     'Розплідник кошенят Arlen Fluffy Plush із Тернополя, зареєстрований у World Cat Federation із 2016 року. ' +
-    'Головна порода — регдол, поряд із нею в розпліднику є десятки інших порід, зокрема британські та шотландські. ' +
+    'Головна порода — регдол; поряд із нею розплідник працює з британськими та шотландськими котами. ' +
     'Кошенята зростають удома, їдуть до нових родин вакцинованими, чипованими та з документами WCF. ' +
     'Доставляємо кошенят по Україні та в будь-яку країну світу — Німеччину, країни ЄС, США, Канаду та інші.',
   en:
     'Arlen Fluffy Plush is a kitten cattery in Ternopil, Ukraine, registered with the World Cat Federation since 2016. ' +
-    'Ragdoll is our main breed, alongside dozens of others including British and Scottish cats. ' +
+    'Ragdoll is our main breed, alongside British and Scottish cats. ' +
     'Our kittens grow up at home and move to their new families vaccinated, microchipped and with WCF papers. ' +
     'We deliver kittens across Ukraine and to any country in the world — Germany, the EU, the USA, Canada and beyond.',
 };

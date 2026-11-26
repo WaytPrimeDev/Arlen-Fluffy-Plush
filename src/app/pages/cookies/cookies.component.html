@@ -1,0 +1,142 @@
+<div class="cookies-page">
+  <section class="cookies-page__hero">
+    <div class="cookies-page__hero-inner">
+      <h1>{{ 'cookiesHeroTitle' | translate }}</h1>
+      <p>{{ 'cookiesHeroSubtitle' | translate }}</p>
+      <p class="cookies-page__updated">{{ 'cookiesUpdated' | translate }}</p>
+    </div>
+  </section>
+
+  <div class="cookies-page__body">
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesWhatTitle' | translate }}</h2>
+      <p>{{ 'cookiesWhatP1' | translate }}</p>
+      <p>{{ 'cookiesWhatP2' | translate }}</p>
+    </section>
+
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesListTitle' | translate }}</h2>
+      <p>{{ 'cookiesListP1' | translate }}</p>
+
+      <div class="cookies-page__table-wrap" tabindex="0" [attr.aria-label]="'cookiesListTitle' | translate" role="group">
+        <table class="cookies-page__table">
+          <caption class="visually-hidden">{{ 'cookiesTableCaption' | translate }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ 'cookiesTableName' | translate }}</th>
+              <th scope="col">{{ 'cookiesTableGroup' | translate }}</th>
+              <th scope="col">{{ 'cookiesTablePurpose' | translate }}</th>
+              <th scope="col">{{ 'cookiesTableLifetime' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows; track row.name) {
+              <tr>
+                <th scope="row"><code>{{ row.name }}</code></th>
+                <td>{{ row.groupKey | translate }}</td>
+                <td>{{ row.purposeKey | translate }}</td>
+                <td>{{ row.lifetimeKey | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h3>{{ 'cookiesGroupNecessary' | translate }}</h3>
+      <p>{{ 'cookiesNecessaryDesc' | translate }}</p>
+
+      <h3>{{ 'cookiesGroupAnalytics' | translate }}</h3>
+      <p>{{ 'cookiesAnalyticsDesc' | translate }}</p>
+      <p>{{ 'cookiesStorageNote' | translate }}</p>
+    </section>
+
+    <!-- The controls themselves, above the third-party list and well before
+         the browser instructions: the one-click way to change the decision has
+         to be easier to find than the manual way, not buried under it. -->
+    <section class="cookies-page__section" id="cookie-consent">
+      <h2>{{ 'cookiesConsentTitle' | translate }}</h2>
+      <p>{{ 'cookiesConsentP1' | translate }}</p>
+
+      <p class="cookies-page__consent-state" role="status">
+        <span class="cookies-page__consent-label">{{
+          'cookiesConsentStatusLabel' | translate
+        }}:</span>
+        {{ stateKey() | translate }}
+      </p>
+
+      <div class="cookies-page__consent-actions">
+        <button
+          type="button"
+          class="cookies-page__consent-button cookies-page__consent-button--decline"
+          [disabled]="consent.decision$() === 'declined'"
+          (click)="consent.decline()"
+        >
+          {{ declineKey() | translate }}
+        </button>
+        <button
+          type="button"
+          class="cookies-page__consent-button cookies-page__consent-button--accept"
+          [disabled]="consent.decision$() === 'accepted'"
+          (click)="consent.accept()"
+        >
+          {{ 'cookiesConsentAccept' | translate }}
+        </button>
+      </div>
+    </section>
+
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesThirdPartyTitle' | translate }}</h2>
+      <p>{{ 'cookiesThirdPartyP1' | translate }}</p>
+      <ul class="cookies-page__list">
+        <li>
+          {{ 'cookiesThirdPartyGoogle' | translate }}
+          <a
+            href="https://policies.google.com/technologies/cookies"
+            target="_blank"
+            rel="noopener noreferrer"
+            >policies.google.com</a
+          >
+        </li>
+        <li>{{ 'cookiesThirdPartyFonts' | translate }}</li>
+      </ul>
+      <p>{{ 'cookiesThirdPartyP2' | translate }}</p>
+    </section>
+
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesLegalTitle' | translate }}</h2>
+      <p>{{ 'cookiesLegalP1' | translate }}</p>
+      <p>{{ 'cookiesLegalP2' | translate }}</p>
+    </section>
+
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesManageTitle' | translate }}</h2>
+      <p>{{ 'cookiesManageP1' | translate }}</p>
+      <ul class="cookies-page__list">
+        @for (key of manageItemKeys; track key) {
+          <li>{{ key | translate }}</li>
+        }
+      </ul>
+      <p>{{ 'cookiesManageP2' | translate }}</p>
+    </section>
+
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesChangesTitle' | translate }}</h2>
+      <p>{{ 'cookiesChangesP1' | translate }}</p>
+    </section>
+
+    <section class="cookies-page__section">
+      <h2>{{ 'cookiesContactTitle' | translate }}</h2>
+      <p>{{ 'cookiesContactP1' | translate }}</p>
+      <ul class="cookies-page__list cookies-page__list--contacts">
+        @if (email) {
+          <li>
+            <a [href]="'mailto:' + email">{{ email }}</a>
+          </li>
+        }
+        <li>
+          <a [href]="telegram" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
