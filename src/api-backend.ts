@@ -9,7 +9,7 @@
  * That is a silent failure worth one noisy line in the build log, which is
  * what the warning below is for.
  */
- * `API_ORIGIN` names it, and the public backend is the default: a deployment
+/* `API_ORIGIN` names it, and the public backend is the default: a deployment
  * that never sets the variable still serves the whole catalogue. Set it to
  * point the site at another backend — `http://localhost:3000` to develop
  * against a local one, a staging host to try a release against that.
