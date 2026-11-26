@@ -77,6 +77,14 @@
   transition: box-shadow 0.2s ease;
 }
 
+/* Fills the tile above it, which is what sets the size. */
+.app-header__brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .app-header__brand:hover .app-header__brand-icon {
   box-shadow: 0 6px 14px rgb(115 86 168 / 18%);
 }

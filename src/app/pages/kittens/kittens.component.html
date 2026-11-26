@@ -2,9 +2,21 @@
   <section class="kittens-hero">
     <div class="kittens-hero__glow" aria-hidden="true"></div>
     <div class="kittens-hero__inner">
-      <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
-      <h1 class="kittens-hero__title">{{ i18n.t('exploreOurKittens') }}</h1>
-      <p class="kittens-hero__subtitle">{{ i18n.t('exploreOurKittensSubtitle') }}</p>
+      @if (isBreedPage()) {
+        <a class="kittens-hero__back" [routerLink]="'/kittens' | locPath">
+          <span aria-hidden="true">←</span> {{ i18n.t('backToAllKittens') }}
+        </a>
+        <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
+        <h1 class="kittens-hero__title">{{ activeBreedName() }}</h1>
+        <p class="kittens-hero__subtitle">{{ i18n.t('breedPageSubtitle') }}</p>
+        @if (breedIntro()) {
+          <p class="kittens-hero__intro">{{ breedIntro() }}</p>
+        }
+      } @else {
+        <span class="kittens-hero__eyebrow">{{ i18n.t('premiumKittens') }}</span>
+        <h1 class="kittens-hero__title">{{ i18n.t('exploreOurKittens') }}</h1>
+        <p class="kittens-hero__subtitle">{{ i18n.t('exploreOurKittensSubtitle') }}</p>
+      }
 
       <!-- @if (!isLoading() && !loadError()) {
         <dl class="kittens-hero__stats">
@@ -26,6 +38,10 @@
   </section>
 
   <div class="kittens-page">
+    <!-- The breed picker: a link per breed rather than a filter, so every breed
+         is a page of its own that a visitor can land on and share. -->
+    <app-breed-tiles [breeds]="breeds()" [activeSlug]="breedSlugParam()" />
+
     <div class="kittens-page__tabs" role="tablist" [attr.aria-label]="i18n.t('viewMode')">
       <button
         type="button"
@@ -59,59 +75,66 @@
       </button>
     </div>
 
-    <section class="toolbar" [attr.aria-label]="i18n.t('filterAndSort')">
+    <section
+      class="toolbar"
+      [attr.aria-label]="filtersEnabled ? i18n.t('filterAndSort') : i18n.t('view')"
+    >
       <div class="toolbar__bar">
-        <button
-          #filtersToggle
-          type="button"
-          class="toolbar__toggle"
-          [class.toolbar__toggle--open]="filtersOpen()"
-          [attr.aria-expanded]="filtersOpen()"
-          aria-controls="kittens-filters"
-          (click)="toggleFilters()"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            focusable="false"
+        @if (filtersEnabled) {
+          <button
+            #filtersToggle
+            type="button"
+            class="toolbar__toggle"
+            [class.toolbar__toggle--open]="filtersOpen()"
+            [attr.aria-expanded]="filtersOpen()"
+            aria-controls="kittens-filters"
+            (click)="toggleFilters()"
           >
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <line x1="7" y1="12" x2="17" y2="12" />
-            <line x1="10" y1="18" x2="14" y2="18" />
-          </svg>
-          {{ i18n.t('filters') }}
-          @if (activeFilterCount()) {
-            <span class="toolbar__toggle-count" aria-hidden="true">{{ activeFilterCount() }}</span>
-            <span class="visually-hidden">
-              {{ activeFilterCount() }} {{ i18n.t('filtersActive') }}
-            </span>
-          }
-          <span class="toolbar__toggle-chevron" aria-hidden="true">
             <svg
-              width="14"
-              height="14"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2.4"
+              stroke-width="2.2"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
               focusable="false"
             >
-              <polyline points="6 9 12 15 18 9" />
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="7" y1="12" x2="17" y2="12" />
+              <line x1="10" y1="18" x2="14" y2="18" />
             </svg>
-          </span>
-        </button>
+            {{ i18n.t('filters') }}
+            @if (activeFilterCount()) {
+              <span class="toolbar__toggle-count" aria-hidden="true">{{
+                activeFilterCount()
+              }}</span>
+              <span class="visually-hidden">
+                {{ i18n.plural('activeFiltersCount', activeFilterCount()) }}
+              </span>
+            }
+            <span class="toolbar__toggle-chevron" aria-hidden="true">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                focusable="false"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </span>
+          </button>
+        }
 
         <div class="toolbar__actions">
-          @if (hasActiveFilters()) {
+          @if (filtersEnabled && hasActiveFilters()) {
             <button type="button" class="toolbar__reset" (click)="resetFilters()">
               <span class="toolbar__reset-count" aria-hidden="true">{{ activeFilterCount() }}</span>
               {{ i18n.t('resetAllFilters') }}
@@ -180,7 +203,7 @@
         </div>
       </div>
 
-      @if (filtersOpen()) {
+      @if (filtersEnabled && filtersOpen()) {
         <div class="toolbar__filters" id="kittens-filters">
           @if (showKittenOnlyFilters()) {
             <div class="toolbar__field">
@@ -214,15 +237,17 @@
             </div>
           }
 
-          <div class="toolbar__field">
-            <span class="toolbar__field-label">{{ i18n.t('filterByBreed') }}</span>
-            <app-select
-              [options]="breedOptions()"
-              [value]="selectedBreed()"
-              [ariaLabel]="i18n.t('filterByBreed')"
-              (valueChange)="setBreed($event)"
-            />
-          </div>
+          @if (showBreedFilter()) {
+            <div class="toolbar__field">
+              <span class="toolbar__field-label">{{ i18n.t('filterByBreed') }}</span>
+              <app-select
+                [options]="breedOptions()"
+                [value]="selectedBreed()"
+                [ariaLabel]="i18n.t('filterByBreed')"
+                (valueChange)="setBreed($event)"
+              />
+            </div>
+          }
 
           <div class="toolbar__field">
             <span class="toolbar__field-label">{{ i18n.t('filterByColor') }}</span>
@@ -242,7 +267,16 @@
       role="tabpanel"
       [attr.aria-labelledby]="activeTab() === 'kittens' ? 'tab-kittens' : 'tab-parents'"
     >
-      @if (isLoading()) {
+      @if (breedMissing()) {
+        <div class="state" role="status">
+          <span class="state__icon" aria-hidden="true">🐾</span>
+          <h2>{{ i18n.t('breedNotFoundTitle') }}</h2>
+          <p>{{ i18n.t('breedNotFoundText') }}</p>
+          <a class="state__action" [routerLink]="'/kittens' | locPath">
+            {{ i18n.t('backToAllKittens') }}
+          </a>
+        </div>
+      } @else if (isLoading()) {
         <p class="visually-hidden" role="status">{{ i18n.t('loadingKittens') }}</p>
         <div class="card-grid" aria-hidden="true">
           @for (slot of skeletons; track slot) {
@@ -272,20 +306,26 @@
           @if (filteredKittens().length) {
             <div class="card-grid">
               @for (kitten of filteredKittens(); track kitten.id) {
-                <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
+                <article class="kitten-card">
                   <div class="kitten-card__media">
-                    <img
-                      draggable="false"
-                      decoding="async"
-                      appImageFallback
-                      [src]="kitten.image"
+                    <app-card-gallery
+                      [images]="kitten.images"
                       [alt]="kitten.name"
-                      loading="lazy"
+                      [link]="['/kittens', kitten.routeParam] | locPath"
                     />
-                    <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                    <div class="kitten-card__media-badges">
+                      <app-status-pill [status]="kitten.status" variant="overlay" />
+                      <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                    </div>
                   </div>
                   <div class="kitten-card__body">
-                    <h3 class="kitten-card__name">{{ kitten.name }}</h3>
+                    <h3 class="kitten-card__name">
+                      <a
+                        class="kitten-card__link"
+                        [routerLink]="['/kittens', kitten.routeParam] | locPath"
+                        >{{ kitten.name }}</a
+                      >
+                    </h3>
 
                     <div class="kitten-card__meta-row">
                       <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
@@ -322,7 +362,7 @@
                       }
                     </div>
                   </div>
-                </a>
+                </article>
               }
             </div>
           } @else {
@@ -331,12 +371,24 @@
                 hasActiveFilters() ? '🔍' : '🐱'
               }}</span>
               <h2>
-                {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
+                @if (hasActiveFilters()) {
+                  {{ i18n.t('noKittensMatchFilters') }}
+                } @else if (breedSlugParam()) {
+                  {{ i18n.t('noKittensOfBreed') }}
+                } @else {
+                  {{ i18n.t('noKittensYet') }}
+                }
               </h2>
               @if (hasActiveFilters()) {
                 <button type="button" class="state__action" (click)="resetFilters()">
                   {{ i18n.t('resetAllFilters') }}
                 </button>
+              } @else if (breedSlugParam()) {
+                <!-- A breed page with nothing in stock is still a page; this is the
+                     way on from it, for a visitor and for a crawler alike. -->
+                <a class="state__action" [routerLink]="'/kittens' | locPath">
+                  {{ i18n.t('backToAllKittens') }}
+                </a>
               }
             </div>
           }
@@ -348,7 +400,7 @@
                   @if (litter.mother; as mom) {
                     <a
                       class="litter__parent litter__parent--mom"
-                      [routerLink]="['/parents', mom.id] | locPath"
+                      [routerLink]="['/parents', mom.routeParam] | locPath"
                       [attr.aria-label]="i18n.t('mom') + ': ' + mom.name"
                     >
                       <img
@@ -361,7 +413,7 @@
                       />
                       <div class="litter__parent-info">
                         <strong>{{ i18n.t('mom') }}: {{ mom.name }}</strong>
-                        <span>{{ mom.breed }}{{ mom.color ? ' · ' + mom.color : '' }}</span>
+                        <span>{{ mom.meta }}</span>
                       </div>
                     </a>
                   }
@@ -369,7 +421,7 @@
                   @if (litter.father; as dad) {
                     <a
                       class="litter__parent litter__parent--dad"
-                      [routerLink]="['/parents', dad.id] | locPath"
+                      [routerLink]="['/parents', dad.routeParam] | locPath"
                       [attr.aria-label]="i18n.t('dad') + ': ' + dad.name"
                     >
                       <img
@@ -382,34 +434,40 @@
                       />
                       <div class="litter__parent-info">
                         <strong>{{ i18n.t('dad') }}: {{ dad.name }}</strong>
-                        <span>{{ dad.breed }}{{ dad.color ? ' · ' + dad.color : '' }}</span>
+                        <span>{{ dad.meta }}</span>
                       </div>
                     </a>
                   }
                 </div>
 
-                <h3 class="litter__title">
+                <h2 class="litter__title">
                   {{ litter.name }}
                   <app-paw-count class="litter__count" [count]="litter.kittens.length" />
-                </h3>
+                </h2>
               </header>
 
               <div class="card-grid card-grid--litter">
                 @for (kitten of litter.kittens; track kitten.id) {
-                  <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
+                  <article class="kitten-card">
                     <div class="kitten-card__media">
-                      <img
-                        draggable="false"
-                        decoding="async"
-                        appImageFallback
-                        [src]="kitten.image"
+                      <app-card-gallery
+                        [images]="kitten.images"
                         [alt]="kitten.name"
-                        loading="lazy"
+                        [link]="['/kittens', kitten.routeParam] | locPath"
                       />
-                      <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                      <div class="kitten-card__media-badges">
+                        <app-status-pill [status]="kitten.status" variant="overlay" />
+                        <span class="kitten-card__age-badge">{{ kitten.age }}</span>
+                      </div>
                     </div>
                     <div class="kitten-card__body">
-                      <h4 class="kitten-card__name">{{ kitten.name }}</h4>
+                      <h3 class="kitten-card__name">
+                        <a
+                          class="kitten-card__link"
+                          [routerLink]="['/kittens', kitten.routeParam] | locPath"
+                          >{{ kitten.name }}</a
+                        >
+                      </h3>
 
                       <div class="kitten-card__meta-row">
                         <p class="kitten-card__meta">{{ kitten.breed }} · {{ kitten.color }}</p>
@@ -448,7 +506,7 @@
                         }
                       </div>
                     </div>
-                  </a>
+                  </article>
                 }
               </div>
             </article>
@@ -459,12 +517,24 @@
               hasActiveFilters() ? '🔍' : '🐱'
             }}</span>
             <h2>
-              {{ hasActiveFilters() ? i18n.t('noKittensMatchFilters') : i18n.t('noKittensYet') }}
+              @if (hasActiveFilters()) {
+                {{ i18n.t('noKittensMatchFilters') }}
+              } @else if (breedSlugParam()) {
+                {{ i18n.t('noKittensOfBreed') }}
+              } @else {
+                {{ i18n.t('noKittensYet') }}
+              }
             </h2>
             @if (hasActiveFilters()) {
               <button type="button" class="state__action" (click)="resetFilters()">
                 {{ i18n.t('resetAllFilters') }}
               </button>
+            } @else if (breedSlugParam()) {
+              <!-- A breed page with nothing in stock is still a page; this is the
+                   way on from it, for a visitor and for a crawler alike. -->
+              <a class="state__action" [routerLink]="'/kittens' | locPath">
+                {{ i18n.t('backToAllKittens') }}
+              </a>
             }
           </div>
         }
@@ -480,7 +550,7 @@
               @for (parent of queens(); track parent.id) {
                 <a
                   class="parent-card"
-                  [routerLink]="['/parents', parent.id] | locPath"
+                  [routerLink]="['/parents', parent.routeParam] | locPath"
                   [attr.aria-label]="parent.name"
                 >
                   <div class="parent-card__media">
@@ -525,7 +595,7 @@
               @for (parent of studs(); track parent.id) {
                 <a
                   class="parent-card"
-                  [routerLink]="['/parents', parent.id] | locPath"
+                  [routerLink]="['/parents', parent.routeParam] | locPath"
                   [attr.aria-label]="parent.name"
                 >
                   <div class="parent-card__media">

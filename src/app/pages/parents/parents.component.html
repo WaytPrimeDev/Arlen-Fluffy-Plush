@@ -36,7 +36,9 @@
         <span class="parents-page__filters-count" aria-hidden="true">
           {{ activeFilterCount() }}
         </span>
-        <span class="visually-hidden">{{ activeFilterCount() }} {{ i18n.t('filtersActive') }}</span>
+        <span class="visually-hidden">{{
+          i18n.plural('activeFiltersCount', activeFilterCount())
+        }}</span>
       }
       <span class="parents-page__filters-chevron" aria-hidden="true">
         <svg
@@ -89,8 +91,8 @@
             [attr.aria-label]="i18n.t('filterByBreed')"
           >
             <option value="all">{{ i18n.t('allBreeds') }}</option>
-            @for (breed of breeds(); track breed) {
-              <option [value]="breed">{{ breed }}</option>
+            @for (option of breedOptions(); track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
             }
           </select>
         </label>
@@ -104,8 +106,8 @@
             [attr.aria-label]="i18n.t('filterByColor')"
           >
             <option value="all">{{ i18n.t('allColors') }}</option>
-            @for (color of colors(); track color) {
-              <option [value]="color">{{ color }}</option>
+            @for (option of colorOptions(); track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
             }
           </select>
         </label>
@@ -137,7 +139,7 @@
         <li role="listitem">
           <a
             class="parent-card"
-            [routerLink]="['/parents', parent.id] | locPath"
+            [routerLink]="['/parents', parent.routeParam] | locPath"
             [attr.aria-label]="i18n.t('moreAbout') + ' ' + parent.name"
           >
             <div class="parent-card__media">
@@ -161,7 +163,7 @@
                   class="parent-card__kittens-count"
                   variant="solid"
                   [count]="parent.kittensCount"
-                  attr.aria-label="{{ parent.kittensCount }} {{ i18n.t('kittensWord') }}"
+                  [attr.aria-label]="i18n.plural('kittensCount', parent.kittensCount)"
                 />
               }
             </div>

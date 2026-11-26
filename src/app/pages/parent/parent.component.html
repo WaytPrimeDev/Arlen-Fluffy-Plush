@@ -33,6 +33,18 @@
           <div class="skeleton-line"></div>
         </div>
       </div>
+    } @else if (notFound()) {
+      <!-- A dead link, not a failure: its own copy, and `noindex` applied by
+           the component so the URL leaves the index instead of lingering as a
+           soft 404. -->
+      <div class="parent-page__empty">
+        <p class="parent-page__eyebrow">{{ i18n.t('parentNotFoundTitle') }}</p>
+        <h1>{{ i18n.t('parentNotFoundTitle') }}</h1>
+        <p>{{ i18n.t('parentNotFoundText') }}</p>
+        <a class="parent-page__back-cta" [routerLink]="'/parents' | locPath">{{
+          i18n.t('backToParents')
+        }}</a>
+      </div>
     } @else if (loadError()) {
       <div class="parent-page__empty" role="alert">
         <p class="parent-page__eyebrow">{{ i18n.t('error') }}</p>
@@ -168,7 +180,7 @@
               </svg>
               <div>
                 <p class="parent-page__spec-label">{{ i18n.t('breed') }}</p>
-                <p class="parent-page__spec-value">{{ parent()!.breed || '—' }}</p>
+                <p class="parent-page__spec-value">{{ breedName() }}</p>
               </div>
             </div>
             <div class="parent-page__spec-row">
@@ -195,7 +207,7 @@
               </svg>
               <div>
                 <p class="parent-page__spec-label">{{ i18n.t('color') }}</p>
-                <p class="parent-page__spec-value">{{ parent()!.color || '—' }}</p>
+                <p class="parent-page__spec-value">{{ colorName() }}</p>
               </div>
             </div>
             <div class="parent-page__spec-row">
@@ -242,7 +254,7 @@
         } @else {
           <div class="parent-page__kittens-grid">
             @for (kitten of kittens(); track kitten.id) {
-              <a class="kitten-card" [routerLink]="['/kittens', kitten.id] | locPath">
+              <a class="kitten-card" [routerLink]="['/kittens', kitten.routeParam] | locPath">
                 <div class="kitten-card__media">
                   <img
                     draggable="false"

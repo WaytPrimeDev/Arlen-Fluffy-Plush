@@ -8,9 +8,12 @@ import { KittenComponent } from './kitten.component';
 
 const CLOUDINARY = 'https://res.cloudinary.com/demo/image/upload';
 
-function kittenWith(imageCount: number): KittenApiItem {
+const VIDEO_ID = 'dQw4w9WgXcQ';
+
+function kittenWith(imageCount: number, videoId?: string | null): KittenApiItem {
   return {
     _id: 'kitten-1',
+    videoId: videoId ?? null,
     nameUa: 'Мурчик',
     nameEn: 'Murchyk',
     breed: 'Британська',
@@ -39,6 +42,7 @@ describe('KittenComponent gallery', () => {
   const activeSlides = () => slides().filter((a) => a.classList.contains('kitten-page__slide--active'));
   const thumbs = () =>
     Array.from(host().querySelectorAll('button.kitten-page__thumb')) as HTMLButtonElement[];
+  const videoSlides = () => slides().filter((slide) => slide.hasAttribute('data-pswp-video-embed'));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,11 +57,11 @@ describe('KittenComponent gallery', () => {
     http.verify();
   });
 
-  async function load(imageCount: number): Promise<void> {
+  async function load(imageCount: number, videoId?: string | null): Promise<void> {
     await fixture.whenStable();
     http
       .expectOne((candidate) => candidate.url.includes('/cats/kitten/'))
-      .flush({ data: kittenWith(imageCount), message: 'ok' });
+      .flush({ data: kittenWith(imageCount, videoId), message: 'ok' });
     await fixture.whenStable();
   }
 
@@ -150,5 +154,122 @@ describe('KittenComponent gallery', () => {
 
     expect(slides().length).toBe(1);
     expect(thumbs().length).toBe(0);
+  });
+
+  it('adds no slide when the kitten has no video', async () => {
+    await load(3);
+
+    expect(videoSlides().length).toBe(0);
+    expect(slides().length).toBe(3);
+  });
+
+  it('puts the video second, after the main photo', async () => {
+    await load(3, VIDEO_ID);
+
+    // The main photo is what every card links to and what the page is
+    // recognised by, so it keeps the opening slot and the video follows it.
+    const kinds = slides().map((slide) =>
+      slide.hasAttribute('data-pswp-video-embed') ? 'video' : 'photo',
+    );
+    expect(kinds).toEqual(['photo', 'video', 'photo', 'photo']);
+  });
+
+  it('leaves the video last for a kitten with a single photo', async () => {
+    await load(1, VIDEO_ID);
+
+    const kinds = slides().map((slide) =>
+      slide.hasAttribute('data-pswp-video-embed') ? 'video' : 'photo',
+    );
+    expect(kinds).toEqual(['photo', 'video']);
+    // Two slides now, so the strip that a lone photo hides comes back.
+    expect(thumbs().length).toBe(2);
+  });
+
+  it('keeps the placeholder first and the video second when there are no photos', async () => {
+    await load(0, VIDEO_ID);
+
+    // The placeholder is not a button: there is nothing to open full screen,
+    // and a placeholder inside the lightbox would be a dead end.
+    const placeholder = host().querySelector('img.kitten-page__slide');
+    expect(placeholder).not.toBeNull();
+    expect(videoSlides().length).toBe(1);
+    expect(slides().length).toBe(1);
+
+    const stageChildren = Array.from(host().querySelector('.kitten-page__stage')!.children);
+    expect(stageChildren.indexOf(placeholder!)).toBe(0);
+    expect(stageChildren.indexOf(videoSlides()[0])).toBe(1);
+  });
+
+  it('loads no player until the video is opened', async () => {
+    await load(2, VIDEO_ID);
+
+    // The whole point of the poster: a kitten page that nobody watches the
+    // video on must cost no YouTube request and set no YouTube identifiers.
+    expect(host().querySelectorAll('iframe').length).toBe(0);
+    const poster = videoSlides()[0].querySelector('img');
+    expect(poster!.getAttribute('src')).toBe(`https://i.ytimg.com/vi/${VIDEO_ID}/hqdefault.jpg`);
+  });
+
+  it('hands the viewer a cookie-free player URL and the shape to size it', async () => {
+    await load(2, VIDEO_ID);
+
+    const video = videoSlides()[0];
+    const embed = video.getAttribute('data-pswp-video-embed')!;
+    expect(embed.startsWith(`https://www.youtube-nocookie.com/embed/${VIDEO_ID}?`)).toBe(true);
+    // An iframe has no intrinsic size and its contents are cross-origin, so
+    // the proportions have to be declared or the player is stretched.
+    expect(video.getAttribute('data-pswp-width')).toBe('1280');
+    expect(video.getAttribute('data-pswp-height')).toBe('720');
+  });
+
+  it('numbers the lightbox over the slides it actually holds', async () => {
+    await load(0, VIDEO_ID);
+
+    // The placeholder takes a slot on the stage but never opens, so counting
+    // it would promise the viewer a slide it does not contain.
+    expect(videoSlides()[0].getAttribute('aria-label')).toBe(
+      TestBed.inject(I18nService).t('videoPlay', { label: 'Мурчик' }),
+    );
+    const photoLabels = slides()
+      .filter((slide) => !slide.hasAttribute('data-pswp-video-embed'))
+      .map((slide) => slide.getAttribute('aria-label'));
+    expect(photoLabels).toEqual([]);
+  });
+
+  it('names the video for assistive tech and marks its thumbnail by shape', async () => {
+    await load(2, VIDEO_ID);
+    const i18n = TestBed.inject(I18nService);
+
+    expect(videoSlides()[0].getAttribute('aria-label')).toBe(
+      i18n.t('videoPlay', { label: 'Мурчик' }),
+    );
+
+    const videoThumb = thumbs()[1];
+    expect(videoThumb.getAttribute('aria-label')).toBe(i18n.t('viewerGoToVideo'));
+    // Not a tint: a difference carried by colour alone is no difference for
+    // everyone who cannot see it.
+    expect(videoThumb.querySelector('.kitten-page__thumb-badge')).not.toBeNull();
+    expect(thumbs()[0].querySelector('.kitten-page__thumb-badge')).toBeNull();
+  });
+
+  it('drops a video id the backend should never have stored', async () => {
+    // The id is re-checked on the way out because this runs against whatever
+    // the API answered with, including an older build that kept a full URL in
+    // the field. A bad value has to lose the video, not produce a dead player.
+    await load(2, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+    expect(videoSlides().length).toBe(0);
+    expect(slides().length).toBe(2);
+  });
+
+  it('switches to the video when its thumbnail is clicked', async () => {
+    await load(3, VIDEO_ID);
+
+    thumbs()[1].click();
+    await fixture.whenStable();
+
+    expect(activeSlides().length).toBe(1);
+    expect(activeSlides()[0].hasAttribute('data-pswp-video-embed')).toBe(true);
+    expect(thumbs()[1].getAttribute('aria-current')).toBe('true');
   });
 });

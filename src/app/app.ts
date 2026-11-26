@@ -14,6 +14,7 @@ import { filter, map, startWith } from 'rxjs';
 import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FooterComponent } from './components/footer/footer.component';
+import { CookieBannerComponent } from './components/cookie-banner/cookie-banner.component';
 import { I18nService, languageFromPathname, stripLanguagePrefix } from './services/i18n.service';
 import { SeoService } from './services/seo.service';
 import { AnalyticsService } from './services/analytics.service';
@@ -34,6 +35,7 @@ interface SeoTarget {
     LanguageSwitcherComponent,
     TranslatePipe,
     FooterComponent,
+    CookieBannerComponent,
     LocalizedPathPipe,
   ],
   templateUrl: './app.html',

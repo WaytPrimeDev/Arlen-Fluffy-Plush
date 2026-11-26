@@ -22,8 +22,23 @@ interface PhotoItemData {
   h?: number;
   width?: number;
   height?: number;
+  /** `'html'` turns the slide into arbitrary markup instead of an image. */
+  type?: string;
+  html?: string;
+  /** Set on a video slide only; read back when the slide is activated. */
+  videoEmbed?: string;
+  videoTitle?: string;
   [key: string]: unknown;
 }
+
+/** The part of PhotoSwipe's `Content` this directive touches. */
+interface PhotoContent {
+  data: PhotoItemData;
+  element?: HTMLElement;
+}
+
+/** Marks the box inside a video slide that the player is mounted into. */
+const VIDEO_FRAME_CLASS = 'app-video__frame';
 
 @Directive({
   selector: '[appPhotoViewer]',
@@ -84,6 +99,11 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
     this.lightbox.addFilter(
       'domItemData',
       (itemData: PhotoItemData, element: HTMLElement) => {
+        const embed = element.dataset['pswpVideoEmbed'];
+        if (embed) {
+          return this.videoItemData(itemData, element, embed);
+        }
+
         const source = element.dataset['pswpSrc'];
         if (source) {
           itemData.src = source;
@@ -103,7 +123,91 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
       },
     );
 
+    // The player is created when the slide becomes the active one and torn
+    // down when it stops being active. PhotoSwipe loads the slides either side
+    // of the current one ahead of time, so building the iframe in `load()` —
+    // which is what putting it in `itemData.html` would do — would start a
+    // video playing off screen while a photo is still on it. Removing the
+    // iframe is also the only way to stop playback: YouTube owns what is inside
+    // it, and there is nothing to pause from out here.
+    this.lightbox.on('contentActivate', ({ content }: { content: PhotoContent }) => {
+      this.mountPlayer(content);
+    });
+
+    this.lightbox.on('contentDeactivate', ({ content }: { content: PhotoContent }) => {
+      this.unmountPlayer(content);
+    });
+
     this.lightbox.init();
+  }
+
+  /**
+   * Turns the slide of the video button into an HTML slide holding the player.
+   *
+   * The poster is handed over as `msrc`, which is the still PhotoSwipe shows
+   * while the slide opens, so the zoom-in animation has something to animate
+   * rather than a black rectangle. The dimensions come from the button's own
+   * `data-pswp-width`/`height`, because an iframe cannot be measured the way a
+   * photo can: it has no intrinsic size, and whatever is inside it is
+   * cross-origin.
+   */
+  private videoItemData(
+    itemData: PhotoItemData,
+    element: HTMLElement,
+    embed: string,
+  ): PhotoItemData {
+    const poster = element.querySelector('img');
+
+    itemData.type = 'html';
+    itemData.videoEmbed = embed;
+    itemData.videoTitle = element.dataset['pswpVideoTitle'] ?? '';
+    // An empty frame, filled in on activation. It is in the markup from the
+    // start so the slide has a box of the right shape to lay out.
+    itemData.html = `<div class="app-video"><div class="${VIDEO_FRAME_CLASS}"></div></div>`;
+
+    if (poster) {
+      itemData.msrc = poster.currentSrc || poster.src;
+    }
+
+    const width = Number(element.dataset['pswpWidth']) || 0;
+    const height = Number(element.dataset['pswpHeight']) || 0;
+    itemData.w = itemData.width = width;
+    itemData.h = itemData.height = height;
+
+    return itemData;
+  }
+
+  /**
+   * Builds the player inside an activated video slide, and moves focus into it
+   * so the keyboard lands on the video rather than staying on the page behind
+   * the viewer.
+   */
+  private mountPlayer(content: PhotoContent): void {
+    const embed = content.data.videoEmbed;
+    const frame = content.element?.querySelector<HTMLElement>(`.${VIDEO_FRAME_CLASS}`);
+    if (!embed || !frame || frame.firstElementChild) {
+      return;
+    }
+
+    const iframe = document.createElement('iframe');
+    // The URL is composed from a validated id by `video-url.util`, never taken
+    // from the API as a string, so there is nothing here to sanitize.
+    iframe.src = embed;
+    iframe.title = content.data.videoTitle || '';
+    iframe.allow =
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    iframe.setAttribute('frameborder', '0');
+
+    frame.appendChild(iframe);
+    iframe.focus({ preventScroll: true });
+  }
+
+  /** Drops the player, which is what stops the sound when the slide is left. */
+  private unmountPlayer(content: PhotoContent): void {
+    const frame = content.element?.querySelector<HTMLElement>(`.${VIDEO_FRAME_CLASS}`);
+    frame?.replaceChildren();
   }
 
   ngAfterViewInit(): void {
@@ -159,6 +263,11 @@ export class PhotoViewerDirective implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private measure(slide: HTMLElement): void {
+    // A video slide states its own proportions: its only image is the poster,
+    // whose 480x360 letterboxed shape is not the shape of the video, so
+    // measuring it would stretch the player to 4:3.
+    if (slide.dataset['pswpVideoEmbed']) return;
+
     const image = slide.querySelector('img');
     if (!image) return;
 

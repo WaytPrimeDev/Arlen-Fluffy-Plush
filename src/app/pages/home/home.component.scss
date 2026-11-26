@@ -108,7 +108,9 @@
 }
 
 .hero {
-  min-height: 100vh;
+  /* A touch under the viewport: the photo is 16:9 and a full-height hero is
+     taller than that, which forces `cover` to scale the picture up again. */
+  min-height: 92vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   position: relative;
@@ -204,8 +206,28 @@
   background: rgba(115, 86, 168, 0.05);
 }
 
+/*
+ * Full-bleed on purpose. The photo is 16:9 and the hero is roughly square, so
+ * confining it to the right-hand grid column meant `cover` cropping away about
+ * half the frame — the kitten on the end lost its body to the right edge. Taken
+ * out of the grid it spans the whole hero, the crop is nearly nothing, and the
+ * copy sits over its left side where the blur below dissolves it.
+ */
 .hero__media {
-  position: relative;
+  position: absolute;
+  inset: 0 0 0 auto;
+
+  /* Not the full width: the photo is 16:9 and the hero is wider than that, so
+     covering the whole hero scales the picture up until the top and bottom of
+     the room are cropped away and the kittens crowd the frame. Pulling the box
+     in from the left drops the scale close to `contain` — more room, smaller
+     kittens — and the strip it gives up is under the copy, where the gradient
+     below paints page colour anyway. */
+  width: 80%;
+
+  /* Its own stacking context, so the overlay and the pill inside it stay below
+     `.hero__content` no matter what z-index they take relative to each other. */
+  z-index: 0;
   min-height: 500px;
   overflow: hidden;
 }
@@ -225,21 +247,80 @@
   height: 100%;
   object-fit: cover;
 
-  /* Biased to the right of the frame: the cat sits off-centre in the photo and
-     a centred crop cuts its head off at desktop widths. */
-  object-position: 80% center;
+  z-index: 0;
+
+  /* Nudged right of centre: the kittens sit in the right half of the frame and
+     this keeps them clear of the copy without cropping any of them off. */
+  object-position: 62% center;
+}
+
+/*
+ * The left edge of the photo has to dissolve into the page, not stop at a line.
+ * Two layers do that: this one blurs the photo itself through a feathered mask
+ * (strongest at the left, gone by the middle), and `.hero__overlay` lays the
+ * page colour over the same span. Blur alone would still show the picture;
+ * colour alone leaves hard detail showing through. Together the photo loses
+ * both focus and contrast over the same distance, which is what reads as a
+ * soft edge.
+ */
+.hero__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  backdrop-filter: blur(26px) saturate(0.92);
+  -webkit-backdrop-filter: blur(26px) saturate(0.92);
+
+  /* Many stops, not two: a linear ramp over this distance leaves a visible
+     band where the blur ends. These approximate an ease-out falloff. */
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 16%,
+    rgba(0, 0, 0, 0.92) 22%,
+    rgba(0, 0, 0, 0.74) 27%,
+    rgba(0, 0, 0, 0.48) 32%,
+    rgba(0, 0, 0, 0.24) 36%,
+    rgba(0, 0, 0, 0.08) 39%,
+    rgba(0, 0, 0, 0) 42%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 16%,
+    rgba(0, 0, 0, 0.92) 22%,
+    rgba(0, 0, 0, 0.74) 27%,
+    rgba(0, 0, 0, 0.48) 32%,
+    rgba(0, 0, 0, 0.24) 36%,
+    rgba(0, 0, 0, 0.08) 39%,
+    rgba(0, 0, 0, 0) 42%
+  );
 }
 
 .hero__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, var(--warm-bg) 0%, transparent 35%);
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgb(251 248 245 / 100%) 0%,
+    rgb(251 248 245 / 100%) 18%,
+    rgb(251 248 245 / 94%) 24%,
+    rgb(251 248 245 / 78%) 29%,
+    rgb(251 248 245 / 52%) 34%,
+    rgb(251 248 245 / 26%) 38%,
+    rgb(251 248 245 / 9%) 41%,
+    rgb(251 248 245 / 0%) 44%
+  );
 }
 
 .hero__pill {
   position: absolute;
+  z-index: 3;
   bottom: 48px;
-  left: 32px;
+  right: 48px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
   border-radius: 20px;
@@ -785,7 +866,42 @@
   }
 
   .hero__media {
+    position: relative;
+    inset: auto;
+    width: 100%;
     min-height: 380px;
+  }
+
+  /* Stacked layout: the photo sits above the copy, so the edge that has to
+     dissolve is the bottom one, not the left. */
+  .hero__media::after {
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 55%,
+      rgba(0, 0, 0, 0.18) 72%,
+      rgba(0, 0, 0, 0.55) 86%,
+      rgba(0, 0, 0, 0.9) 96%,
+      rgba(0, 0, 0, 1) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 55%,
+      rgba(0, 0, 0, 0.18) 72%,
+      rgba(0, 0, 0, 0.55) 86%,
+      rgba(0, 0, 0, 0.9) 96%,
+      rgba(0, 0, 0, 1) 100%
+    );
+  }
+
+  .hero__overlay {
+    background: linear-gradient(
+      to bottom,
+      rgb(251 248 245 / 0%) 55%,
+      rgb(251 248 245 / 16%) 72%,
+      rgb(251 248 245 / 52%) 86%,
+      rgb(251 248 245 / 88%) 96%,
+      rgb(251 248 245 / 100%) 100%
+    );
   }
 
   .philosophy {

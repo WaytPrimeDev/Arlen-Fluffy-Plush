@@ -23,7 +23,10 @@ import {
   PARENT_PLACEHOLDER,
   withCurrency,
 } from '../../services/kitten-view.util';
+import { taxonomyName } from '../../services/taxonomy';
+import { HttpErrorResponse } from '@angular/common/http';
 import { STAGE_WIDTH, VIEWER_WIDTH, scaledImage } from '../../services/image-url.util';
+import { catRouteParam } from '../../services/cat-route.util';
 
 interface GalleryImage {
   /** Shown on the page, at the photo's own aspect ratio. */
@@ -36,6 +39,13 @@ interface GalleryImage {
 
 interface KittenCard {
   id: string;
+  /**
+   * The segment this record's page lives at: its slug, or its `_id` while the
+   * backend has not minted one. Separate from `id`, which stays the `_id` the
+   * analytics events and `@for` keys are built on, so switching the public
+   * URLs over to slugs did not quietly change what gets reported.
+   */
+  routeParam: string;
   name: string;
   breed: string;
   color: string;
@@ -51,12 +61,20 @@ interface LoadState {
   parent: ParentApiItem | null;
   kittens: KittenCard[];
   error: string;
+  /** Set for a 404 only; see the note above `loadState`. */
+  notFound: boolean;
   loaded: boolean;
 }
 
 @Component({
   selector: 'app-parent',
-  imports: [RouterLink, PhotoViewerDirective, LocalizedPathPipe, ImageFallbackDirective, PawCountComponent],
+  imports: [
+    RouterLink,
+    PhotoViewerDirective,
+    LocalizedPathPipe,
+    ImageFallbackDirective,
+    PawCountComponent,
+  ],
   templateUrl: './parent.component.html',
   styleUrl: './parent.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,44 +95,90 @@ export class ParentComponent {
 
   private readonly requestedImageIndex = signal(0);
 
+  /** The slug or id in the URL, kept so a 404 can name the page it was. */
+  private readonly routeParam = toSignal(
+    this.route.paramMap.pipe(map((params) => params.get('id') ?? '')),
+    { initialValue: '' },
+  );
+
+  /**
+   * A cat the API will not serve is not the same failure as an API that is
+   * down. A parent is published only while it still has a litter, so one whose
+   * last litter is gone starts answering 404 at an address that used to work.
+   * That is an ordinary dead link: it gets its own copy and `noindex`, so a
+   * crawler drops the URL rather than filing a soft 404 against the site.
+   */
   private readonly loadState = toSignal(
     this.route.paramMap.pipe(
       map((params) => params.get('id') ?? ''),
       switchMap((id) =>
-        this.parentsService.getParentById(id).pipe(
+        this.parentsService.getParent(id).pipe(
           switchMap((parent) => {
             const kittenIds = parent.Kittens ?? [];
             if (!kittenIds.length) {
-              return of<LoadState>({ parent, kittens: [], error: '', loaded: true });
+              return of<LoadState>({
+                parent,
+                kittens: [],
+                error: '',
+                notFound: false,
+                loaded: true,
+              });
             }
-            return forkJoin(kittenIds.map((kid) => this.kittensService.getKittenById(kid))).pipe(
+            return forkJoin(kittenIds.map((kid) => this.kittensService.getKitten(kid))).pipe(
               map(
                 (kittens): LoadState => ({
                   parent,
                   kittens: kittens.map((k) => mapKittenApiToCard(k, this.i18n)),
                   error: '',
+                  notFound: false,
                   loaded: true,
                 }),
               ),
-              catchError(() => of<LoadState>({ parent, kittens: [], error: '', loaded: true })),
+              // The cat itself loaded; a litter that will not load costs the
+              // kitten strip, not the page.
+              catchError(() =>
+                of<LoadState>({
+                  parent,
+                  kittens: [],
+                  error: '',
+                  notFound: false,
+                  loaded: true,
+                }),
+              ),
             );
           }),
-          catchError(() =>
-            of<LoadState>({
+          catchError((error: unknown) => {
+            // 400 counts as missing too: the backend answers it for an `_id`
+            // that is not a well-formed one, which is a malformed address
+            // rather than a service that is down. 404 is the same address
+            // being valid but naming nothing the API will serve.
+            const missing =
+              error instanceof HttpErrorResponse && (error.status === 404 || error.status === 400);
+            return of<LoadState>({
               parent: null,
               kittens: [],
-              error: this.i18n.t('error'),
+              error: missing ? '' : this.i18n.t('error'),
+              notFound: missing,
               loaded: true,
-            }),
-          ),
+            });
+          }),
         ),
       ),
     ),
-    { initialValue: { parent: null, kittens: [], error: '', loaded: false } satisfies LoadState },
+    {
+      initialValue: {
+        parent: null,
+        kittens: [],
+        error: '',
+        notFound: false,
+        loaded: false,
+      } satisfies LoadState,
+    },
   );
 
   protected readonly isLoading = computed(() => !this.loadState().loaded);
   protected readonly loadError = computed(() => this.loadState().error);
+  protected readonly notFound = computed(() => this.loadState().notFound);
   protected readonly parent = computed(() => this.loadState().parent);
   protected readonly kittens = computed(() => this.loadState().kittens);
 
@@ -159,6 +223,18 @@ export class ParentComponent {
       : p.nameEn || p.nameUa || '—';
   });
 
+  /**
+   * The breed and colour as words.
+   *
+   * They are read through `taxonomyName` rather than straight off the record
+   * because the API sends a dictionary reference — `{ _id, nameUa, nameEn }` —
+   * where it used to send a bare name. Interpolating that object printed
+   * "[object Object]" on the page. The helper also picks the language and
+   * survives the older string shape, so both deployments read the same.
+   */
+  protected readonly breedName = computed(() => taxonomyName(this.parent()?.breed, this.i18n, '—'));
+  protected readonly colorName = computed(() => taxonomyName(this.parent()?.color, this.i18n, '—'));
+
   protected readonly sexLabel = computed(() => {
     const sex = this.parent()?.sex;
     if (sex === 'female') return this.i18n.t('queen');
@@ -188,16 +264,21 @@ export class ParentComponent {
     });
 
     effect(() => {
+      if (this.notFound()) {
+        this.seo.applyNotFound(`/parents/${this.routeParam()}`);
+        return;
+      }
+
       const parent = this.parent();
       if (!parent) {
         return;
       }
 
       this.seo.applyParent({
-        path: `/parents/${parent._id}`,
+        path: `/parents/${catRouteParam(parent)}`,
         name: this.name(),
-        breed: parent.breed ?? '',
-        color: parent.color ?? '',
+        breed: taxonomyName(parent.breed, this.i18n),
+        color: taxonomyName(parent.color, this.i18n),
         image: this.selectedImage(),
       });
     });
@@ -212,10 +293,11 @@ function mapKittenApiToCard(kitten: KittenApiItem, i18n: I18nService): KittenCar
   const lang = i18n.getLanguage();
   return {
     id: kitten._id,
+    routeParam: catRouteParam(kitten),
     name:
       lang === 'uk' ? kitten.nameUa || kitten.nameEn || '—' : kitten.nameEn || kitten.nameUa || '—',
-    breed: kitten.breed || '—',
-    color: kitten.color || '—',
+    breed: taxonomyName(kitten.breed, i18n, '—'),
+    color: taxonomyName(kitten.color, i18n, '—'),
     gender: kitten.sex === 'male' || kitten.sex === 'female' ? kitten.sex : 'unknown',
     age: formatAgeShort(kitten.birthDay, i18n) ?? '—',
     image:

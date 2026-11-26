@@ -15,6 +15,13 @@
           <li>
             <a [routerLink]="'/kittens' | locPath">{{ 'availableKittensTab' | translate }}</a>
           </li>
+          <!-- The parents page is in the sitemap and indexable, so it needs a
+               link from the site itself: a URL Google is told about but that
+               nothing on the site points at is an orphan, and the catalogue's
+               own parents tab is not the same address. -->
+          <li>
+            <a [routerLink]="'/parents' | locPath">{{ 'ourParentsTab' | translate }}</a>
+          </li>
           <li>
             <a [routerLink]="'/about' | locPath">{{ 'ourStory' | translate }}</a>
           </li>
@@ -90,6 +97,9 @@
 
     <div class="app-footer__bottom">
       <p>© {{ currentYear }} Arlen Fluffy Plush. {{ 'allRightsReserved' | translate }}</p>
+      <p class="app-footer__legal">
+        <a [routerLink]="'/cookies' | locPath">{{ 'cookiePolicy' | translate }}</a>
+      </p>
       <p class="app-footer__made">
         {{ 'madeWith' | translate }}
         <svg

@@ -54,6 +54,27 @@
   letter-spacing: 0.12em;
 }
 
+/* The way back out of a breed page, above its own title. */
+.kittens-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--brand-purple);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--brand-purple);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
 .kittens-hero__title {
   margin: 0;
   font-family: 'Playfair Display', serif;
@@ -68,6 +89,18 @@
   color: var(--text-muted);
   line-height: 1.7;
   font-size: 1.02rem;
+}
+
+/* The cattery's own paragraph about a breed, on the breed's permanent page.
+   Narrower measure and a smaller size than the subtitle above it: it is a
+   paragraph to read rather than a line to glance at. */
+.kittens-hero__intro {
+  margin: 1rem 0 0;
+  max-width: 68ch;
+  color: var(--text-muted);
+  line-height: 1.75;
+  font-size: 0.95rem;
+  text-align: left;
 }
 
 .kittens-hero__stats {
@@ -651,7 +684,9 @@
 }
 
 .state__action {
+  display: inline-block;
   margin-top: 0.5rem;
+  text-decoration: none;
   padding: 0.6rem 1.3rem;
   border: none;
   border-radius: 999px;

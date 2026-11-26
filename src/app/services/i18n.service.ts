@@ -72,10 +72,6 @@ export class I18nService {
       families: 'Families',
       language: 'Language',
 
-      // Pages
-      homeTitle: 'Welcome to Arlen Fluffy Plush',
-      homeDescription: 'Beautiful British Shorthair Kittens',
-
       // Parents page
       parentsTitle: 'Our Parents',
       parentsDescription: 'Meet the beautiful parents of our kittens',
@@ -122,7 +118,12 @@ export class I18nService {
       allColors: 'All colors',
       filterAndSort: 'Filter & Sort',
       filters: 'Filters',
-      filtersActive: 'active filters',
+      /** Read by `plural`, which picks the entry the number calls for. */
+      activeFiltersCount: {
+        one: '{count} active filter',
+        few: '{count} active filters',
+        many: '{count} active filters',
+      },
       view: 'View',
       allKittens: 'All Available Kittens',
       byParents: 'By Families',
@@ -163,7 +164,7 @@ export class I18nService {
       father: 'Father',
       interestedIn: 'Interested in',
       telegramCtaSubtext:
-        "Contact us on Telegram for pricing and adoption details. We're happy to answer any questions.",
+        "Contact us on Telegram for adoption details. We're happy to answer any questions.",
       contactOnTelegram: 'Contact us on Telegram',
 
       // Kittens page hero & tabs
@@ -172,6 +173,24 @@ export class I18nService {
         'Find your perfect fluffy companion from our carefully bred kittens',
       availableKittensTab: 'Available Kittens',
       ourParentsTab: 'Our Parents',
+
+      // Breed tiles & breed pages
+      browseByBreed: 'Choose a breed',
+      allBreedsTile: 'All kittens',
+      allBreedsHint: 'Every breed at once',
+      breedKittens: 'kittens',
+      breedPageSubtitle: 'Kittens of this breed from our cattery, with photos, prices and parents',
+      backToAllKittens: 'All kittens',
+      breedNotFoundTitle: 'This breed does not exist',
+      breedNotFoundText:
+        'The link may be out of date. Pick a breed from the list, or look through every kitten.',
+      kittenNotFoundTitle: 'This kitten is no longer listed',
+      kittenNotFoundText:
+        'It may have found a home, or the link may be out of date. Have a look at the kittens we have now.',
+      parentNotFoundTitle: 'This cat is no longer listed',
+      parentNotFoundText:
+        'The link may be out of date. Have a look at the cats in our cattery now.',
+      noKittensOfBreed: 'No kittens of this breed right now',
       ourQueens: 'Our Queens',
       ourStuds: 'Our Studs',
       noParentsMatchFilter: 'No parents match your filter.',
@@ -182,6 +201,12 @@ export class I18nService {
       kittenCarousel: 'carousel',
       scrollToPreviousKittens: 'Previous kittens',
       scrollToNextKittens: 'Next kittens',
+
+      // Card photo gallery
+      photoGallery: 'photo gallery',
+      previousPhoto: 'Previous photo',
+      nextPhoto: 'Next photo',
+      photoNumber: 'Photo',
       litters: 'Litters',
       loadingKittens: 'Loading kittens',
       filtersApplied: 'filters applied',
@@ -281,7 +306,12 @@ export class I18nService {
         'Meet our queens and studs — the pride of the cattery and the parents of every kitten here.',
       filterBySex: 'Filter by sex',
       showLabel: 'Show',
-      kittensWord: 'kittens',
+      /** Read by `plural`, which picks the entry the number calls for. */
+      kittensCount: {
+        one: '{count} kitten',
+        few: '{count} kittens',
+        many: '{count} kittens',
+      },
       loadErrorTitle: 'Could not load',
       nothingFoundTitle: 'Nobody found',
       nothingFoundText: 'Try a different filter.',
@@ -324,8 +354,7 @@ export class I18nService {
       contacts: 'Contacts',
 
       // Footer
-      footerAbout:
-        'Breeding exceptional fluffy kittens with love and dedication.',
+      footerAbout: 'Breeding exceptional fluffy kittens with love and dedication.',
       quickLinks: 'Quick Links',
       ourStory: 'Our Story',
       contactUs: 'Contact Us',
@@ -333,6 +362,94 @@ export class I18nService {
       allRightsReserved: 'All rights reserved.',
       madeWith: 'Made with',
       forFluffyFriends: 'for fluffy friends',
+      // Cookie notice
+      cookieBannerTitle: 'We use cookies',
+      cookieBannerText:
+        'We use cookies so the site remembers your language, and — only if you agree — so we can see which pages are read most. Refusing keeps the statistics off entirely. What is stored, and for how long, is set out here:',
+      cookieBannerAccept: 'Accept',
+      cookieBannerDecline: 'Necessary only',
+      cookiePolicy: 'Cookie Policy',
+
+      // Cookie policy page
+      cookiesHeroTitle: 'Cookie Policy',
+      cookiesHeroSubtitle:
+        'What the Arlen Fluffy Plush website stores on your device, why it is stored, and how you can remove it at any time.',
+      cookiesUpdated: 'Last updated: 26 November 2026',
+      cookiesWhatTitle: 'What cookies are',
+      cookiesWhatP1:
+        'A cookie is a small text file that a website asks your browser to keep on your device. On the next visit the browser sends it back, which is how a site can recognise the settings you have already chosen without asking again.',
+      cookiesWhatP2:
+        'Cookies are not programs: they cannot read your files, see your other tabs or run anything on your device. The ones this site uses hold a language code, a record that you have read this notice, and anonymous visit statistics.',
+      cookiesListTitle: 'The cookies this site uses',
+      cookiesListP1:
+        'This is the full list. You can check it yourself in your browser’s storage inspector while this page is open.',
+      cookiesTableCaption:
+        'Cookies set by the Arlen Fluffy Plush website, with their group, purpose and lifetime.',
+      cookiesTableName: 'Name',
+      cookiesTableGroup: 'Group',
+      cookiesTablePurpose: 'Purpose',
+      cookiesTableLifetime: 'Lifetime',
+      cookiesGroupNecessary: 'Necessary',
+      cookiesGroupAnalytics: 'Analytics',
+      cookieLanguagePurpose:
+        'Remembers the language you chose, so a link without a language prefix opens in it.',
+      cookieConsentPurpose:
+        'Remembers your answer to this notice, so it is not shown on every page.',
+      cookieGaPurpose:
+        'Google Analytics: tells one browser from another, so visits are not counted twice.',
+      cookieGaSessionPurpose: 'Google Analytics: keeps the state of the current visit.',
+      cookieGidPurpose: 'Google Analytics: groups the page views of one visit over a day.',
+      cookieLife1Year: '1 year',
+      cookieLife2Years: '2 years',
+      cookieLife24Hours: '24 hours',
+      cookiesNecessaryDesc:
+        'These two are set by the site itself and carry no identifier of you — only a language code, and the word “accepted” or “declined”. Without them the site would forget your language on every page and would show this notice again each time.',
+      cookiesAnalyticsDesc:
+        'Analytics cookies are set by Google Analytics 4, which the site loads through Google Tag Manager — and only once you have accepted. Until then, and for good if you refuse, the tag manager is never requested at all: no script is fetched from Google, no analytics cookie is created and no event is sent. Once on, they report aggregated statistics: how many people opened a page, which kittens are looked at, how far a page is read. We use them to see which parts of the cattery’s site are useful and which are not. We do not use them for advertising, and we do not sell this data.',
+      cookiesStorageNote:
+        'Besides cookies, the site keeps two values in your browser’s local storage: the language code and your answer to this notice. They stay on your device, are never sent to a server, and clearing the site’s data removes them — which is also what brings this notice back.',
+      // The consent controls on the policy page. Withdrawing has to be as
+      // easy as giving consent was, so the page carries the same two answers
+      // the notice does rather than only instructions for the browser.
+      cookiesConsentTitle: 'Your choice, and how to change it',
+      cookiesConsentP1:
+        'Your answer to the cookie notice is recorded in this browser, and you can change it here at any time — withdrawing is one click, exactly as accepting was. Refusing also deletes any Google Analytics cookies an earlier visit left behind.',
+      cookiesConsentStatusLabel: 'Current choice',
+      cookiesConsentStateAccepted: 'Analytics cookies accepted.',
+      cookiesConsentStateDeclined: 'Necessary cookies only. Analytics is off.',
+      cookiesConsentStateUnanswered: 'Not answered yet — analytics is off until you accept.',
+      cookiesConsentAccept: 'Accept analytics cookies',
+      cookiesConsentWithdraw: 'Withdraw consent',
+      cookiesConsentDecline: 'Necessary only',
+      cookiesThirdPartyTitle: 'Third-party services',
+      cookiesThirdPartyP1:
+        'Some of the cookies above are set not by us but by the services the site loads:',
+      cookiesThirdPartyGoogle:
+        'Google Analytics 4 and Google Tag Manager (Google Ireland Limited) — visit statistics. Google describes its own cookies at',
+      cookiesThirdPartyFonts:
+        'Google Fonts — the typefaces the site is set in. It serves font files and sets no cookies of its own.',
+      cookiesThirdPartyP2:
+        'Links from this site to Instagram, TikTok or Telegram open those services in a new tab. What they store on your device is governed by their own policies, not by this one.',
+      cookiesLegalTitle: 'Legal basis',
+      cookiesLegalP1:
+        'The necessary cookies are set because the site cannot give you what you asked for without them — a page in the language you chose, and a notice that does not keep reappearing.',
+      cookiesLegalP2:
+        'Analytics cookies rest on your consent, and nothing analytical happens without it. The notice at the bottom of the page offers both answers: “Accept” turns the statistics on, “Necessary only” leaves them off and clears any analytics cookies an earlier visit left behind. You can withdraw an acceptance at any time, on this page, with the button above — it takes the same single click that giving it did, and no browser settings are involved. If you are in the EU or the EEA, the GDPR applies to you; in Ukraine, the Law of Ukraine “On the Protection of Personal Data” applies.',
+      cookiesManageTitle: 'How to manage or remove cookies',
+      cookiesManageP1:
+        'You do not need any of this to withdraw your consent — the button above does that. But every browser can also show, delete and block cookies, for one site or for all of them, and clearing this site’s data resets everything at once: the notice comes back on your next visit, and the site forgets your language choice as well:',
+      cookiesManageChrome: 'Chrome: Settings → Privacy and security → Third-party cookies.',
+      cookiesManageSafari: 'Safari: Settings → Privacy → Manage Website Data.',
+      cookiesManageFirefox: 'Firefox: Settings → Privacy & Security → Cookies and Site Data.',
+      cookiesManageEdge: 'Edge: Settings → Cookies and site permissions.',
+      cookiesManageP2:
+        'Blocking cookies entirely does not stop you using the site: the catalogue, the photos and the contact details all work without them. Only your language choice, and your answer to this notice, will not be remembered between visits.',
+      cookiesChangesTitle: 'Changes to this policy',
+      cookiesChangesP1:
+        'If the set of cookies the site uses changes, this page changes with it and the date at the top is updated. Please look at it again from time to time.',
+      cookiesContactTitle: 'Questions',
+      cookiesContactP1:
+        'Write to us if anything here is unclear, or if you want to know what has been stored about your visit:',
 
       // About page
       aboutHeroTitle: 'Our Story',
@@ -345,7 +462,8 @@ export class I18nService {
         'Since September 2016 we have been officially registered as a cattery with the World Cat Federation (WCF) under the name Arlen Fluffy Plush. In 2021 we discovered the wonderful Ragdoll breed, and since then working with these royal cats has been the main focus of our cattery. Today we work with several breeds, but the Ragdolls remain our heart.',
       aboutIntroP3:
         'For our family this is not just a favourite pursuit — it is part of our life. The birth of every new litter of kittens is a true celebration for us, one we await with great excitement and impatience.',
-      aboutIntroImageAlt: 'A bright cattery room with a cat tree, wall shelves and beds, where Ragdoll cats play on a rug',
+      aboutIntroImageAlt:
+        'A bright cattery room with a cat tree, wall shelves and beds, where Ragdoll cats play on a rug',
       coreValues: 'Our Core Values',
       valueLoveTitle: 'Love & Care',
       valueLoveDesc:
@@ -383,8 +501,7 @@ export class I18nService {
       readiness1Desc:
         'From birth the little ones get used to people, to the sounds of the house and to being petted, so they grow up very sociable, hand-raised and trusting.',
       readiness2Title: 'Health and protection',
-      readiness2Desc:
-        'Kittens move to their new families fully vaccinated and microchipped.',
+      readiness2Desc: 'Kittens move to their new families fully vaccinated and microchipped.',
       readiness3Title: 'Official set of documents',
       readiness3Desc:
         'Together with the kitten you receive a complete set: a pedigree, a club transfer and an veterinary passport.',
@@ -429,6 +546,13 @@ export class I18nService {
       openPhotoFullscreen: 'Open photo full screen',
       galleryThumbnails: 'Photo thumbnails',
 
+      // Kitten video
+      video: 'Video',
+      videoPlay: 'Play the video about {label}',
+      videoTitle: 'Video about {label}',
+      viewerGoToVideo: 'Go to the video',
+      videoWatchOnYoutube: 'Watch on YouTube',
+
       // Kitten fallbacks
       kittenFallbackName: 'Kitten',
       kittenLoadError: 'Failed to load kitten data.',
@@ -446,10 +570,6 @@ export class I18nService {
       kittens: 'Кошенята',
       families: 'Сім’ї',
       language: 'Мова',
-
-      // Pages
-      homeTitle: 'Ласкаво просимо до Arlen Fluffy Plush',
-      homeDescription: 'Прекрасні британські короткошерсті кошенята',
 
       // Parents page
       parentsTitle: 'Наші батьки',
@@ -497,7 +617,12 @@ export class I18nService {
       allColors: 'Усі кольори',
       filterAndSort: 'Фільтр і сортування',
       filters: 'Фільтри',
-      filtersActive: 'активних фільтрів',
+      /** Read by `plural`, which picks the entry the number calls for. */
+      activeFiltersCount: {
+        one: '{count} активний фільтр',
+        few: '{count} активні фільтри',
+        many: '{count} активних фільтрів',
+      },
       view: 'Вигляд',
       allKittens: 'Усі доступні кошенята',
       byParents: 'За сім’ями',
@@ -538,7 +663,7 @@ export class I18nService {
       father: 'Тато',
       interestedIn: 'Зацікавилися',
       telegramCtaSubtext:
-        'Напишіть нам у Telegram, щоб дізнатися ціну та деталі. Ми залюбки відповімо на всі запитання.',
+        'Напишіть нам у Telegram, щоб дізнатися деталі. Ми залюбки відповімо на всі запитання.',
       contactOnTelegram: 'Написати в Telegram',
 
       // Kittens page hero & tabs
@@ -547,6 +672,24 @@ export class I18nService {
         'Знайдіть ідеального пухнастого друга з-поміж наших дбайливо вирощених кошенят',
       availableKittensTab: 'Доступні кошенята',
       ourParentsTab: 'Наші батьки',
+
+      // Breed tiles & breed pages
+      browseByBreed: 'Оберіть породу',
+      allBreedsTile: 'Усі кошенята',
+      allBreedsHint: 'Усі породи разом',
+      breedKittens: 'кошенят',
+      breedPageSubtitle: 'Кошенята цієї породи з нашого розплідника — фото, ціни та батьки кожного',
+      backToAllKittens: 'Усі кошенята',
+      breedNotFoundTitle: 'Такої породи не існує',
+      breedNotFoundText:
+        'Можливо, посилання застаріло. Оберіть породу зі списку або подивіться всіх кошенят.',
+      kittenNotFoundTitle: 'Це кошеня більше не в каталозі',
+      kittenNotFoundText:
+        'Можливо, воно вже знайшло дім або посилання застаріло. Подивіться кошенят, які є зараз.',
+      parentNotFoundTitle: 'Цього кота більше не в каталозі',
+      parentNotFoundText:
+        'Можливо, посилання застаріло. Подивіться котів нашого розплідника зараз.',
+      noKittensOfBreed: 'Зараз немає кошенят цієї породи',
       ourQueens: 'Наші мами',
       ourStuds: 'Наші тата',
       noParentsMatchFilter: 'Немає батьків, що відповідають фільтру.',
@@ -557,6 +700,12 @@ export class I18nService {
       kittenCarousel: 'карусель',
       scrollToPreviousKittens: 'Попередні кошенята',
       scrollToNextKittens: 'Наступні кошенята',
+
+      // Card photo gallery
+      photoGallery: 'фотогалерея',
+      previousPhoto: 'Попереднє фото',
+      nextPhoto: 'Наступне фото',
+      photoNumber: 'Фото',
       litters: 'Послідів',
       loadingKittens: 'Завантажуємо кошенят',
       filtersApplied: 'фільтрів активно',
@@ -574,7 +723,8 @@ export class I18nService {
       homeHeroTitleTail: 'Це родина.',
       homeHeroDescription:
         'Ми вирощуємо кошенят, які стають повноправними членами родини — гріють холодні вечори, слухають ваші історії й перетворюють квартиру на справжній дім.',
-      homeHeroImageAlt: 'Пухнастий кіт рагдол відпочиває на сонячному підвіконні у затишній вітальні',
+      homeHeroImageAlt:
+        'Пухнастий кіт рагдол відпочиває на сонячному підвіконні у затишній вітальні',
       homeHeroPrimaryCta: 'Познайомитись із кошенятами',
       homeHeroSecondaryCta: 'Про розплідник',
       homeHeroPillTitle: 'Усі кошенята соціалізовані',
@@ -656,7 +806,12 @@ export class I18nService {
         'Познайомтеся з нашими кішками та котами — гордістю розплідника й батьками всіх малюків.',
       filterBySex: 'Фільтрація за статтю',
       showLabel: 'Показати',
-      kittensWord: 'кошенят',
+      /** Read by `plural`, which picks the entry the number calls for. */
+      kittensCount: {
+        one: '{count} кошеня',
+        few: '{count} кошенята',
+        many: '{count} кошенят',
+      },
       loadErrorTitle: 'Помилка завантаження',
       nothingFoundTitle: 'Нікого не знайдено',
       nothingFoundText: 'Спробуйте вибрати інший фільтр.',
@@ -699,8 +854,7 @@ export class I18nService {
       contacts: 'Контакти',
 
       // Footer
-      footerAbout:
-        'Розводимо виняткових пухнастих кошенят із любов’ю та відданістю.',
+      footerAbout: 'Розводимо виняткових пухнастих кошенят із любов’ю та відданістю.',
       quickLinks: 'Швидкі посилання',
       ourStory: 'Наша історія',
       contactUs: 'Зв’язатися з нами',
@@ -708,11 +862,103 @@ export class I18nService {
       allRightsReserved: 'Усі права захищені.',
       madeWith: 'Зроблено з',
       forFluffyFriends: 'для пухнастих друзів',
+      // Cookie notice
+      cookieBannerTitle: 'Ми використовуємо файли cookie',
+      cookieBannerText:
+        'Ми використовуємо cookie, щоб сайт пам’ятав вашу мову, і — лише за вашої згоди — щоб бачити, які сторінки читають найчастіше. Якщо відмовитесь, статистика не увімкнеться взагалі. Що саме зберігається і на який час — описано тут:',
+      cookieBannerAccept: 'Прийняти',
+      cookieBannerDecline: 'Лише необхідні',
+      cookiePolicy: 'Політика cookie',
+
+      // Cookie policy page
+      cookiesHeroTitle: 'Політика використання файлів cookie',
+      cookiesHeroSubtitle:
+        'Що сайт Arlen Fluffy Plush зберігає на вашому пристрої, для чого саме і як це можна видалити будь-коли.',
+      cookiesUpdated: 'Останнє оновлення: 26 листопада 2026 року',
+      cookiesWhatTitle: 'Що таке cookie',
+      cookiesWhatP1:
+        'Cookie — це невеликий текстовий файл, який сайт просить ваш браузер зберегти на пристрої. Під час наступного візиту браузер надсилає його назад, і саме так сайт впізнає налаштування, які ви вже обрали, і не питає про них удруге.',
+      cookiesWhatP2:
+        'Cookie не є програмами: вони не читають ваших файлів, не бачать інших вкладок і нічого не запускають на пристрої. Ті, що використовує цей сайт, зберігають код мови, відмітку про прочитане повідомлення та анонімну статистику відвідувань.',
+      cookiesListTitle: 'Які cookie використовує цей сайт',
+      cookiesListP1:
+        'Це повний перелік. Ви можете перевірити його самостійно в інспекторі сховища свого браузера, поки ця сторінка відкрита.',
+      cookiesTableCaption:
+        'Файли cookie сайту Arlen Fluffy Plush: група, призначення та термін зберігання.',
+      cookiesTableName: 'Назва',
+      cookiesTableGroup: 'Група',
+      cookiesTablePurpose: 'Призначення',
+      cookiesTableLifetime: 'Термін',
+      cookiesGroupNecessary: 'Необхідні',
+      cookiesGroupAnalytics: 'Аналітичні',
+      cookieLanguagePurpose:
+        'Запам’ятовує обрану вами мову, щоб посилання без мовного префікса відкривалося саме нею.',
+      cookieConsentPurpose:
+        'Запам’ятовує вашу відповідь на це повідомлення, щоб воно не з’являлося на кожній сторінці.',
+      cookieGaPurpose:
+        'Google Analytics: відрізняє один браузер від іншого, щоб візити не рахувалися двічі.',
+      cookieGaSessionPurpose: 'Google Analytics: зберігає стан поточного візиту.',
+      cookieGidPurpose:
+        'Google Analytics: об’єднує перегляди сторінок одного візиту протягом доби.',
+      cookieLife1Year: '1 рік',
+      cookieLife2Years: '2 роки',
+      cookieLife24Hours: '24 години',
+      cookiesNecessaryDesc:
+        'Ці два файли встановлює сам сайт, і вони не містять жодного ідентифікатора вас — лише код мови та слово «прийнято» або «відмовлено». Без них сайт забував би вашу мову на кожній сторінці й показував би це повідомлення щоразу.',
+      cookiesAnalyticsDesc:
+        'Аналітичні cookie встановлює Google Analytics 4, який сайт завантажує через Google Tag Manager — і лише після того, як ви прийняли повідомлення. До того, а в разі відмови — й зовсім, тег-менеджер не завантажується взагалі: жоден скрипт із Google не запитується, жоден аналітичний cookie не створюється і жодна подія не надсилається. Увімкнені, вони дають узагальнену статистику: скільки людей відкрили сторінку, яких кошенят дивляться, наскільки далеко читають сторінку. Ми використовуємо це, щоб бачити, які частини сайту розплідника корисні, а які — ні. Для рекламного таргетингу ми їх не використовуємо і цих даних не продаємо.',
+      cookiesStorageNote:
+        'Крім cookie, сайт зберігає у локальному сховищі браузера два значення: код мови та вашу відповідь на це повідомлення. Вони залишаються лише на вашому пристрої, не надсилаються на сервер, і очищення даних сайту видаляє їх — саме це й повертає це повідомлення.',
+      // Елементи керування згодою на самій сторінці політики: відкликати згоду
+      // має бути так само просто, як її надати, тому тут ті самі дві відповіді,
+      // що й у повідомленні, а не лише інструкції для браузера.
+      cookiesConsentTitle: 'Ваш вибір і як його змінити',
+      cookiesConsentP1:
+        'Ваша відповідь на повідомлення про cookie зберігається в цьому браузері, і ви можете змінити її тут будь-коли — відкликати згоду так само просто, як було її надати. Відмова також видаляє аналітичні cookie Google, якщо вони залишилися від попереднього візиту.',
+      cookiesConsentStatusLabel: 'Поточний вибір',
+      cookiesConsentStateAccepted: 'Аналітичні cookie прийнято.',
+      cookiesConsentStateDeclined: 'Лише необхідні cookie. Аналітика вимкнена.',
+      cookiesConsentStateUnanswered:
+        'Відповіді ще немає — аналітика вимкнена, доки ви не приймете її.',
+      cookiesConsentAccept: 'Прийняти аналітичні cookie',
+      cookiesConsentWithdraw: 'Відкликати згоду',
+      cookiesConsentDecline: 'Лише необхідні',
+      cookiesThirdPartyTitle: 'Сторонні сервіси',
+      cookiesThirdPartyP1:
+        'Частину cookie з таблиці вище встановлюємо не ми, а сервіси, які завантажує сайт:',
+      cookiesThirdPartyGoogle:
+        'Google Analytics 4 і Google Tag Manager (Google Ireland Limited) — статистика відвідувань. Власні cookie Google описані тут:',
+      cookiesThirdPartyFonts:
+        'Google Fonts — шрифти, якими набрано сайт. Сервіс віддає файли шрифтів і власних cookie не встановлює.',
+      cookiesThirdPartyP2:
+        'Посилання з цього сайту на Instagram, TikTok чи Telegram відкривають ці сервіси в новій вкладці. Те, що вони зберігають на вашому пристрої, регулюється їхніми власними політиками, а не цією.',
+      cookiesLegalTitle: 'Правова підстава',
+      cookiesLegalP1:
+        'Необхідні cookie встановлюються тому, що без них сайт не може дати саме те, про що ви попросили — сторінку обраною мовою та повідомлення, яке не з’являється знову і знову.',
+      cookiesLegalP2:
+        'Аналітичні cookie ґрунтуються на вашій згоді, і без неї жодна аналітика не працює. Повідомлення внизу сторінки пропонує дві відповіді: «Прийняти» вмикає статистику, а «Лише необхідні» залишає її вимкненою й очищає аналітичні cookie, якщо вони залишилися від попереднього візиту. Надану згоду можна відкликати будь-коли — кнопкою вище на цій самій сторінці, одним кліком, так само як її було надано, без жодних налаштувань браузера. Якщо ви перебуваєте в ЄС або ЄЕЗ, до вас застосовується GDPR; в Україні — Закон України «Про захист персональних даних».',
+      cookiesManageTitle: 'Як керувати cookie або видалити їх',
+      cookiesManageP1:
+        'Щоб відкликати згоду, нічого з цього не потрібно — для цього є кнопка вище. Але кожен браузер також уміє показувати, видаляти та блокувати cookie — окремо для сайту або для всіх сайтів, а очищення даних цього сайту скидає все разом: повідомлення з’явиться знову при наступному візиті, а сайт забуде й вибір мови:',
+      cookiesManageChrome:
+        'Chrome: Налаштування → Конфіденційність і безпека → Сторонні файли cookie.',
+      cookiesManageSafari:
+        'Safari: Налаштування → Конфіденційність → Керувати даними сайтів.',
+      cookiesManageFirefox:
+        'Firefox: Налаштування → Приватність і захист → Куки та дані сайтів.',
+      cookiesManageEdge: 'Edge: Налаштування → Файли cookie та дозволи сайтів.',
+      cookiesManageP2:
+        'Повне блокування cookie не заважає користуватися сайтом: каталог, фотографії та контакти працюють і без них. Не збережеться лише вибір мови та ваша відповідь на це повідомлення між візитами.',
+      cookiesChangesTitle: 'Зміни до цієї політики',
+      cookiesChangesP1:
+        'Якщо набір cookie на сайті зміниться, ця сторінка зміниться разом із ним, а дату вгорі буде оновлено. Радимо час від часу зазирати сюди знову.',
+      cookiesContactTitle: 'Питання',
+      cookiesContactP1:
+        'Напишіть нам, якщо щось тут незрозуміло або якщо ви хочете дізнатися, що саме збережено про ваш візит:',
 
       // About page
       aboutHeroTitle: 'Наша історія',
-      aboutHeroSubtitle:
-        'Подорож пристрасті, відданості та любові до виняткових пухнастих кошенят',
+      aboutHeroSubtitle: 'Подорож пристрасті, відданості та любові до виняткових пухнастих кошенят',
       aboutIntroTitle: 'Досконалість у розведенні з 2010 року',
       aboutIntroP1:
         'Наша історія розпочалася ще у 2010 році, коли в нашому домі з’явилася перша шотландська прямовуха кішка. Саме з неї зародилася наша велика любов, захоплення та професійний шлях у світі котів.',
@@ -720,7 +966,8 @@ export class I18nService {
         'З вересня 2016 року ми офіційно зареєстровані як розплідник у Всесвітній федерації котів (WCF) під назвою Arlen Fluffy Plush. У 2021 році ми відкрили для себе дивовижну породу регдол, і з того часу робота з цими королівськими котами стала основним напрямком нашого розплідника. Сьогодні ми працюємо з кількома породами, але регдоли залишаються головними.',
       aboutIntroP3:
         'Для нашої родини це не просто улюблена справа — це частина нашого життя. Народження кожного нового помету кошенят для нас — це справжнє свято, на яке ми чекаємо з великим трепетом і нетерпінням.',
-      aboutIntroImageAlt: 'Світла кімната розплідника з ігровим комплексом, полицями та лежанками, де на килимі граються коти рагдол',
+      aboutIntroImageAlt:
+        'Світла кімната розплідника з ігровим комплексом, полицями та лежанками, де на килимі граються коти рагдол',
       coreValues: 'Наші цінності',
       valueLoveTitle: 'Любов та турбота',
       valueLoveDesc:
@@ -802,6 +1049,13 @@ export class I18nService {
       photo: 'Фото',
       openPhotoFullscreen: 'Відкрити фото на весь екран',
       galleryThumbnails: 'Мініатюри фото',
+
+      // Kitten video
+      video: 'Відео',
+      videoPlay: 'Подивитися відео про {label}',
+      videoTitle: 'Відео про {label}',
+      viewerGoToVideo: 'Перейти до відео',
+      videoWatchOnYoutube: 'Дивитися на YouTube',
 
       // Kitten fallbacks
       kittenFallbackName: 'Кошеня',
@@ -973,6 +1227,62 @@ export class I18nService {
   t(key: string, params?: Readonly<Record<string, string | number>>): string {
     return this.translate(key, params);
   }
+
+  /**
+   * A counted phrase in the form the number calls for, with `{count}` already
+   * filled in: `plural('kittensCount', 1)` reads "1 кошеня" and
+   * `plural('kittensCount', 5)` reads "5 кошенят".
+   *
+   * The count cannot simply be pasted in front of a noun. Ukrainian puts that
+   * noun in three different forms depending on the number — одне кошеня, два
+   * кошенята, п'ять кошенят — and English in two, so a template that writes
+   * `{{ count }} {{ t('kittens') }}` is wrong for most numbers in both
+   * languages. The whole phrase therefore belongs to the translation, under a
+   * key that holds one entry per form.
+   */
+  plural(
+    key: string,
+    count: number,
+    params?: Readonly<Record<string, string | number>>,
+  ): string {
+    return this.translate(`${key}.${pluralCategory(count, this.language())}`, {
+      count,
+      ...params,
+    });
+  }
+}
+
+/** The grammatical forms a counted phrase is written in. */
+type PluralCategory = 'one' | 'few' | 'many';
+
+/**
+ * Which form a number calls for.
+ *
+ * Ukrainian follows the usual East Slavic rule — `one` for numbers ending in
+ * 1 but not 11, `few` for those ending in 2 to 4 but not 12 to 14, `many` for
+ * the rest. English has only a singular and a plural, so it answers `one` or
+ * `many` and never `few`; the `few` entry is still written for it, which keeps
+ * every phrase complete in both languages.
+ */
+function pluralCategory(count: number, language: Language): PluralCategory {
+  const value = Math.abs(Math.trunc(count));
+
+  if (language === 'en') {
+    return value === 1 ? 'one' : 'many';
+  }
+
+  const lastDigit = value % 10;
+  const lastTwo = value % 100;
+
+  if (lastDigit === 1 && lastTwo !== 11) {
+    return 'one';
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4 && (lastTwo < 12 || lastTwo > 14)) {
+    return 'few';
+  }
+
+  return 'many';
 }
 
 /** Replaces every `{name}` a phrase declares with the value given for it. */

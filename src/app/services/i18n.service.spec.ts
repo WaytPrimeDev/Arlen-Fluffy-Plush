@@ -110,6 +110,53 @@ describe('I18nService', () => {
     }
   });
 
+  it('declines a counted noun through all three Ukrainian forms', () => {
+    const i18n = service();
+    i18n.setLanguage('uk');
+
+    const counted = (count: number) => i18n.plural('kittensCount', count);
+
+    // One, two-to-four, five-and-up — and the teens, which look like the
+    // first two groups but take the third form.
+    expect(counted(1)).toBe('1 кошеня');
+    expect(counted(2)).toBe('2 кошенята');
+    expect(counted(4)).toBe('4 кошенята');
+    expect(counted(5)).toBe('5 кошенят');
+    expect(counted(0)).toBe('0 кошенят');
+    expect(counted(11)).toBe('11 кошенят');
+    expect(counted(12)).toBe('12 кошенят');
+    expect(counted(14)).toBe('14 кошенят');
+    expect(counted(21)).toBe('21 кошеня');
+    expect(counted(22)).toBe('22 кошенята');
+    expect(counted(25)).toBe('25 кошенят');
+  });
+
+  it('uses the English singular for one and the plural for everything else', () => {
+    const i18n = service();
+    i18n.setLanguage('en');
+
+    expect(i18n.plural('kittensCount', 1)).toBe('1 kitten');
+    expect(i18n.plural('kittensCount', 2)).toBe('2 kittens');
+    expect(i18n.plural('kittensCount', 0)).toBe('0 kittens');
+    expect(i18n.plural('kittensCount', 21)).toBe('21 kittens');
+  });
+
+  it('has every form of every counted phrase in both languages', () => {
+    const i18n = service();
+    const keys = ['kittensCount', 'activeFiltersCount'];
+
+    for (const language of LANGUAGES) {
+      i18n.setLanguage(language);
+      for (const key of keys) {
+        for (const count of [1, 2, 5]) {
+          // plural() echoes the key path back when a form is missing.
+          expect(i18n.plural(key, count)).toContain(String(count));
+          expect(i18n.plural(key, count)).not.toContain(key);
+        }
+      }
+    }
+  });
+
   it('remembers the choice in a cookie so the server can read it', () => {
     const i18n = service();
 

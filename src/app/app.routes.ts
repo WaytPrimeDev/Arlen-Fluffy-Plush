@@ -21,6 +21,16 @@ const localizedRoutes: Routes = [
       import('./pages/kittens/kittens.component').then((m) => m.KittensComponent),
   },
   {
+    /**
+     * A breed's own listing, rendered by the kittens page: same catalogue,
+     * scoped to one breed by the slug in the URL. It declares no `seo` key
+     * because the component names the page itself, once the breed has loaded.
+     */
+    path: 'breeds/:slug',
+    loadComponent: () =>
+      import('./pages/kittens/kittens.component').then((m) => m.KittensComponent),
+  },
+  {
     path: 'kittens/:id',
     loadComponent: () => import('./pages/kitten/kitten.component').then((m) => m.KittenComponent),
   },
@@ -44,6 +54,12 @@ const localizedRoutes: Routes = [
     data: { seo: 'contacts' },
     loadComponent: () =>
       import('./pages/contacts/contacts.component').then((m) => m.ContactsComponent),
+  },
+  {
+    path: 'cookies',
+    data: { seo: 'cookies' },
+    loadComponent: () =>
+      import('./pages/cookies/cookies.component').then((m) => m.CookiesComponent),
   },
   {
     // Must stay inside the language subtree. Without it an unknown path such as
